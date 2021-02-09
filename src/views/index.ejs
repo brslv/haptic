@@ -152,10 +152,8 @@
 
     joinBtn.addEventListener('click', function joinBtnClick() {
         emailInput.classList.add('shake')
-        setTimeout(() => emailInput.focus(), 0)
-        setTimeout(function () {
-            emailInput.classList.remove('shake')
-        }, 3000)
+        setTimeout(function () { emailInput.focus() }, 0)
+        setTimeout(function () { emailInput.classList.remove('shake') }, 3000)
     })
   })
 </script>
