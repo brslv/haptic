@@ -1,0 +1,30 @@
+<!doctype html>
+<html class="no-js" lang="en" id="html">
+<head id="head">
+    <meta charset="utf-8">
+    <title><%= meta.title %></title>
+    <meta name="description" content="<%= meta.description %>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <% if (meta.og.title) { %>
+        <meta property="og:title" content="<%= meta.og.title %>">
+    <% } %>
+    <% if (meta.og.description) { %>
+        <meta property="og:type" content="<%= meta.og.description %>">
+    <% } %>
+    <% if (meta.og.url) { %>
+        <meta property="og:type" content="<%= meta.og.url %>">
+    <% } %>
+    <% if (meta.og.image) { %>
+        <meta property="og:type" content="<%= meta.og.image %>">
+    <% } %>
+
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="apple-touch-icon" href="icon.png">
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="/static/assets/css/styles.css">
+    <meta name="theme-color" content="#fafafa">
+</head>
+<body class="dark:bg-gray-800" id="body">
+    <div class="text-gray-800 dark:text-gray-200" id="root">
