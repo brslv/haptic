@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en" id="html">
+<html lang="en" id="html">
 <head id="head">
     <meta charset="utf-8">
     <title><%= meta.title %></title>
@@ -10,21 +10,27 @@
         <meta property="og:title" content="<%= meta.og.title %>">
     <% } %>
     <% if (meta.og.description) { %>
-        <meta property="og:type" content="<%= meta.og.description %>">
+        <meta property="og:description" content="<%= meta.og.description %>">
+    <% } else { %>
+        <meta property="og:description" content="<% meta.description %>"
     <% } %>
     <% if (meta.og.url) { %>
-        <meta property="og:type" content="<%= meta.og.url %>">
+        <meta property="og:url" content="<%= meta.og.url %>">
     <% } %>
     <% if (meta.og.image) { %>
-        <meta property="og:type" content="<%= meta.og.image %>">
+        <meta property="og:image" content="<%= meta.og.image %>">
+    <% } %>
+    <% if (meta.twitter && meta.twitter.twitter_card) { %>
+        <meta property="twitter:card" content="<% meta.twitter.twitter_card %>">
+    <% } else { %>
+        <meta property="twitter:card" content="summary_large_image">
     <% } %>
 
-    <link rel="manifest" href="site.webmanifest">
-    <link rel="apple-touch-icon" href="icon.png">
-    <!-- Place favicon.ico in the root directory -->
 
-    <link rel="stylesheet" href="/static/assets/css/styles.css">
-    <meta name="theme-color" content="#fafafa">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="icon" href="/static/images/icon.ico">
+    <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body class="dark:bg-gray-800" id="body">
     <div class="text-gray-800 dark:text-gray-200" id="root">
