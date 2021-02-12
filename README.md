@@ -8,6 +8,7 @@ Setup .env file, based on the `.env.example`.
 
 - Run `npm install`
 - Run `npm run css:prod`
+- Run `knex migrate:up`
 - Run `npm start`
 
 That's it.
