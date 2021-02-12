@@ -48,6 +48,10 @@ const defaultMetas = {
     title: "Haptic - The #BuildInPublic toolkit for your next big thing",
     image: "https://haptic.so/static/images/landing/social-img.png",
   },
+  twitter: {
+    image: "https://haptic.so/static/images/landing/social-img.png",
+    image_alt: "Haptic.so social media sharing image",
+  },
 };
 
 // helpers
