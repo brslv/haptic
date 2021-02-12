@@ -13,17 +13,17 @@
     <% if (meta.og.description) { %>
         <meta property="og:description" content="<%= meta.og.description %>">
     <% } else { %>
-        <meta property="og:description" content="<%= meta.description %>"
+        <meta property="og:description" content="<%= meta.description %>">
     <% } %>
-    
+
     <% if (meta.og.url) { %>
         <meta property="og:url" content="<%= meta.og.url %>">
     <% } %>
 
     <% if (meta.og.image) { %>
-        <meta property="og:image" content="<%= meta.og.image %>">
+        <meta property="og:image" content="<%- meta.og.image %>">
     <% } %>
-    
+
     <% if (meta.twitter && meta.twitter.twitter_card) { %>
         <meta property="twitter:card" content="<%= meta.twitter.twitter_card %>">
     <% } else { %>
