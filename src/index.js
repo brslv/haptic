@@ -39,27 +39,33 @@ app.use(
 // setup db
 const db = knex(isProd ? dbConfig.production : dbConfig.development);
 
+// default meta for views
+const defaultMetas = {
+  title: "Haptic - The #BuildInPublic toolkit for your next big thing",
+  description:
+    "Build, test and learn in public. Get feedback for your product from your audience and grow beyond their expectations.",
+  og: {
+    title: "Haptic - The #BuildInPublic toolkit for your next big thing",
+    image: "/static/images/landing/social-img.png",
+  },
+};
+
+// helpers
+const isAjaxCall = (req) =>
+  req.headers["accept"] && req.headers["accept"].includes("application/json");
+const ajaxOnly = (req, res, next) => {
+  if (isAjaxCall(req)) next();
+  else res.status(400).end("400 Bad Request");
+};
+
 // setup routes
 app.get("/", (req, res) => {
   res.render("index", {
-    meta: {
-      title: "Haptic - The #BuildInPublic toolkit for your next big thing",
-      description:
-        "Build, test and learn in public. Get feedback for your product from your audience and grow beyond their expectations.",
-      og: {
-        title: "Haptic - The #BuildInPublic toolkit for your next big thing",
-        image: "/static/images/landing/social-img.png",
-      },
-    },
+    meta: defaultMetas,
   });
 });
 
 // ajax routes
-const ajaxOnly = (req, res, next) => {
-  if (req.headers) next();
-  else res.status(400).end("400 Bad Request");
-};
-
 app.post("/sub", ajaxOnly, express.json(), (req, res) => {
   db("subs")
     .insert({
@@ -78,7 +84,24 @@ app.post("/sub", ajaxOnly, express.json(), (req, res) => {
         res
           .status(400)
           .json({ ok: 0, err: "Email already used. 😱", details: null });
+
+      next(err);
     });
+});
+
+// error handler
+app.use((err, req, res, next) => {
+  console.log("An error occurred.", err);
+  if (res.headersSent) return next(err);
+  if (isAjaxCall(req))
+    return res.json({
+      ok: 0,
+      err:
+        "Something went wrong. 😱 Please, write to me in twitter to resolve this issue for you.",
+      details: { err },
+    });
+  res.status(500);
+  res.render("error", { error: err, meta: defaultMetas });
 });
 
 // run this bad boy!

@@ -42,12 +42,18 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       axios
         .post("/sub", values)
         .then(function handleSubResponse(result) {
-          var succMsg = result.data.details.msg;
-          formMsg.innerHTML = `<span class="py-2 px-4 text-white bg-green-500 rounded-full">${succMsg}</span>`;
+          var msg;
+          if (result.data.ok) {
+            msg = result.data.details.msg;
+            formMsg.innerHTML = `<span class="py-2 px-4 text-white bg-green-500 rounded-full">${msg}</span>`;
+          } else {
+            msg = result.data.err;
+            formMsg.innerHTML = `<span class="py-2 px-4 text-white bg-red-400 rounded-full">${msg}</span>`;
+          }
         })
         .catch(function handleSubError(err) {
-          var errMsg = err.response.data.err;
-          formMsg.innerHTML = `<span class="py-2 px-4 text-white bg-red-400 rounded-full">${errMsg}</span>`;
+          var msg = err.response.data.err;
+          formMsg.innerHTML = `<span class="py-2 px-4 text-white bg-red-400 rounded-full">${msg}</span>`;
         });
     } else {
       formMsg.innerHTML = `<span class="py-2 px-4 text-white bg-yellow-400 rounded-full">Is that even an email? 🤔</span>`;
