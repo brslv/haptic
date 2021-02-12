@@ -28,6 +28,7 @@ app.use(
         "script-src": [
           "'self'",
           "cdnjs.cloudflare.com",
+          "googletagmanager.com"
           "fonts.gstatic.com",
           "fonts.googleapis.com",
         ],
