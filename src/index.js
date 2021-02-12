@@ -23,16 +23,7 @@ app.use("/static", express.static(path.join(__dirname, "../public")));
 app.use(
   helmet({
     contentSecurityPolicy: {
-      directives: {
-        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "script-src": [
-          "'self'",
-          "cdnjs.cloudflare.com",
-          "googletagmanager.com",
-          "fonts.gstatic.com",
-          "fonts.googleapis.com",
-        ],
-      },
+      directives: false,
     },
   })
 );
