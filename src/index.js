@@ -46,7 +46,7 @@ const defaultMetas = {
     "Build, test and learn in public. Get feedback for your product from your audience and grow beyond their expectations.",
   og: {
     title: "Haptic - The #BuildInPublic toolkit for your next big thing",
-    image: "/static/images/landing/social-img.png",
+    image: "https://haptic.so/static/images/landing/social-img.png",
   },
 };
 
