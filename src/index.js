@@ -5,31 +5,17 @@ const knex = require("knex");
 const dotenv = require("dotenv");
 const dbConfig = require("../knexfile");
 const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
+const expressSession = require("express-session");
 
+const passport = require("passport");
+require("./passport");
+
+// constants
+const SID = "__sid__";
 const dbErrCodes = {
   DUP_CODE: "23505",
 };
-
-// setup env
-const isProd = process.env.NODE_ENV === "production";
-const dotenvConfigPath = isProd ? ".env" : ".env.dev";
-dotenv.config({ path: dotenvConfigPath });
-
-// setup view engine
-const app = express();
-app.set("views", path.join(__dirname, "./views"));
-app.set("view engine", "ejs");
-app.use("/static", express.static(path.join(__dirname, "../public")));
-app.use(
-  helmet({
-    contentSecurityPolicy: false,
-  })
-);
-
-// setup db
-const db = knex(isProd ? dbConfig.production : dbConfig.development);
-
-// default meta for views
 const defaultMetas = {
   title: "Haptic - The #BuildInPublic toolkit for your next big thing",
   description:
@@ -44,6 +30,37 @@ const defaultMetas = {
   },
 };
 
+// setup env
+const isProd = process.env.NODE_ENV === "production";
+const dotenvConfigPath = isProd ? ".env" : ".env.dev";
+dotenv.config({ path: dotenvConfigPath });
+
+// setup view engine
+const app = express();
+app.use("/static", express.static(path.join(__dirname, "../public")));
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "./views"));
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
+app.use(
+  expressSession({
+    name: SID,
+    secret: process.env.COOKIES_SECRET,
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+// setup db
+const db = knex(isProd ? dbConfig.production : dbConfig.development);
+
 // helpers
 const isAjaxCall = (req) =>
   req.headers["accept"] && req.headers["accept"].includes("application/json");
@@ -54,9 +71,7 @@ const ajaxOnly = (req, res, next) => {
 
 // setup routes
 app.get("/", (req, res) => {
-  res.render("index", {
-    meta: defaultMetas,
-  });
+  res.render("index", { meta: defaultMetas });
 });
 
 // ajax routes
@@ -81,6 +96,21 @@ app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
 
       next(err);
     });
+});
+
+app.get("/auth/error", (req, res) => res.send("Unknown Error"));
+app.get("/auth/twitter", passport.authenticate("twitter"));
+app.get(
+  "/auth/twitter/callback",
+  passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
+  function(req, res) {
+    res.redirect("/");
+  }
+);
+app.get("/logout", (req, res) => {
+  req.session = null;
+  req.logout();
+  res.redirect("/");
 });
 
 // error handler
