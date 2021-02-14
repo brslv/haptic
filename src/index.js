@@ -60,7 +60,7 @@ app.get("/", (req, res) => {
 });
 
 // ajax routes
-app.post("/sub", ajaxOnly, express.json(), (req, res) => {
+app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
   db("subs")
     .insert({
       email: req.body.email,
