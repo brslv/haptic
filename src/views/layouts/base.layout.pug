@@ -51,6 +51,21 @@ html(lang="en" id="html")
       gtag('config', 'G-DD6BBRSV9W');
   body(class="dark:bg-gray-800" id="body")
     div(class="text-gray-800 dark:text-gray-200" id="root")
+      div(class="z-20 border border-gray-100 hidden fixed bottom-0 right-0 m-8 p-4 rounded-xl bg-white shadow-2xl text-sm" id="cookies-consent")
+        p(class="w-60 mb-4").
+          We use cookies to provide the best user experience possible. We use them for the proper functioning of the website, for monitoring visitor traffic and marketing purposes. By continuing to browse the site, you agree to our use of cookies.
+        
+        // You can read more about it <a href="/privacy-policy" class="text-blue-500">here</a>.
+        button(class="w-full px-4 py-2 bg-yellow-400 rounded-full" id="cookies-consent-ok-btn").
+          OK
+
+
       block content
 
     block scripts
+      script(
+        src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+        integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+        crossorigin="anonymous"
+      )
+      script(src="/static/js/cookies-consent.js")
