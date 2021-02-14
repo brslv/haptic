@@ -12,6 +12,8 @@ const passport = require("passport");
 require("./passport");
 
 // constants
+const IS_DEV = process.env.NODE_ENV === "development";
+const IS_PROD = !IS_DEV;
 const SID = "__sid__";
 const dbErrCodes = {
   DUP_CODE: "23505",
@@ -40,7 +42,7 @@ const app = express();
 app.use("/static", express.static(path.join(__dirname, "../public")));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.set("view engine", "ejs");
+app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "./views"));
 app.use(
   helmet({
