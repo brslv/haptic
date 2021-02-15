@@ -80,12 +80,20 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// helpers
+// helpers / middlewares
 const isAjaxCall = (req) =>
   req.headers["accept"] && req.headers["accept"].includes("application/json");
 const ajaxOnly = (req, res, next) => {
   if (isAjaxCall(req)) next();
   else res.status(400).end("400 Bad Request");
+};
+const authOnly = (req, res, next) => {
+  if (req.user) next();
+  else res.redirect("/login");
+};
+const guestsOnly = (req, res, next) => {
+  if (!req.user) next();
+  else res.redirect("/dashboard");
 };
 
 // setup routes
@@ -93,11 +101,11 @@ app.get("/", (req, res) => {
   res.render("index", { meta: defaultMetas, user: req.user });
 });
 
-app.get("/dashboard", (req, res) => {
+app.get("/dashboard", authOnly, (req, res) => {
   res.render("dashboard", { meta: defaultMetas, user: req.user });
 });
 
-app.get("/login", (req, res) => {
+app.get("/login", guestsOnly, (req, res) => {
   res.render("login", { meta: defaultMetas });
 });
 
@@ -108,7 +116,7 @@ app.get("/auth/twitter", passport.authenticate("twitter"));
 app.get(
   "/auth/twitter/callback",
   passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
-  function(req, res) {
+  function (req, res) {
     req.session.save(function onSessionSave() {
       res.redirect("/dashboard");
     });
@@ -117,7 +125,7 @@ app.get(
 
 app.get("/logout", (req, res) => {
   req.logout();
-  req.session.destroy(function(err) {
+  req.session.destroy(function (err) {
     res.redirect("/");
   });
 });
