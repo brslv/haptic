@@ -60,9 +60,12 @@ app.use(
   })
 );
 const RedisStore = connectRedis(expressSession);
-const redisClient = redis.createClient({
-  url: process.env.REDIS_URL,
-});
+const redisClient = redis.createClient(
+  process.env.REDIS_PORT,
+  process.env.REDIS_HOST
+);
+redisClient.on("connect", () => console.log("🚀 connected to redis"));
+redisClient.on("error", (err) => console.log("❌ redis connection error", err));
 app.use(
   expressSession({
     name: SID,
