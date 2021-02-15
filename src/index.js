@@ -14,16 +14,9 @@ const redis = require("redis");
 const connectRedis = require("connect-redis");
 const session = require("express-session");
 
-// setup rollbar
-const rollbar = new Rollbar({
-  accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
-
 // constants
 const IS_DEV = process.env.NODE_ENV === "development";
-const IS_PROD = !IS_DEV;
+const IS_PROD = process.env.NODE_ENV === "production";
 const SID = "__sid__";
 const dbErrCodes = {
   DUP_CODE: "23505",
@@ -43,9 +36,15 @@ const defaultMetas = {
 };
 
 // setup env
-const isProd = process.env.NODE_ENV === "production";
-const dotenvConfigPath = isProd ? ".env" : ".env.dev";
+const dotenvConfigPath = IS_PROD ? ".env" : ".env.dev";
 dotenv.config({ path: dotenvConfigPath });
+
+// setup rollbar
+const rollbar = new Rollbar({
+  accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
 
 // setup view engine
 const app = express();
@@ -65,7 +64,12 @@ const redisClient = redis.createClient(
   process.env.REDIS_HOST
 );
 redisClient.on("connect", () => console.log("🚀 connected to redis"));
-redisClient.on("error", (err) => console.log("❌ redis connection error", err));
+redisClient.on("error", (err) =>
+  console.log("❌ redis connection error", err, {
+    port: process.env.REDIS_PORT,
+    host: process.env.REDIS_HOST,
+  })
+);
 app.use(
   expressSession({
     name: SID,
@@ -79,7 +83,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // setup db
-const db = knex(isProd ? dbConfig.production : dbConfig.development);
+const db = knex(IS_PROD ? dbConfig.production : dbConfig.development);
 
 // helpers
 const isAjaxCall = (req) =>
