@@ -10,11 +10,10 @@ const expressSession = require("express-session");
 const Rollbar = require("rollbar");
 const passport = require("passport");
 require("./passport");
-const redis = require("redis");
-const connectRedis = require("connect-redis");
-const session = require("express-session");
+const KnexSessionStore = require("connect-session-knex")(expressSession);
 
 // constants
+const HOUR_IN_MS = 3600000;
 const IS_DEV = process.env.NODE_ENV === "development";
 const IS_PROD = process.env.NODE_ENV === "production";
 const SID = "__sid__";
@@ -46,6 +45,9 @@ const rollbar = new Rollbar({
   captureUnhandledRejections: true,
 });
 
+// setup db
+const db = knex(IS_PROD ? dbConfig.production : dbConfig.development);
+
 // setup view engine
 const app = express();
 app.use("/static", express.static(path.join(__dirname, "../public")));
@@ -58,34 +60,25 @@ app.use(
     contentSecurityPolicy: false,
   })
 );
-const RedisStore = connectRedis(expressSession);
-const redisClient = redis.createClient({
-  tls: {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-  },
-});
-redisClient.on("connect", () => console.log("🚀 connected to redis"));
-redisClient.on("error", (err) =>
-  console.log("❌ redis connection error", err, {
-    port: process.env.REDIS_PORT,
-    host: process.env.REDIS_HOST,
-  })
-);
+if (IS_PROD) app.set("trust proxy", 1);
 app.use(
   expressSession({
     name: SID,
-    store: new RedisStore({ client: redisClient }),
+    store: new KnexSessionStore({
+      knex: db,
+      createtable: false,
+    }),
     secret: process.env.COOKIES_SECRET,
     resave: false,
     saveUninitialized: true,
+    cookie: {
+      secure: IS_PROD,
+      maxAge: HOUR_IN_MS,
+    },
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
-// setup db
-const db = knex(IS_PROD ? dbConfig.production : dbConfig.development);
 
 // helpers
 const isAjaxCall = (req) =>
