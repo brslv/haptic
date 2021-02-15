@@ -7,7 +7,7 @@ const dbConfig = require("../knexfile");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
-
+var Rollbar = require("rollbar");
 const passport = require("passport");
 require("./passport");
 
@@ -62,6 +62,13 @@ app.use(passport.session());
 
 // setup db
 const db = knex(isProd ? dbConfig.production : dbConfig.development);
+
+// setup rollbar
+const rollbar = new Rollbar({
+  accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
 
 // helpers
 const isAjaxCall = (req) =>
