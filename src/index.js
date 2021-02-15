@@ -7,9 +7,12 @@ const dbConfig = require("../knexfile");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
-var Rollbar = require("rollbar");
+const Rollbar = require("rollbar");
 const passport = require("passport");
 require("./passport");
+const redis = require("redis");
+const connectRedis = require("connect-redis");
+const session = require("express-session");
 
 // constants
 const IS_DEV = process.env.NODE_ENV === "development";
@@ -49,11 +52,16 @@ app.use(
     contentSecurityPolicy: false,
   })
 );
+const RedisStore = connectRedis(expressSession);
+const redisClient = redis.createClient({
+  url: process.env.REDIS_URL,
+});
 app.use(
   expressSession({
     name: SID,
+    store: new RedisStore({ client: redisClient }),
     secret: process.env.COOKIES_SECRET,
-    resave: true,
+    resave: false,
     saveUninitialized: true,
   })
 );
