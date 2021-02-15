@@ -14,6 +14,13 @@ const redis = require("redis");
 const connectRedis = require("connect-redis");
 const session = require("express-session");
 
+// setup rollbar
+const rollbar = new Rollbar({
+  accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
+
 // constants
 const IS_DEV = process.env.NODE_ENV === "development";
 const IS_PROD = !IS_DEV;
@@ -70,13 +77,6 @@ app.use(passport.session());
 
 // setup db
 const db = knex(isProd ? dbConfig.production : dbConfig.development);
-
-// setup rollbar
-const rollbar = new Rollbar({
-  accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
 
 // helpers
 const isAjaxCall = (req) =>
