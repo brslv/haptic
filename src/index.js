@@ -54,7 +54,8 @@ app.use(
 );
 const RedisStore = connectRedis(expressSession);
 const redisClient = redis.createClient({
-  url: process.env.REDIS_URL,
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
 });
 app.use(
   expressSession({
