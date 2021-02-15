@@ -70,7 +70,7 @@ app.use(
     }),
     secret: process.env.COOKIES_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
       secure: IS_PROD,
       maxAge: HOUR_IN_MS,
@@ -90,7 +90,36 @@ const ajaxOnly = (req, res, next) => {
 
 // setup routes
 app.get("/", (req, res) => {
-  res.render("index", { meta: defaultMetas });
+  res.render("index", { meta: defaultMetas, user: req.user });
+});
+
+app.get("/dashboard", (req, res) => {
+  res.render("dashboard", { meta: defaultMetas, user: req.user });
+});
+
+app.get("/login", (req, res) => {
+  res.render("login", { meta: defaultMetas });
+});
+
+app.get("/auth/error", (req, res) => res.send("Unknown Error"));
+
+app.get("/auth/twitter", passport.authenticate("twitter"));
+
+app.get(
+  "/auth/twitter/callback",
+  passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
+  function(req, res) {
+    req.session.save(function onSessionSave() {
+      res.redirect("/dashboard");
+    });
+  }
+);
+
+app.get("/logout", (req, res) => {
+  req.logout();
+  req.session.destroy(function(err) {
+    res.redirect("/");
+  });
 });
 
 // ajax routes
@@ -115,21 +144,6 @@ app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
 
       next(err);
     });
-});
-
-app.get("/auth/error", (req, res) => res.send("Unknown Error"));
-app.get("/auth/twitter", passport.authenticate("twitter"));
-app.get(
-  "/auth/twitter/callback",
-  passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
-  function(req, res) {
-    res.redirect("/");
-  }
-);
-app.get("/logout", (req, res) => {
-  req.session = null;
-  req.logout();
-  res.redirect("/");
 });
 
 // error handler

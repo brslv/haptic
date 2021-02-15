@@ -8,6 +8,11 @@ module.exports = {
       fontFamily: {
         sans: ["Montserrat", ...defaultTheme.fontFamily.sans],
       },
+      backgroundColor: {
+        twitter: "#1DA1F2",
+        "twitter-dark": "#1690db",
+        ...defaultTheme.backgroundColor,
+      },
     },
   },
   variants: {
