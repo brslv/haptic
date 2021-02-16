@@ -7,10 +7,12 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
     '[data-modal-name="create-product-modal"] [data-modal-close]'
   );
   var form = document.getElementById("create-product-form");
+  var productNameEl = document.getElementById("product-name");
 
   if (createBtn && modal) {
     createBtn.addEventListener("click", function onCreate() {
       modal.classList.remove("hidden");
+      if (productNameEl) productNameEl.focus();
     });
   }
 
@@ -22,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
 
   if (form) {
     (function() {
-      var productNameEl = document.getElementById("product-name");
       var productSlugEl = document.getElementById("product-slug");
       var submitBtn = document.querySelector(
         '#create-product-form button[type="submit"]'
@@ -44,17 +45,27 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
           });
       });
 
-      productNameEl.addEventListener("input", function productNameElInput(e) {
+      function validation(e) {
+        console.log(productNameEl.value.length && productSlugEl.value.length);
+        if (productNameEl.value.length && productSlugEl.value.length) {
+          submitBtn.removeAttribute("disabled");
+        } else {
+          submitBtn.setAttribute("disabled", "disabled");
+        }
+
         if (productNameEl.value.length) {
           genSlugBtn.removeAttribute("disabled");
           productSlugEl.removeAttribute("disabled");
-          submitBtn.removeAttribute("disabled");
         } else {
           genSlugBtn.setAttribute("disabled", "disabled");
           productSlugEl.setAttribute("disabled", "disabled");
-          submitBtn.setAttribute("disabled", "disabled");
         }
-      });
+      }
+
+      productNameEl.addEventListener("blur", validation);
+      productSlugEl.addEventListener("blur", validation);
+      productNameEl.addEventListener("input", validation);
+      productSlugEl.addEventListener("input", validation);
 
       form.addEventListener("submit", function asyncFormSubmit(e) {
         e.preventDefault();
