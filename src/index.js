@@ -159,14 +159,23 @@ app.get("/", (req, res) => {
 });
 
 app.get("/dashboard", authOnly, (req, res) => {
-  res.render("dashboard", {
-    meta: {
-      defaultMetas,
-      title: "Dashboard | Haptic",
-      og: { title: "Dashboard | Haptic" },
-    },
-    user: req.user,
-  });
+  db("products")
+    .select()
+    .where({ user_id: req.user.id })
+    .then((result) => {
+      res.render("dashboard", {
+        meta: {
+          defaultMetas,
+          title: "Dashboard | Haptic",
+          og: { title: "Dashboard | Haptic" },
+        },
+        user: req.user,
+        products: result,
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 app.get("/dashboard/product/:slug", authOnly, (req, res) => {
