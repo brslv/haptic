@@ -11,6 +11,8 @@ const Rollbar = require("rollbar");
 const passport = require("passport");
 require("./passport");
 const KnexSessionStore = require("connect-session-knex")(expressSession);
+const slugify = require("slugify");
+const { nanoid } = require("nanoid");
 
 // constants
 const HOUR_IN_MS = 3600000;
@@ -116,7 +118,7 @@ app.get("/auth/twitter", passport.authenticate("twitter"));
 app.get(
   "/auth/twitter/callback",
   passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
-  function (req, res) {
+  function(req, res) {
     req.session.save(function onSessionSave() {
       res.redirect("/dashboard");
     });
@@ -125,7 +127,7 @@ app.get(
 
 app.get("/logout", (req, res) => {
   req.logout();
-  req.session.destroy(function (err) {
+  req.session.destroy(function(err) {
     res.redirect("/");
   });
 });
@@ -146,9 +148,53 @@ app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === dbErrCodes.DUP_CODE)
-        res
+        return res
           .status(400)
           .json({ ok: 0, err: "Email already used. 😱", details: null });
+
+      next(err);
+    });
+});
+
+app.post("/product-slug", ajaxOnly, express.json(), (req, res, next) => {
+  let slug = nanoid();
+  if (req.body.name) slug = slugify(req.body.name);
+
+  db("products")
+    .where({ slug })
+    .then((result) => {
+      if (result.length) {
+        // slug is taken
+        slug = `${slug}-${nanoid(6)}`;
+      }
+
+      res.json({
+        ok: 1,
+        err: null,
+        details: { slug },
+      });
+    })
+    .catch((err) => next(err));
+});
+
+app.post("/product", ajaxOnly, express.json(), (req, res) => {
+  db("products")
+    .insert({
+      name: req.body.name,
+      slug: req.body.slug,
+    })
+    .returning(["id", "slug"])
+    .then((result) => {
+      res.json({ ok: 1, err: null, details: { ...result[0] } });
+    })
+    .catch((err) => {
+      console.log(err);
+      if (err.code === dbErrCodes.DUP_CODE)
+        return res.status(400).json({
+          ok: 0,
+          err: "Slug already taken 😕. Please, use another slug.",
+          details: null,
+        });
 
       next(err);
     });

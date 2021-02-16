@@ -7,11 +7,44 @@
     @apply text-blue-500 hover:text-blue-600 underline;
   }
 
+  input[disabled] {
+    @apply bg-gray-100 dark:bg-gray-700;
+  }
+
   .shake {
     animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     perspective: 1000px;
+  }
+
+  .btn {
+    @apply cursor-pointer block px-4 py-2 rounded-xl font-medium text-gray-800 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400;
+  }
+
+  .btn-default {
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-800 dark:text-white hover:text-gray-800 dark:hover:text-white dark:bg-gray-600 dark:hover:bg-gray-500;
+  }
+
+  .btn-primary {
+    @apply bg-yellow-300 hover:bg-yellow-400 text-gray-800 dark:text-gray-800 hover:text-gray-800 dark:hover:text-gray-800;
+  }
+
+  .btn-twitter {
+    @apply bg-twitter hover:bg-twitter-dark text-white hover:text-white dark:hover:text-white;
+  }
+
+  .btn[disabled] {
+    @apply text-gray-400 bg-gray-100 cursor-auto dark:bg-gray-500 !important;
+  }
+
+  .input {
+    @apply px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 w-full dark:bg-transparent;
+    dark: border-gray-700;
+  }
+
+  .input[disabled] {
+    @apply bg-gray-100 dark:bg-gray-600;
   }
 
   @keyframes shake {

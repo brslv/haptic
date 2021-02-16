@@ -1,0 +1,7 @@
+mixin modal(name, attr = {})
+  div(data-modal-name=name class="hidden z-20 fixed top-0 left-0 w-screen h-screen flex items-center justify-center w-screen h-screen")
+    div(class="absolute top-0 left-0 w-full h-full bg-black dark:bg-gray-800 opacity-50 dark:opacity-70")
+    div(class="btn btn-default fixed top-0 right-0 m-10" data-modal-close) Close
+    div(class="relative p-4 rounded-xl bg-white dark:bg-gray-700" style="min-width: 250px")&attributes(attr)
+      if block
+        block
