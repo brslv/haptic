@@ -1,0 +1,17 @@
+mixin top-bar
+    div(class="z-10 relative p-4 w-full container mx-auto")
+        div(class="flex items-center justify-between")
+            a(href="/")
+                div(class="flex items-center")
+                    h1(class="text-xl font-black text-yellow-300").
+                        haptic.so
+            nav
+                ul(class="flex items-center")
+                    if user
+                        a(href="/dashboard" class="px-4 py-2 font-medium")
+                            li Dashboard
+                        a(href="/logout" class="px-4 py-2 bg-yellow-100 hover:bg-yellow-300 rounded-xl font-medium")
+                            li Logout
+                    else
+                        a(href="/login" class="px-4 py-2 bg-yellow-100 hover:bg-yellow-300 rounded-xl font-medium")
+                            li(class="inline-block") Login

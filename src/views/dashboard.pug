@@ -1,4 +1,8 @@
 extends layouts/base.layout.pug
 
+include partials/top-bar.pug
+
 block content
+  +top-bar
+  
   div The dashboard of the user #{user.displayName}
