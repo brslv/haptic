@@ -5,6 +5,13 @@ exports.up = function(knex) {
     if (!exists) {
       return knex.schema.createTable("products", function(t) {
         t.increments("id").primary();
+        t.integer("user_id")
+          .unsigned()
+          .notNullable();
+        t.foreign("user_id")
+          .references("id")
+          .inTable("users")
+          .onDelete("CASCADE");
         t.string("name", 200).notNullable();
         t.string("slug", 200)
           .unique()

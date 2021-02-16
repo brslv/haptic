@@ -277,6 +277,7 @@ app.post("/product-slug", ajaxOnly, express.json(), (req, res, next) => {
 app.post("/product", ajaxOnly, express.json(), (req, res) => {
   db("products")
     .insert({
+      user_id: req.user.id,
       name: req.body.name,
       slug: req.body.slug.toLowerCase(),
     })
@@ -285,7 +286,6 @@ app.post("/product", ajaxOnly, express.json(), (req, res) => {
       res.json({ ok: 1, err: null, details: { ...result[0] } });
     })
     .catch((err) => {
-      console.log(err);
       if (err.code === dbErrCodes.DUP_CODE)
         return res.status(400).json({
           ok: 0,
