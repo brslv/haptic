@@ -199,15 +199,15 @@ app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
 });
 
 app.post("/product-slug", ajaxOnly, express.json(), (req, res, next) => {
-  let slug = nanoid();
-  if (req.body.name) slug = slugify(req.body.name);
+  let slug = nanoid(6).toLowerCase();
+  if (req.body.name) slug = slugify(req.body.name, { lower: true });
 
   db("products")
     .where({ slug })
     .then((result) => {
       if (result.length) {
         // slug is taken
-        slug = `${slug}-${nanoid(6)}`;
+        slug = `${slug}-${nanoid(6).toLowerCase()}`;
       }
 
       res.json({
@@ -223,7 +223,7 @@ app.post("/product", ajaxOnly, express.json(), (req, res) => {
   db("products")
     .insert({
       name: req.body.name,
-      slug: req.body.slug,
+      slug: req.body.slug.toLowerCase(),
     })
     .returning(["id", "slug"])
     .then((result) => {

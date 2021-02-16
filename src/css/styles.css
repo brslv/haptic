@@ -11,6 +11,15 @@
     @apply bg-gray-100 dark:bg-gray-700;
   }
 
+  a:focus {
+    @apply border-b border-yellow-300;
+    outline: none !important;
+  }
+
+  a.btn:focus {
+    @apply border-0;
+  }
+
   .shake {
     animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     transform: translate3d(0, 0, 0);
@@ -20,14 +29,23 @@
 
   .btn {
     @apply cursor-pointer block px-4 py-2 rounded-xl font-medium text-gray-800 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400;
+    outline: none !important;
   }
 
   .btn-default {
     @apply bg-gray-100 hover:bg-gray-200 text-gray-800 dark:text-white hover:text-gray-800 dark:hover:text-white dark:bg-gray-600 dark:hover:bg-gray-500;
   }
 
+  .btn-default:focus {
+    @apply bg-gray-200 dark:bg-gray-500;
+  }
+
   .btn-primary {
     @apply bg-yellow-300 hover:bg-yellow-400 text-gray-800 dark:text-gray-800 hover:text-gray-800 dark:hover:text-gray-800;
+  }
+
+  .btn-primary:focus {
+    @apply bg-yellow-400;
   }
 
   .btn-twitter {
@@ -40,7 +58,7 @@
 
   .input {
     @apply px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 w-full dark:bg-transparent;
-    outline: none;
+    outline: none !important;
   }
 
   .input:focus {
