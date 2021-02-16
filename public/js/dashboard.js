@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
             .post("/product", { name: productName, slug: productSlug })
             .then(function createProduct(result) {
               var slug = result.data.details.slug;
-              window.location.href = "/product/" + slug;
+              window.location.href = "/dashboard/product/" + slug;
             })
             .catch((err) => {
               var errorEl = document.querySelector(

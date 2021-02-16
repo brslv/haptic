@@ -104,7 +104,38 @@ app.get("/", (req, res) => {
 });
 
 app.get("/dashboard", authOnly, (req, res) => {
-  res.render("dashboard", { meta: defaultMetas, user: req.user });
+  res.render("dashboard", {
+    meta: {
+      defaultMetas,
+      title: "Dashboard | Haptic",
+      og: { title: "Dashboard | Haptic" },
+    },
+    user: req.user,
+  });
+});
+
+app.get("/dashboard/product/:slug", authOnly, (req, res) => {
+  const slug = req.params.slug;
+  db.select()
+    .table("products")
+    .where({ slug })
+    .first()
+    .then((result) => {
+      res.render("dashboard/product", {
+        meta: {
+          defaultMetas,
+          title: `${result.name} | Haptic`,
+          og: {
+            title: `${result.name} | Haptic`,
+          },
+        },
+        user: req.user,
+        product: { name: result.name },
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 app.get("/login", guestsOnly, (req, res) => {
