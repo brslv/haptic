@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
 const Rollbar = require("rollbar");
 const passport = require("passport");
-require("./passport");
+const TwitterStrategy = require("passport-twitter").Strategy;
 const KnexSessionStore = require("connect-session-knex")(expressSession);
 const slugify = require("slugify");
 const { nanoid } = require("nanoid");
@@ -49,6 +49,61 @@ const rollbar = new Rollbar({
 
 // setup db
 const db = knex(IS_PROD ? dbConfig.production : dbConfig.development);
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.use(
+  new TwitterStrategy(
+    {
+      consumerKey: process.env.TWITTER_API_KEY,
+      consumerSecret: process.env.TWITTER_API_SECRET,
+      callbackURL: process.env.TWITTER_API_CALLBACK_URL,
+    },
+    function(accessToken, refreshToken, profile, done) {
+      const twitterData = profile._json;
+      db.select()
+        .table("users")
+        .where({ twitter_id: twitterData.id })
+        .first()
+        .then((result) => {
+          if (!result) {
+            db("users")
+              .insert({
+                twitter_id: twitterData.id,
+                twitter_name: twitterData.name,
+                twitter_screen_name: twitterData.screen_name,
+                twitter_location: twitterData.location,
+                twitter_description: twitterData.description,
+                twitter_url: twitterData.url,
+                twitter_profile_image_url: twitterData.profile_image_url_https,
+              })
+              .then(() => {
+                db.select()
+                  .table("users")
+                  .first()
+                  .then((result) => {
+                    done(null, result);
+                  })
+                  .catch((err) => done(err, null));
+              })
+              .catch((err) => done(err, null));
+          } else {
+            // return the user
+            done(null, result);
+          }
+        })
+        .catch((err) => {
+          return done(err, null);
+        });
+    }
+  )
+);
 
 // setup view engine
 const app = express();
