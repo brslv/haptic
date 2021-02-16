@@ -40,7 +40,11 @@
 
   .input {
     @apply px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 w-full dark:bg-transparent;
-    dark: border-gray-700;
+    outline: none;
+  }
+
+  .input:focus {
+    @apply border-yellow-300;
   }
 
   .input[disabled] {

@@ -121,11 +121,22 @@ app.get("/dashboard/product/:slug", authOnly, (req, res) => {
     .where({ slug })
     .first()
     .then((result) => {
+      if (!result) {
+        return res.render("404", {
+          meta: {
+            ...defaultMetas,
+            title: "Page not found | Haptic",
+            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+          },
+          user: req.user,
+        });
+      }
       res.render("dashboard/product", {
         meta: {
-          defaultMetas,
+          ...defaultMetas,
           title: `${result.name} | Haptic`,
           og: {
+            ...defaultMetas.og,
             title: `${result.name} | Haptic`,
           },
         },
