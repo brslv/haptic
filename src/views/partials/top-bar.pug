@@ -14,7 +14,7 @@ mixin top-bar()
                             li(class="icon-container")
                                 ion-icon(name="prism-outline" class="text-2xl")
 
-                        a(href="/dashboard" class="btn")
+                        a(href="/dashboard/profile" class="btn")
                             li(class="icon-container")
                                 img(class="rounded-full w-8 h-8" src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
 
@@ -22,5 +22,6 @@ mixin top-bar()
                             li(class="icon-container")
                                 ion-icon(name="log-out-outline" class="text-2xl")
                     else
-                        a(href="/login" class="btn btn-primary icon-container")
-                            li(class="inline-block") Login
+                        a(href="/login" class="btn icon-container")
+                            li(class="icon-container")
+                                ion-icon(name="log-in-outline" class="text-2xl")

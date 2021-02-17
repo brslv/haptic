@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       });
 
       function validation(e) {
-        console.log(productNameEl.value.length && productSlugEl.value.length);
         if (productNameEl.value.length && productSlugEl.value.length) {
           submitBtn.removeAttribute("disabled");
         } else {

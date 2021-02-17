@@ -5,6 +5,7 @@ exports.up = function(knex) {
     if (!exists) {
       return knex.schema.createTable("users", function(t) {
         t.increments("id").primary();
+        t.string("bio", 400).nullable();
         t.bigInteger("twitter_id")
           .index()
           .notNullable();

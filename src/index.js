@@ -76,6 +76,7 @@ passport.use(
           if (!result) {
             db("users")
               .insert({
+                bio: twitterData.description,
                 twitter_id: twitterData.id,
                 twitter_name: twitterData.name,
                 twitter_screen_name: twitterData.screen_name,
@@ -180,7 +181,9 @@ app.get("/dashboard", authOnly, (req, res) => {
     });
 });
 
-app.get("/dashboard/product/:slug", authOnly, (req, res) => {});
+app.get("/dashboard/product/:slug", authOnly, (req, res) => {
+  return res.redirect(`/dashboard/product/${req.params.slug}/settings`);
+});
 
 app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
   const slug = req.params.slug;
@@ -325,6 +328,16 @@ app.post(
   }
 );
 
+app.get("/dashboard/profile", authOnly, (req, res, next) => {
+  return res.render("dashboard/profile", {
+    meta: defaultMetas,
+    user: req.user,
+    form: {
+      action: "/dashboard/profile/update",
+    },
+  });
+});
+
 app.get("/login", guestsOnly, (req, res) => {
   res.render("login", { meta: defaultMetas });
 });
@@ -395,7 +408,7 @@ app.post("/product-slug", ajaxOnly, express.json(), (req, res, next) => {
     .catch((err) => next(err));
 });
 
-app.post("/product", ajaxOnly, express.json(), (req, res) => {
+app.post("/product", ajaxOnly, express.json(), (req, res, next) => {
   db("products")
     .insert({
       user_id: req.user.id,
