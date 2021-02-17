@@ -4,6 +4,14 @@ module.exports = {
   purge: ["./src/views/**/*.pug", "./public/js/**/*.js"],
   darkMode: "class", // or 'media' or 'class'
   theme: {
+    container: {
+      screens: {
+        sm: "100%",
+        md: "100%",
+        lg: "1024px",
+        xl: "1024px",
+      },
+    },
     extend: {
       fontFamily: {
         sans: ["Montserrat", ...defaultTheme.fontFamily.sans],
