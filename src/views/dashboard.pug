@@ -2,13 +2,14 @@ extends layouts/base.layout.pug
 
 include partials/top-bar.pug
 include partials/modal.pug
+include partials/page-title.pug
 
 block content
   +top-bar
   
   div(class="container mx-auto p-4")
     section
-      h2(class="text-xs uppercase font-medium text-gray-500 pb-4") Products
+      +page-title Products
 
       div(class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3")
         each product in products
