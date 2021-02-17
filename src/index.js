@@ -216,6 +216,7 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
         links: {
           posts: `/dashboard/product/${slug}/posts`,
           settings: `/dashboard/product/${slug}/settings`,
+          url: `/p/${slug}`,
         },
       });
     })
@@ -264,6 +265,7 @@ app.get(
           links: {
             posts: `/dashboard/product/${slug}/posts`,
             settings: `/dashboard/product/${slug}/settings`,
+            url: `/p/${slug}`,
           },
           form: {
             action: `/dashboard/product/${slug}/settings/update`,
@@ -336,6 +338,68 @@ app.get("/dashboard/profile", authOnly, (req, res, next) => {
       action: "/dashboard/profile/update",
     },
   });
+});
+
+app.get("/p/:slug", (req, res, next) => {
+  const slug = req.params.slug;
+
+  db.select(
+    "products.id",
+    "products.name",
+    "products.slug",
+    "products.description",
+    "products.is_public",
+    "products.is_listed",
+    "products.created_at as product_created_at",
+    "products.updated_at as product_updated_at",
+    "users.id as user_id",
+    "users.bio as user_bio",
+    "users.twitter_id as user_twitter_id",
+    "users.twitter_name as user_twitter_name",
+    "users.twitter_screen_name as user_twitter_screen_name",
+    "users.twitter_location as user_twitter_location",
+    "users.twitter_url as user_twitter_url",
+    "users.twitter_profile_image_url as user_twitter_profile_image_url",
+    "users.created_at as user_created_at",
+    "users.updated_at as user_updated_at"
+  )
+    .table("products")
+    .leftJoin("users", "products.user_id", "users.id")
+    .where({ "products.slug": slug })
+    .first()
+    .then((result) => {
+      if (!result) {
+        return res.status(404).render("404", {
+          meta: {
+            ...defaultMetas,
+            title: "Page not found | Haptic",
+            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+          },
+          user: req.user,
+        });
+      }
+
+      res.render("product", {
+        meta: {
+          ...defaultMetas,
+          title: `${result.name} | Haptic`,
+          og: {
+            ...defaultMetas.og,
+            title: `${result.name} | Haptic`,
+          },
+        },
+        user: req.user,
+        product: { ...result },
+        links: {
+          posts: `/dashboard/product/${slug}/posts`,
+          settings: `/dashboard/product/${slug}/settings`,
+          url: `/p/${slug}`,
+        },
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 app.get("/login", guestsOnly, (req, res) => {

@@ -89,6 +89,12 @@
     line-height: 0;
   }
 
+  .product-main {
+    @apply gap-4;
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+  }
+
   @keyframes shake {
     10%,
     90% {
