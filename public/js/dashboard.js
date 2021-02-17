@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
             .post("/product", { name: productName, slug: productSlug })
             .then(function createProduct(result) {
               var slug = result.data.details.slug;
-              window.location.href = "/dashboard/product/" + slug;
+              window.location.href = "/dashboard/product/" + slug + "/settings";
             })
             .catch((err) => {
               var errorEl = document.querySelector(

@@ -1,0 +1,8 @@
+extends ../../layouts/base.layout.pug
+
+include ../../partials/top-bar.pug
+include ../../partials/product-header.pug
+
+block content
+  +top-bar
+  +product-header(product, links, 'settings')

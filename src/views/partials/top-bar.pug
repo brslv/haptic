@@ -7,12 +7,15 @@ mixin top-bar()
                         haptic.so
             nav
                 ul(class="flex items-center")
-                    li(class="font-medium hover:text-gray-600 cursor-pointer" data-dark-mode-toggle) Dark mode
+                    li(class="font-medium hover:text-gray-600 cursor-pointer btn" data-dark-mode-toggle)
+                        ion-icon(name="sunny-outline" size="large")
                     if user
                         a(href="/dashboard" class="btn")
-                            li Dashboard
-                        a(href="/logout" class="btn btn-primary")
-                            li Logout
+                            li
+                                ion-icon(name="apps-outline" size="large")
+                        a(href="/logout" class="btn")
+                            li
+                                ion-icon(name="log-out-outline" size="large")
                     else
                         a(href="/login" class="btn btn-primary")
                             li(class="inline-block") Login

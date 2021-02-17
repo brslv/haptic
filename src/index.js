@@ -178,7 +178,9 @@ app.get("/dashboard", authOnly, (req, res) => {
     });
 });
 
-app.get("/dashboard/product/:slug", authOnly, (req, res) => {
+app.get("/dashboard/product/:slug", authOnly, (req, res) => {});
+
+app.get("/dashboard/product/:slug/posts", (req, res, next) => {
   const slug = req.params.slug;
   db.select()
     .table("products")
@@ -195,7 +197,7 @@ app.get("/dashboard/product/:slug", authOnly, (req, res) => {
           user: req.user,
         });
       }
-      res.render("dashboard/product", {
+      res.render("dashboard/product/posts", {
         meta: {
           ...defaultMetas,
           title: `${result.name} | Haptic`,
@@ -206,6 +208,49 @@ app.get("/dashboard/product/:slug", authOnly, (req, res) => {
         },
         user: req.user,
         product: { name: result.name },
+        links: {
+          posts: `/dashboard/product/${slug}/posts`,
+          settings: `/dashboard/product/${slug}/settings`,
+        },
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get("/dashboard/product/:slug/settings", (req, res, next) => {
+  const slug = req.params.slug;
+  db.select()
+    .table("products")
+    .where({ slug })
+    .first()
+    .then((result) => {
+      if (!result) {
+        return res.render("404", {
+          meta: {
+            ...defaultMetas,
+            title: "Page not found | Haptic",
+            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+          },
+          user: req.user,
+        });
+      }
+      res.render("dashboard/product/settings", {
+        meta: {
+          ...defaultMetas,
+          title: `${result.name} | Haptic`,
+          og: {
+            ...defaultMetas.og,
+            title: `${result.name} | Haptic`,
+          },
+        },
+        user: req.user,
+        product: { name: result.name },
+        links: {
+          posts: `/dashboard/product/${slug}/posts`,
+          settings: `/dashboard/product/${slug}/settings`,
+        },
       });
     })
     .catch((err) => {
