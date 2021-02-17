@@ -60,6 +60,23 @@
     @apply bg-gray-100 dark:bg-gray-600;
   }
 
+  .label {
+    @apply text-xs uppercase text-gray-500 dark:text-gray-300;
+  }
+
+  .textarea {
+    @apply bg-transparent border border-gray-300 rounded-xl p-4 dark:border-gray-700 resize-none;
+    outline: none !important;
+  }
+
+  .textarea.:focus {
+    @apply border-yellow-300;
+  }
+
+  .textarea[disabled] {
+    @apply bg-gray-100 dark:bg-gray-600;
+  }
+
   @keyframes shake {
     10%,
     90% {

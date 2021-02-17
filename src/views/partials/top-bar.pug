@@ -8,14 +8,14 @@ mixin top-bar()
             nav
                 ul(class="flex items-center")
                     li(class="font-medium hover:text-gray-600 cursor-pointer btn" data-dark-mode-toggle)
-                        ion-icon(name="sunny-outline" size="large")
+                        ion-icon(name="sunny-outline" class="text-2xl")
                     if user
                         a(href="/dashboard" class="btn")
                             li
-                                ion-icon(name="apps-outline" size="large")
+                                ion-icon(name="apps-outline" class="text-2xl")
                         a(href="/logout" class="btn")
                             li
-                                ion-icon(name="log-out-outline" size="large")
+                                ion-icon(name="log-out-outline" class="text-2xl")
                     else
                         a(href="/login" class="btn btn-primary")
                             li(class="inline-block") Login

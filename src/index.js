@@ -246,7 +246,7 @@ app.get("/dashboard/product/:slug/settings", (req, res, next) => {
           },
         },
         user: req.user,
-        product: { name: result.name },
+        product: { id: result.id, name: result.name },
         links: {
           posts: `/dashboard/product/${slug}/posts`,
           settings: `/dashboard/product/${slug}/settings`,
