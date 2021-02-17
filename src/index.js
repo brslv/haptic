@@ -302,9 +302,10 @@ app.post(
         db("products")
           .where({ slug, user_id: req.user.id })
           .update({
+            name: input.name,
             description: input.description,
-            is_public: input.is_public,
-            is_listed: input.is_listed,
+            is_public: input.is_public === "on",
+            is_listed: input.is_listed === "on",
           })
           .then((result) => {
             if (result) {
