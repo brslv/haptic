@@ -17,11 +17,11 @@ block content
           div(class="icon-container")
             ion-icon(name="close-outline" class="absolute top-4 right-4 cursor-pointer text-2xl" id="close-creator-details-btn")
           h2(class="text-lg font-bold")= product.user_twitter_name
-          a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
+          a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
           p(class="text-gray-600 dark:text-gray-400")= product.user_bio
 
     if product.description
-      div(class="py-14")
+      div(class="p-8 my-8 rounded-xl border border-gray-100 dark:border-gray-700")
         p(class="text-xl")= product.description
 
     main(class="product-main" id="product-main")
