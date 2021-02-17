@@ -7,6 +7,7 @@ mixin top-bar()
                         haptic.so
             nav
                 ul(class="flex items-center")
+                    li(class="font-medium hover:text-gray-600 cursor-pointer" data-dark-mode-toggle) Dark mode
                     if user
                         a(href="/dashboard" class="btn")
                             li Dashboard
