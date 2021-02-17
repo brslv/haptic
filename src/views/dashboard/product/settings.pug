@@ -7,24 +7,27 @@ block content
   +top-bar
   +product-header(product, links, 'settings')
   div(class="container mx-auto p-4")
-    form(id="product-settings-form")
-      input(type="hidden" name="product-id" value=`${product.id}` id="product-id")
+    if flash.success.length
+      div(class="success-container mb-8")= flash.success[0]
+    if flash.error.length
+      div(class="error-container mb-8")= flash.error[0]
+
+    form(action=`${form.action}` method="POST" id="product-settings-form")
       div(class="pb-8")
         label
           div(class="label pb-1 pl-1") Description
-          textarea(class="textarea w-full" placeholder="E.g. Haptic.so helps entrepreneurs build in public..." name="product-description" id="product-description")
+          textarea(class="textarea w-full" placeholder="E.g. Haptic.so helps entrepreneurs build their products in public by setting up their on #BuildInPublic space" name="description" id="product-description")= product.description
         span(class="text-sm text-gray-500") Briefly describe your product
 
       div(class="pb-8")
         label(class="flex items-center")
-          input(type="checkbox" class="mr-2" name="product-is-public" id="product-is-public")
+          input(type="checkbox" class="mr-2" name="product-is-public" id="is_public" checked=(product.is_public ? 'checked' : false))
           span(class="label") Public
         span(class="text-sm text-gray-500") Turn this off, if you want to hide your product page from the public
 
       div(class="pb-8")
         label(class="flex items-center")
-          input(type="checkbox" class="mr-2" name="product-is-listed" id="product-is-listed")
+          input(type="checkbox" class="mr-2" name="product-is-listed" id="is_listed" checked=(product.is_listed ? 'checked' : false))
           span(class="label") List on Haptic
-        span(class="text-sm text-gray-500") By turning this on, you agree that we can list your product on our homepage
-
-    button(type="submit" class="btn btn-primary") Save
+        span(class="text-sm text-gray-500") By having this on, you agree that we can list your product on our homepage
+      button(type="submit" class="btn btn-primary") Save

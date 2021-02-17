@@ -13,6 +13,7 @@ const TwitterStrategy = require("passport-twitter").Strategy;
 const KnexSessionStore = require("connect-session-knex")(expressSession);
 const slugify = require("slugify");
 const { nanoid } = require("nanoid");
+const { flash } = require("express-flash-message");
 
 // constants
 const HOUR_IN_MS = 3600000;
@@ -127,7 +128,7 @@ app.use(
     }),
     secret: process.env.COOKIES_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       secure: IS_PROD,
       maxAge: HOUR_IN_MS,
@@ -136,6 +137,7 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash({ sessionKeyName: SID }));
 
 // helpers / middlewares
 const isAjaxCall = (req) =>
@@ -180,7 +182,7 @@ app.get("/dashboard", authOnly, (req, res) => {
 
 app.get("/dashboard/product/:slug", authOnly, (req, res) => {});
 
-app.get("/dashboard/product/:slug/posts", (req, res, next) => {
+app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
   const slug = req.params.slug;
   db.select()
     .table("products")
@@ -188,7 +190,7 @@ app.get("/dashboard/product/:slug/posts", (req, res, next) => {
     .first()
     .then((result) => {
       if (!result) {
-        return res.render("404", {
+        return res.status(404).render("404", {
           meta: {
             ...defaultMetas,
             title: "Page not found | Haptic",
@@ -207,7 +209,7 @@ app.get("/dashboard/product/:slug/posts", (req, res, next) => {
           },
         },
         user: req.user,
-        product: { name: result.name },
+        product: { ...result },
         links: {
           posts: `/dashboard/product/${slug}/posts`,
           settings: `/dashboard/product/${slug}/settings`,
@@ -219,44 +221,108 @@ app.get("/dashboard/product/:slug/posts", (req, res, next) => {
     });
 });
 
-app.get("/dashboard/product/:slug/settings", (req, res, next) => {
-  const slug = req.params.slug;
-  db.select()
-    .table("products")
-    .where({ slug })
-    .first()
-    .then((result) => {
-      if (!result) {
-        return res.render("404", {
+app.get(
+  "/dashboard/product/:slug/settings",
+  authOnly,
+  async (req, res, next) => {
+    const slug = req.params.slug;
+    const flash = {
+      success: await req.consumeFlash("success"),
+      error: await req.consumeFlash("error"),
+    };
+
+    db.select()
+      .table("products")
+      .where({ slug })
+      .first()
+      .then((result) => {
+        if (!result) {
+          return res.status(404).render("404", {
+            meta: {
+              ...defaultMetas,
+              title: "Page not found | Haptic",
+              og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+            },
+            user: req.user,
+          });
+        }
+
+        res.render("dashboard/product/settings", {
           meta: {
             ...defaultMetas,
-            title: "Page not found | Haptic",
-            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+            title: `${result.name} | Haptic`,
+            og: {
+              ...defaultMetas.og,
+              title: `${result.name} | Haptic`,
+            },
           },
           user: req.user,
-        });
-      }
-      res.render("dashboard/product/settings", {
-        meta: {
-          ...defaultMetas,
-          title: `${result.name} | Haptic`,
-          og: {
-            ...defaultMetas.og,
-            title: `${result.name} | Haptic`,
+          product: { ...result },
+          links: {
+            posts: `/dashboard/product/${slug}/posts`,
+            settings: `/dashboard/product/${slug}/settings`,
           },
-        },
-        user: req.user,
-        product: { id: result.id, name: result.name },
-        links: {
-          posts: `/dashboard/product/${slug}/posts`,
-          settings: `/dashboard/product/${slug}/settings`,
-        },
+          form: {
+            action: `/dashboard/product/${slug}/settings/update`,
+          },
+          flash,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
+
+app.post(
+  "/dashboard/product/:slug/settings/update",
+  authOnly,
+  (req, res, next) => {
+    const slug = req.params.slug;
+    // check if the user owns the product
+    db("products")
+      .select()
+      .where({
+        slug,
+        user_id: req.user.id,
+      })
+      .then((result) => {
+        if (!result) {
+          return res.status(404).render("404", {
+            meta: {
+              ...defaultMetas,
+              title: "Page not found | Haptic",
+              og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+            },
+            user: req.user,
+          });
+        }
+
+        var input = req.body;
+        db("products")
+          .where({ slug, user_id: req.user.id })
+          .update({
+            description: input.description,
+            is_public: input.is_public,
+            is_listed: input.is_listed,
+          })
+          .then((result) => {
+            if (result) {
+              req.flash("success", "Settings updated 🎉").then(() => {
+                res.redirect(`/dashboard/product/${slug}/settings`);
+              });
+            } else {
+              req
+                .flash("error", "Settings update failed, please retry 🙏")
+                .then(() => {
+                  res.redirect(`/dashboard/product/${slug}/settings`);
+                });
+            }
+          })
+          .catch((err) => next(err));
+      });
+  }
+);
 
 app.get("/login", guestsOnly, (req, res) => {
   res.render("login", { meta: defaultMetas });

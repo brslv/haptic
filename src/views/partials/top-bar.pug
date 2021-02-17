@@ -7,15 +7,20 @@ mixin top-bar()
                         haptic.so
             nav
                 ul(class="flex items-center")
-                    li(class="font-medium hover:text-gray-600 cursor-pointer btn" data-dark-mode-toggle)
+                    li(class="font-medium hover:text-gray-600 cursor-pointer btn" style="line-height: 0;" data-dark-mode-toggle)
                         ion-icon(name="sunny-outline" class="text-2xl")
                     if user
                         a(href="/dashboard" class="btn")
-                            li
-                                ion-icon(name="apps-outline" class="text-2xl")
+                            li(style="line-height: 0")
+                                ion-icon(name="prism-outline" class="text-2xl")
+
+                        a(href="/dashboard" class="btn")
+                            li(style="line-height: 0")
+                                img(class="rounded-full w-8 h-8" src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
+
                         a(href="/logout" class="btn")
-                            li
+                            li(style="line-height: 0")
                                 ion-icon(name="log-out-outline" class="text-2xl")
                     else
                         a(href="/login" class="btn btn-primary")
-                            li(class="inline-block") Login
+                            li(class="inline-block" style="line-height: 0;") Login

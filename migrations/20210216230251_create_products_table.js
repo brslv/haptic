@@ -16,6 +16,9 @@ exports.up = function(knex) {
         t.string("slug", 200)
           .unique()
           .notNullable();
+        t.string("description", 280).nullable();
+        t.boolean("is_public").defaultTo(true);
+        t.boolean("is_listed").defaultTo(true);
         t.timestamp("created_at")
           .notNullable()
           .defaultTo(knex.fn.now());

@@ -77,6 +77,14 @@
     @apply bg-gray-100 dark:bg-gray-600;
   }
 
+  .error-container {
+    @apply px-4 py-2 rounded-xl bg-red-500 text-white;
+  }
+
+  .success-container {
+    @apply px-4 py-2 rounded-xl bg-green-500 text-white;
+  }
+
   @keyframes shake {
     10%,
     90% {
