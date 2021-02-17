@@ -85,6 +85,10 @@
     @apply px-4 py-2 rounded-xl bg-green-500 text-white;
   }
 
+  .icon-container {
+    line-height: 0;
+  }
+
   @keyframes shake {
     10%,
     90% {
