@@ -7,7 +7,7 @@ mixin top-bar()
                         haptic.so
             nav
                 ul(class="flex items-center -mr-4")
-                    li(class="font-medium hover:text-gray-600 cursor-pointer btn icon-container" data-dark-mode-toggle)
+                    li(class="font-medium cursor-pointer btn icon-container" data-dark-mode-toggle)
                         ion-icon(name="sunny-outline" class="text-2xl")
                     if user
                         a(href="/dashboard" class="btn")
