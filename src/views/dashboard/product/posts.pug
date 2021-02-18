@@ -2,37 +2,56 @@ extends ../../layouts/base.layout.pug
 
 include ../../partials/top-bar.pug
 include ../../partials/product-header.pug
+include ../../partials/page-title.pug
 
 block content
   +top-bar
   +product-header(product, links, 'posts')
   div(class="container mx-auto px-4 pt-4")
     div
-      div
-        div(class="gap-4 flex flex-wrap pb-4")
-          div(class="cursor-pointer flex items-center py-2 px-4 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-700")
-            span(class="icon-container")
-            ion-icon(class="mr-2 text-lg" name="document-text-outline")
-            span(class="text-sm") Text
-          div(class="flex items-center py-2 px-4 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
-            span(class="icon-container")
-            ion-icon(class="mr-2 text-lg" name="logo-youtube")
-            span(class="mr-4 text-sm") YouTube
-            span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-          div(class="flex items-center py-2 px-4 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
-            span(class="icon-container")
-            ion-icon(class="mr-2 text-lg" name="checkbox-outline")
-            span(class="mr-4 text-sm") Survey
-            span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-          div(class="flex items-center py-2 px-4 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
-            span(class="icon-container")
-            ion-icon(class="mr-2 text-lg" name="happy-outline")
-            span(class="mr-4 text-sm") Milestone
-            span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-          div(class="flex items-center py-2 px-4 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
-            span(class="icon-container")
-            ion-icon(class="mr-2 text-lg" name="map-outline")
-            span(class="mr-4 text-sm") Roadmap
-            span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-      div
-        textarea(class="textarea w-full" placeholder="Share some insights, progress update on your product or simply share your thoughts right now")
+      div(class="grid gap-4 grid-cols-1 md:grid-cols-8")
+        div(class="md:col-span-5")
+          +page-title(class="mb-4") Publish new
+          div(class="gap-1 flex flex-wrap pb-4")
+            div(class="cursor-pointer flex items-center py-2 px-4 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-700")
+              span(class="icon-container")
+              ion-icon(class="mr-2 text-lg" name="document-text-outline")
+              span(class="text-sm") Text
+            div(class="flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
+              span(class="icon-container")
+              ion-icon(class="mr-2 text-lg" name="logo-youtube")
+              span(class="mr-4 text-sm") YouTube
+              span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
+            div(class="flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
+              span(class="icon-container")
+              ion-icon(class="mr-2 text-lg" name="checkbox-outline")
+              span(class="mr-4 text-sm") Survey
+              span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
+            div(class="flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
+              span(class="icon-container")
+              ion-icon(class="mr-2 text-lg" name="happy-outline")
+              span(class="mr-4 text-sm") Milestone
+              span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
+            div(class="flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
+              span(class="icon-container")
+              ion-icon(class="mr-2 text-lg" name="map-outline")
+              span(class="mr-4 text-sm") Roadmap
+              span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
+          div(class="pt-4")
+            form(id="form-post-text")
+              textarea(data-autoresize="2" class="textarea w-full" placeholder="Share some insights, progress update on your product or simply your thoughts right now")
+              button(class="btn btn-primary") Publish
+
+        div(class="hidden md:block md:col-span-3")
+          +page-title(class="mb-4") Pinned posts
+          //- div(class="flex items-center text-gray-300 dark:text-gray-500")
+          //-   ion-icon(name="attach-outline" class="text-3xl mr-4")
+          //-   p(class="") No pinned posts
+          div(class="p-4 rounded-xl border border-gray-300 dark:border-gray-700")
+            p.
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+              quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+              consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+              proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
