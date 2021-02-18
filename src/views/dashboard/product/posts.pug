@@ -13,32 +13,42 @@ block content
         div(class="md:col-span-5")
           +page-title(class="mb-4") Publish new
           div(class="gap-1 flex flex-wrap pb-2")
-            div(class="cursor-pointer flex items-center py-2 px-4 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-700")
+            div(data-bind="text" class="relative cursor-pointer flex items-center py-2 px-4 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-700")
               span(class="icon-container")
               ion-icon(class="mr-2 text-lg" name="document-text-outline")
               span(class="text-sm") Text
-            div(class="flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
+              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="text")
+                ion-icon(name="close-outline")
+            div(data-bind="youtube" data-disabled class="relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
               span(class="icon-container")
               ion-icon(class="mr-2 text-lg" name="logo-youtube")
               span(class="mr-4 text-sm") YouTube
               span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-            div(class="flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
+              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="youtube")
+                ion-icon(name="close-outline")
+            div(data-bind="survey" data-disabled class="relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
               span(class="icon-container")
               ion-icon(class="mr-2 text-lg" name="checkbox-outline")
               span(class="mr-4 text-sm") Survey
               span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-            div(class="flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
+              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="survey")
+                ion-icon(name="close-outline")
+            div(data-bind="milestone" data-disabled class="relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
               span(class="icon-container")
               ion-icon(class="mr-2 text-lg" name="happy-outline")
               span(class="mr-4 text-sm") Milestone
               span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-            div(class="flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
+              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="milestone")
+                ion-icon(name="close-outline")
+            div(data-bind="roadmap" data-disabled class="relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
               span(class="icon-container")
               ion-icon(class="mr-2 text-lg" name="map-outline")
               span(class="mr-4 text-sm") Roadmap
               span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
+              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="roadmap")
+                ion-icon(name="close-outline")
 
-          form(id="form-post-text")
+          form(id="form-post-text" class="hidden" data-show="text")
             input(type="hidden" name="id" value=product.id)
             textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." name="text" id="text")
             button(type="submit" class="btn btn-primary") Publish
