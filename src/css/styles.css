@@ -105,6 +105,19 @@
     grid-template-columns: 7fr 4fr;
   }
 
+  .logo-dark {
+    display: block;
+  }
+  .logo-light {
+    display: none;
+  }
+  .dark .logo-dark {
+    display: none;
+  }
+  .dark .logo-light {
+    display: block;
+  }
+
   @keyframes shake {
     10%,
     90% {
