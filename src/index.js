@@ -14,6 +14,7 @@ const KnexSessionStore = require("connect-session-knex")(expressSession);
 const slugify = require("slugify");
 const { nanoid } = require("nanoid");
 const { flash } = require("express-flash-message");
+const posts = require("./posts");
 
 // constants
 const HOUR_IN_MS = 3600000;
@@ -494,6 +495,43 @@ app.post("/product", ajaxOnly, express.json(), (req, res, next) => {
         });
 
       next(err);
+    });
+});
+
+app.post("/post/:pid/:type", ajaxOnly, express.json(), (req, res, next) => {
+  const types = posts.types;
+  const type = req.params.type;
+  const pid = req.params.pid;
+  const postsActions = posts.actions({ db, user: req.user });
+
+  if (!types.includes(type)) {
+    return res
+      .status(400)
+      .json({ ok: 0, err: `Invalid post type: ${type}. 🧐`, details: null });
+  }
+
+  if (isNaN(pid)) {
+    return res.status(400).json({
+      ok: 0,
+      err: `Invalid product id: ${pid}. 🧐 Should be numeric.`,
+      details: null,
+    });
+  }
+
+  db("products")
+    .select()
+    .where({ id: pid })
+    .first()
+    .then((productResult) => {
+      postsActions
+        .publish(type, productResult, req.body)
+        .then((publishResult) => {
+          return postsActions.getPost(type, { postId: publishResult.postId });
+        })
+        .then((post) => {
+          res.json({ ok: 1, err: null, details: { post } });
+        })
+        .catch((err) => next(err));
     });
 });
 

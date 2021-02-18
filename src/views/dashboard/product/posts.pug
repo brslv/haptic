@@ -37,13 +37,17 @@ block content
               ion-icon(class="mr-2 text-lg" name="map-outline")
               span(class="mr-4 text-sm") Roadmap
               span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
+
           form(id="form-post-text")
-            textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product...")
-            button(class="btn btn-primary") Publish
+            input(type="hidden" name="id" value=product.id)
+            textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." name="text" id="text")
+            button(type="submit" class="btn btn-primary") Publish
+
           div(class="pt-16")
-            div(class="flex items-center text-gray-300 dark:text-gray-500")
+            div(class="flex items-center text-gray-300 dark:text-gray-500" id="no-posts-msg")
               ion-icon(name="pulse-outline" class="text-3xl mr-4")
               p Still no public updates available
+            div(id="posts-container")
 
         aside(class="hidden md:block md:col-span-3")
           +page-title(class="mb-4") Pinned updates
@@ -54,3 +58,10 @@ block content
             p.
               Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
               tempor incididunt ut labore et dolore magna aliqua.
+
+  template(id="post-tpl")
+    div(class="p-4 rounded-xl border border-gray-100 dark:border-gray-700 mb-4")
+      p(data-content="data-content")
+
+block append scripts
+  script(src="/static/js/posts.js")

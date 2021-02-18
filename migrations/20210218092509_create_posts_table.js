@@ -5,6 +5,7 @@ exports.up = function(knex) {
     if (!exists) {
       return knex.schema.createTable("posts", function(t) {
         t.increments("id").primary();
+        t.enu("type", ["text"]).notNullable();
         t.integer("product_id")
           .unsigned()
           .notNullable();
@@ -19,7 +20,6 @@ exports.up = function(knex) {
           .references("id")
           .inTable("users")
           .onDelete("CASCADE");
-        t.text("text").notNullable();
         t.timestamp("created_at")
           .notNullable()
           .defaultTo(knex.fn.now());
