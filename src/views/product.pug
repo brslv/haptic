@@ -5,11 +5,12 @@ include partials/top-bar.pug
 block content
   +top-bar
   div(class="container mx-auto p-4")
-    div(class="flex items-start justify-between")
-      div(class="flex items-center mb-2")
+    div(class="flex items-center justify-between")
+      div(class="flex items-center")
         h1(class="text-2xl font-bold inline-block mr-4")= product.name
-        a(href=`${product.orig_link}` class="icon-container")
-          ion-icon(name="globe-outline" class="text-2xl")
+        if product.website
+          a(href=`${product.website}` class="icon-container" target="_blank" rel="noreferrer noopener")
+            ion-icon(name="globe-outline" class="text-2xl")
       div(class="relative flex items-center")
         span(class="text-xs text-gray-500 uppercase mr-2 bg-gray-100 dark:bg-gray-700 rounded-xl px-2 py-1") Creator
         img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class="cursor-pointer w-10 h-10 rounded-full border-2 border-yellow-300 hover:border-yellow-400" id="creator")
@@ -20,29 +21,35 @@ block content
           a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
           p(class="text-gray-600 dark:text-gray-400")= product.user_bio
 
-    if product.description
-      div(class="p-4 my-8 rounded-xl border border-gray-100 dark:border-gray-700")
+    
+    div(class={"my-8": true, "product-header": product.description})
+      if product.description
         p(class="text-xl")= product.description
+      nav(id="product-nav")
+        ul
+          li(class="w-full mb-2")
+            a(title=`Boost ${product.name} to show it's creator that you care about it. This also helps the product get better haptic rank.` href="/" class="block px-4 py-2 rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700")
+              span(class="flex justify-between")
+                span(class="flex items-center")
+                  span(class="icon-container")
+                    ion-icon(name="rocket-outline" class="text-2xl mr-4")
+                  span(class="mr-4")= `Boost`
+                span(class="px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase") 0
+
+    hr(class="border-gray-300 dark:border-gray-700 mb-8")
 
     main(class="product-main" id="product-main")
       section(id="product-feed")
-        // div(class="flex items-center text-gray-300 dark:text-gray-500")
-        //   ion-icon(name="pulse-outline" class="text-6xl mr-4")
-        //   p(class="text-xl") Still no public updates available
+        div(class="flex items-center text-gray-300 dark:text-gray-500")
+          ion-icon(name="pulse-outline" class="text-6xl mr-4")
+          p(class="text-xl") Still no public updates available
 
-        div(class="p-4 rounded-xl bg-gray-100 dark:bg-gray-700")
-          Some update
+        // div(class="p-4 rounded-xl bg-gray-100 dark:bg-gray-700")
+        //   Some update
       div
-        nav(id="product-nav")
-          ul
-            li(class="w-full mb-2")
-              a(title=`Boost ${product.name} to show it's creator that you care about it. This also helps the product get better haptic rank.` href="/" class="block px-4 py-2 rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700")
-                span(class="flex justify-between")
-                  span(class="flex items-center")
-                    span(class="icon-container")
-                      ion-icon(name="rocket-outline" class="text-2xl mr-4")
-                    span(class="mr-4")= `Boost`
-                  span(class="px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase") 74
+        div(class="flex items-center text-gray-300 dark:text-gray-500")
+          ion-icon(name="attach-outline" class="text-6xl mr-4")
+          p(class="text-xl") No pinned posts
 
 block append scripts
   script(src="/static/js/product.js")

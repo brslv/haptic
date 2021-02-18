@@ -89,10 +89,16 @@
     line-height: 0;
   }
 
+  .product-header {
+    @apply gap-4;
+    display: grid;
+    grid-template-columns: 7fr 4fr;
+  }
+
   .product-main {
     @apply gap-4;
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 7fr 4fr;
   }
 
   @keyframes shake {

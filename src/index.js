@@ -309,6 +309,7 @@ app.post(
           .update({
             name: input.name,
             description: input.description,
+            website: input.website,
             is_public: input.is_public === "on",
             is_listed: input.is_listed === "on",
           })
@@ -348,6 +349,7 @@ app.get("/p/:slug", (req, res, next) => {
     "products.name",
     "products.slug",
     "products.description",
+    "products.website",
     "products.is_public",
     "products.is_listed",
     "products.created_at as product_created_at",
