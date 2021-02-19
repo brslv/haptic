@@ -149,8 +149,17 @@ const ajaxOnly = (req, res, next) => {
   else res.status(400).end("400 Bad Request");
 };
 const authOnly = (req, res, next) => {
-  if (req.user) next();
-  else res.redirect("/login");
+  if (req.user) {
+    next();
+  } else {
+    if (isAjaxCall(req)) {
+      return res
+        .status(401)
+        .json({ ok: 0, err: "Not authorized.", details: null });
+    }
+
+    res.status(401).redirect("/login");
+  }
 };
 const guestsOnly = (req, res, next) => {
   if (!req.user) next();
@@ -454,28 +463,34 @@ app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
     });
 });
 
-app.post("/product-slug", ajaxOnly, express.json(), (req, res, next) => {
-  let slug = nanoid(6).toLowerCase();
-  if (req.body.name) slug = slugify(req.body.name, { lower: true });
+app.post(
+  "/product-slug",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  (req, res, next) => {
+    let slug = nanoid(6).toLowerCase();
+    if (req.body.name) slug = slugify(req.body.name, { lower: true });
 
-  db("products")
-    .where({ slug })
-    .then((result) => {
-      if (result.length) {
-        // slug is taken
-        slug = `${slug}-${nanoid(6).toLowerCase()}`;
-      }
+    db("products")
+      .where({ slug })
+      .then((result) => {
+        if (result.length) {
+          // slug is taken
+          slug = `${slug}-${nanoid(6).toLowerCase()}`;
+        }
 
-      res.json({
-        ok: 1,
-        err: null,
-        details: { slug },
-      });
-    })
-    .catch((err) => next(err));
-});
+        res.json({
+          ok: 1,
+          err: null,
+          details: { slug },
+        });
+      })
+      .catch((err) => next(err));
+  }
+);
 
-app.post("/product", ajaxOnly, express.json(), (req, res, next) => {
+app.post("/product", ajaxOnly, authOnly, express.json(), (req, res, next) => {
   db("products")
     .insert({
       user_id: req.user.id,
@@ -498,41 +513,51 @@ app.post("/product", ajaxOnly, express.json(), (req, res, next) => {
     });
 });
 
-app.post("/post/:pid/:type", ajaxOnly, express.json(), (req, res, next) => {
-  const types = posts.types;
-  const type = req.params.type;
-  const pid = req.params.pid;
-  const postsActions = posts.actions({ db, user: req.user });
+app.post(
+  "/post/:pid/:type",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  (req, res, next) => {
+    const types = posts.types;
+    const type = req.params.type;
+    const pid = req.params.pid;
+    const postsActions = posts.actions({ db, user: req.user });
 
-  if (!types.includes(type)) {
-    return res
-      .status(400)
-      .json({ ok: 0, err: `Invalid post type: ${type}. 🧐`, details: null });
+    if (!types.includes(type)) {
+      return res
+        .status(400)
+        .json({ ok: 0, err: `Invalid post type: ${type}. 🧐`, details: null });
+    }
+
+    if (isNaN(pid)) {
+      return res.status(400).json({
+        ok: 0,
+        err: `Invalid product id: ${pid}. 🧐 Should be numeric.`,
+        details: null,
+      });
+    }
+
+    db("products")
+      .select()
+      .where({ id: pid })
+      .first()
+      .then((productResult) => {
+        postsActions
+          .publish(type, productResult, req.body)
+          .then((publishResult) => {
+            return postsActions.getPost(type, { postId: publishResult.postId });
+          })
+          .then((post) => {
+            res.json({ ok: 1, err: null, details: { post } });
+          })
+          .catch((err) => next(err));
+      });
   }
+);
 
-  if (isNaN(pid)) {
-    return res.status(400).json({
-      ok: 0,
-      err: `Invalid product id: ${pid}. 🧐 Should be numeric.`,
-      details: null,
-    });
-  }
-
-  db("products")
-    .select()
-    .where({ id: pid })
-    .first()
-    .then((productResult) => {
-      postsActions
-        .publish(type, productResult, req.body)
-        .then((publishResult) => {
-          return postsActions.getPost(type, { postId: publishResult.postId });
-        })
-        .then((post) => {
-          res.json({ ok: 1, err: null, details: { post } });
-        })
-        .catch((err) => next(err));
-    });
+app.get("/:pid/posts", ajaxOnly, authOnly, express.json(), (req, res, next) => {
+  // if (req.user)
 });
 
 // error handler
