@@ -50,7 +50,9 @@ block content
 
           form(id="form-post-text" class="hidden" data-show="text")
             input(type="hidden" name="id" value=product.id)
-            textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." name="text" id="text")
+            label
+              textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." name="text" id="text")
+              p(class="hidden text-red-500" id="text-error")
             button(type="submit" class="btn btn-primary") Publish
 
           div(class="pt-16")

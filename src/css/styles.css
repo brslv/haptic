@@ -118,6 +118,10 @@
     display: block;
   }
 
+  .error-field {
+    @apply border border-red-500 !important;
+  }
+
   @keyframes shake {
     10%,
     90% {

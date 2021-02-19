@@ -71,21 +71,28 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
 
   // handling text form submit
   var formPostTextEl = document.getElementById("form-post-text");
+  var textEl = formPostTextEl.querySelector("#text");
+  var textErrorEl = document.getElementById("text-error");
   var postsContainer = document.getElementById("posts-container");
   var noPostsMsg = document.getElementById("no-posts-msg");
 
   formPostTextEl.addEventListener("submit", function formPostTextSubmit(e) {
     e.preventDefault();
 
-    var textEl = formPostTextEl.querySelector("#text");
     var text = textEl.value;
     var productIdInputEl = formPostTextEl.querySelector("input[name=id]");
     if (!productIdInputEl) {
       console.error("Couldn't find product id. 👀");
       return;
     }
-
     var productId = productIdInputEl.value;
+
+    hideErrors(); // hide errors from the ui
+    var errors = validate({ text, productId });
+    if (Object.keys(errors).length) {
+      showErrors(errors); // show errors
+      return;
+    }
 
     axios
       .post(`/post/${productId}/text`, {
@@ -112,4 +119,31 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
         }
       });
   });
+
+  function validate({ text, productId }) {
+    var errors = {};
+    if (text.length < 2) {
+      errors.text = "Text is too short. You can do much better! 🤓";
+    }
+    if (isNaN(productId)) {
+      errors.productId = {
+        productId:
+          "Hmm, it seems like something is broken. There's no productId.",
+      };
+    }
+    return errors;
+  }
+
+  function showErrors(errors) {
+    if (errors.text) {
+      textEl.classList.add("error-field");
+      textErrorEl.innerHTML = errors.text;
+      textErrorEl.classList.remove("hidden");
+    }
+  }
+
+  function hideErrors() {
+    textEl.classList.remove("error-field");
+    textErrorEl.classList.add("hidden");
+  }
 });

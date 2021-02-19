@@ -538,6 +538,14 @@ app.post(
       });
     }
 
+    if (req.body.text.length < 2) {
+      return res.status(400).json({
+        ok: 0,
+        err: `Invalid text length. Min: 2 symbols.`,
+        details: null,
+      });
+    }
+
     db("products")
       .select()
       .where({ id: pid })
@@ -565,10 +573,10 @@ app.use((err, req, res, next) => {
   console.log("An error occurred.", err);
   if (res.headersSent) return next(err);
   if (isAjaxCall(req))
-    return res.json({
+    return res.status(500).json({
       ok: 0,
       err:
-        "Something went wrong. 😱 Please, write to me in twitter to resolve this issue for you.",
+        "Something went wrong. 😱 Sorry for the inconvenience. Please, write to me in twitter to resolve this issue for you.",
       details: { err },
     });
   res.status(500);
