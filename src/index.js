@@ -201,8 +201,8 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
     .table("products")
     .where({ slug })
     .first()
-    .then((result) => {
-      if (!result) {
+    .then((productResult) => {
+      if (!productResult) {
         return res.status(404).render("404", {
           meta: {
             ...defaultMetas,
@@ -212,23 +212,30 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
           user: req.user,
         });
       }
-      res.render("dashboard/product/posts", {
-        meta: {
-          ...defaultMetas,
-          title: `${result.name} | Haptic`,
-          og: {
-            ...defaultMetas.og,
-            title: `${result.name} | Haptic`,
-          },
-        },
-        user: req.user,
-        product: { ...result },
-        links: {
-          posts: `/dashboard/product/${slug}/posts`,
-          settings: `/dashboard/product/${slug}/settings`,
-          url: `/p/${slug}`,
-        },
-      });
+
+      posts
+        .actions({ db, user: req.user })
+        .getAllPosts(productResult.id)
+        .then((postsResult) => {
+          res.render("dashboard/product/posts", {
+            meta: {
+              ...defaultMetas,
+              title: `${productResult.name} | Haptic`,
+              og: {
+                ...defaultMetas.og,
+                title: `${productResult.name} | Haptic`,
+              },
+            },
+            user: req.user,
+            product: { ...productResult },
+            posts: [...postsResult],
+            links: {
+              posts: `/dashboard/product/${slug}/posts`,
+              settings: `/dashboard/product/${slug}/settings`,
+              url: `/p/${slug}`,
+            },
+          });
+        });
     })
     .catch((err) => {
       next(err);
@@ -563,10 +570,6 @@ app.post(
       });
   }
 );
-
-app.get("/:pid/posts", ajaxOnly, authOnly, express.json(), (req, res, next) => {
-  // if (req.user)
-});
 
 // error handler
 app.use((err, req, res, next) => {

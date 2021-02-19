@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
           contentEl.innerHTML = post.text;
         }
 
-        postsContainer.appendChild(tplEl.content);
+        postsContainer.parentNode.prepend(tplEl.content);
 
         textEl.value = "";
 

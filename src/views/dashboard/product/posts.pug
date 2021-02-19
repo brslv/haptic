@@ -56,23 +56,34 @@ block content
             button(type="submit" class="btn btn-primary") Publish
 
           div(class="pt-16")
-            div(class="flex items-center text-gray-300 dark:text-gray-500" id="no-posts-msg")
-              ion-icon(name="pulse-outline" class="text-3xl mr-4")
-              p Still no public updates available
-            div(id="posts-container")
+            if posts && posts.length
+              div(id="posts-container")
+                each post in posts
+                  div(class="p-4 rounded-xl border border-gray-300 dark:border-gray-700 mb-4")
+                    div(class="flex items-center mb-4")
+                      img(src=post.user_twitter_profile_image_url class="w-10 h-10 rounded-full mr-4")
+                      div(class="flex flex-col")
+                        span(class="font-bold")= post.user_twitter_name
+                        a(class="text-xs text-gray-600 dark:text-gray-400" href=`https://twitter.com/${post.user_twitter_screen_name}` target="_blank" rel="noreferrer noopener")= post.user_twitter_screen_name
+                    p(data-content="data-content")= post.text
+            else 
+              div(class="flex items-center text-gray-300 dark:text-gray-500" id="no-posts-msg")
+                ion-icon(name="pulse-outline" class="text-3xl mr-4")
+                p Still no public updates available
 
         aside(class="hidden md:block md:col-span-3")
           +page-title(class="mb-4") Pinned updates
-          //- div(class="flex items-center text-gray-300 dark:text-gray-500")
-          //-   ion-icon(name="attach-outline" class="text-3xl mr-4")
-          //-   p No pinned posts
-          div(class="p-4 rounded-xl border border-gray-300 dark:border-gray-700")
-            p.
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua.
+          div(class="flex items-center text-gray-300 dark:text-gray-500")
+            ion-icon(name="attach-outline" class="text-3xl mr-4")
+            p No pinned posts
 
   template(id="post-tpl")
     div(class="p-4 rounded-xl border border-gray-300 dark:border-gray-700 mb-4")
+      div(class="flex items-center mb-4")
+        img(src=user.twitter_profile_image_url class="w-10 h-10 rounded-full mr-4")
+        div(class="flex flex-col")
+          span(class="font-bold")= user.twitter_name
+          a(class="text-xs text-gray-600 dark:text-gray-400" href=`https://twitter.com/${user.twitter_screen_name}` target="_blank" rel="noreferrer noopener")= user.twitter_screen_name
       p(data-content="data-content")
 
 block append scripts

@@ -88,6 +88,38 @@ function actions({ db, user }) {
     }
   }
 
+  function getAllPosts(productId) {
+    return new Promise((res, rej) => {
+      return db.transaction().then((trx) => {
+        return db
+          .transacting(trx)
+          .select(
+            "posts.id",
+            "posts.type",
+            "posts.created_at",
+            "posts.updated_at",
+            "posts_text.text",
+            "users.twitter_name as user_twitter_name",
+            "users.twitter_profile_image_url as user_twitter_profile_image_url",
+            "users.twitter_screen_name as user_twitter_screen_name"
+          )
+          .table("posts_text")
+          .leftJoin("posts", "posts_text.post_id", "posts.id")
+          .leftJoin("users", "posts.user_id", "users.id")
+          .where({ "posts.product_id": productId })
+          .orderBy("posts.created_at", "DESC")
+          .then((result) => {
+            trx.commit();
+            res(result);
+          })
+          .catch((err) => {
+            trx.rollback();
+            rej(err);
+          });
+      });
+    });
+  }
+
   function publish(type, product, reqBody) {
     switch (type) {
       case "text": {
@@ -97,7 +129,7 @@ function actions({ db, user }) {
     }
   }
 
-  return { publish, getPost };
+  return { publish, getPost, getAllPosts };
 }
 
 module.exports = {
