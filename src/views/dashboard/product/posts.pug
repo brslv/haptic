@@ -4,6 +4,25 @@ include ../../partials/top-bar.pug
 include ../../partials/product-header.pug
 include ../../partials/page-title.pug
 
+mixin post-type-btn({bind, icon, disabled}, attr = {})
+  div(
+    data-bind=bind
+    data-disabled=disabled
+    class={
+      "relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700": true,
+      "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700": !disabled,
+      "text-gray-500": disabled
+    }
+  )&attributes(attr)
+    span(class="icon-container")
+    ion-icon(class="mr-2 text-lg" name=icon)
+    if block
+      block
+    if disabled
+      span(class="text-xs px-2 py-1 ml-4 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
+    span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
+      ion-icon(name="close-outline")
+
 block content
   +top-bar
   +product-header(product, links, 'posts')
@@ -13,40 +32,11 @@ block content
         div(class="md:col-span-5")
           +page-title(class="mb-4") Publish new
           div(class="gap-1 flex flex-wrap pb-2")
-            div(data-bind="text" class="relative cursor-pointer flex items-center py-2 px-4 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-700")
-              span(class="icon-container")
-              ion-icon(class="mr-2 text-lg" name="document-text-outline")
-              span(class="text-sm") Text
-              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="text")
-                ion-icon(name="close-outline")
-            div(data-bind="youtube" data-disabled class="relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
-              span(class="icon-container")
-              ion-icon(class="mr-2 text-lg" name="logo-youtube")
-              span(class="mr-4 text-sm") YouTube
-              span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="youtube")
-                ion-icon(name="close-outline")
-            div(data-bind="survey" data-disabled class="relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
-              span(class="icon-container")
-              ion-icon(class="mr-2 text-lg" name="checkbox-outline")
-              span(class="mr-4 text-sm") Survey
-              span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="survey")
-                ion-icon(name="close-outline")
-            div(data-bind="milestone" data-disabled class="relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
-              span(class="icon-container")
-              ion-icon(class="mr-2 text-lg" name="happy-outline")
-              span(class="mr-4 text-sm") Milestone
-              span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="milestone")
-                ion-icon(name="close-outline")
-            div(data-bind="roadmap" data-disabled class="relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-500")
-              span(class="icon-container")
-              ion-icon(class="mr-2 text-lg" name="map-outline")
-              span(class="mr-4 text-sm") Roadmap
-              span(class="text-xs px-2 py-1 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-              span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close="roadmap")
-                ion-icon(name="close-outline")
+            +post-type-btn({ bind: "text", icon: "document-text-outline", disabled: false }) Text
+            +post-type-btn({ bind: "youtube", icon: "logo-youtube", disabled: true }) YouTube
+            +post-type-btn({ bind: "survey", icon: "checkbox-outline", disabled: true }) Survey
+            +post-type-btn({ bind: "milestone", icon: "happy-outline", disabled: true }) Milestone
+            +post-type-btn({ bind: "roadmap", icon: "map-outline", disabled: true }) Roadmap
 
           form(id="form-post-text" class="hidden" data-show="text")
             input(type="hidden" name="id" value=product.id)
@@ -64,7 +54,12 @@ block content
                       img(src=post.user_twitter_profile_image_url class="w-10 h-10 rounded-full mr-4")
                       div(class="flex flex-col")
                         span(class="font-bold")= post.user_twitter_name
-                        a(class="text-xs text-gray-600 dark:text-gray-400" href=`https://twitter.com/${post.user_twitter_screen_name}` target="_blank" rel="noreferrer noopener")= post.user_twitter_screen_name
+                        div(class="flex items-center text-xs text-gray-600 dark:text-gray-400")
+                          a(class="mr-2" href=`https://twitter.com/${post.user_twitter_screen_name}` target="_blank" rel="noreferrer noopener")= `@${post.user_twitter_screen_name}`
+                          span(class="mr-2") &mdash;
+                          span(class="flex items-center")
+                            ion-icon(name="time-outline" class="mr-2")
+                            span= post.created_at_formatted
                     p(data-content="data-content")= post.text
             else 
               div(class="flex items-center text-gray-300 dark:text-gray-500" id="no-posts-msg")
@@ -83,7 +78,12 @@ block content
         img(src=user.twitter_profile_image_url class="w-10 h-10 rounded-full mr-4")
         div(class="flex flex-col")
           span(class="font-bold")= user.twitter_name
-          a(class="text-xs text-gray-600 dark:text-gray-400" href=`https://twitter.com/${user.twitter_screen_name}` target="_blank" rel="noreferrer noopener")= user.twitter_screen_name
+          div(class="flex items-center text-xs text-gray-600 dark:text-gray-400")
+            a(class="mr-2" href=`https://twitter.com/${user.twitter_screen_name}` target="_blank" rel="noreferrer noopener")= `@${user.twitter_screen_name}`
+            span(class="mr-2") &mdash;
+            span(class="flex items-center")
+              ion-icon(name="time-outline" class="mr-2")
+              span Now
       p(data-content="data-content")
 
 block append scripts

@@ -14,6 +14,7 @@ const KnexSessionStore = require("connect-session-knex")(expressSession);
 const slugify = require("slugify");
 const { nanoid } = require("nanoid");
 const { flash } = require("express-flash-message");
+const day = require("dayjs");
 const posts = require("./posts");
 
 // constants
@@ -165,6 +166,9 @@ const guestsOnly = (req, res, next) => {
   if (!req.user) next();
   else res.redirect("/dashboard");
 };
+const dateFmt = (dateStr) => {
+  return day(dateStr).format("DD MMM, HH:mm");
+};
 
 // setup routes
 app.get("/", (req, res) => {
@@ -228,7 +232,12 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
             },
             user: req.user,
             product: { ...productResult },
-            posts: [...postsResult],
+            posts: [
+              ...postsResult.map((post) => ({
+                ...post,
+                created_at_formatted: dateFmt(post.created_at),
+              })),
+            ],
             links: {
               posts: `/dashboard/product/${slug}/posts`,
               settings: `/dashboard/product/${slug}/settings`,
