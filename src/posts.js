@@ -26,7 +26,7 @@ function actions({ db, user }) {
                 text,
               })
               .returning("id")
-              .then(function postTextInsertSuccess(postTextId) {
+              .then(function postTextInsertSuccess([postTextId]) {
                 return { postId, postTextId };
               })
               .catch((err) => {
@@ -47,37 +47,29 @@ function actions({ db, user }) {
   }
 
   function _getPostText(postId) {
-    return new Promise((res, rej) => {
-      db.transaction().then((trx) => {
-        db("posts")
-          .transacting(trx)
-          .select()
-          .from("posts")
-          .where({ id: postId })
-          .first()
-          .then((resultPost) => {
-            return db("posts_text")
-              .transacting(trx)
-              .select()
-              .where({ post_id: postId })
-              .first()
-              .then((resultPostText) => {
-                return { ...resultPost, ...resultPostText };
-              })
-              .catch((err) => {
-                trx.rollback();
-                throw err;
-              });
-          })
-          .then((post) => {
-            res(post);
-          })
-          .catch((err) => {
-            trx.rollback();
-            rej(err);
-          });
+    return db
+      .select(
+        "posts.id",
+        "posts.type",
+        "posts.created_at",
+        "posts.updated_at",
+        "posts_text.text",
+        "users.twitter_name as user_twitter_name",
+        "users.twitter_profile_image_url as user_twitter_profile_image_url",
+        "users.twitter_screen_name as user_twitter_screen_name"
+      )
+      .table("posts_text")
+      .leftJoin("posts", "posts_text.post_id", "posts.id")
+      .leftJoin("users", "posts.user_id", "users.id")
+      .where({ "posts_text.post_id": postId })
+      .first()
+      .debug()
+      .then((result) => {
+        return result;
+      })
+      .catch((err) => {
+        return err;
       });
-    });
   }
 
   function getPost(type, { postId }) {
@@ -90,7 +82,7 @@ function actions({ db, user }) {
 
   function getAllPosts(productId) {
     return new Promise((res, rej) => {
-      return db.transaction().then((trx) => {
+      db.transaction().then((trx) => {
         db.transacting(trx)
           .select(
             "posts.id",
