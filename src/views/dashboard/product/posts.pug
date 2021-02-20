@@ -23,6 +23,22 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
     span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
       ion-icon(name="close-outline")
 
+mixin post({ img, twitter_name, twitter_screen_name, date_str })
+  div(class="p-4 rounded-xl border border-gray-300 dark:border-gray-700 mb-4")
+    div(class="flex items-center mb-4")
+      img(src=img class="w-10 h-10 rounded-full mr-4")
+      div(class="flex flex-col")
+        span(class="font-bold")= twitter_name
+        div(class="flex items-center text-xs text-gray-600 dark:text-gray-400")
+          a(class="mr-2" href=`https://twitter.com/${twitter_screen_name}` target="_blank" rel="noreferrer noopener")= `@${twitter_screen_name}`
+          span(class="mr-2") &mdash;
+          span(class="flex items-center")
+            ion-icon(name="time-outline" class="mr-2")
+            span= date_str
+    p(data-content="data-content")
+      if block
+        block
+
 block content
   +top-bar
   +product-header(product, links, 'posts')
@@ -49,18 +65,12 @@ block content
             if posts && posts.length
               div(id="posts-container")
                 each post in posts
-                  div(class="p-4 rounded-xl border border-gray-300 dark:border-gray-700 mb-4")
-                    div(class="flex items-center mb-4")
-                      img(src=post.user_twitter_profile_image_url class="w-10 h-10 rounded-full mr-4")
-                      div(class="flex flex-col")
-                        span(class="font-bold")= post.user_twitter_name
-                        div(class="flex items-center text-xs text-gray-600 dark:text-gray-400")
-                          a(class="mr-2" href=`https://twitter.com/${post.user_twitter_screen_name}` target="_blank" rel="noreferrer noopener")= `@${post.user_twitter_screen_name}`
-                          span(class="mr-2") &mdash;
-                          span(class="flex items-center")
-                            ion-icon(name="time-outline" class="mr-2")
-                            span= post.created_at_formatted
-                    p(data-content="data-content")= post.text
+                  +post({
+                    img: post.user_twitter_profile_image_url,
+                    twitter_name: post.user_twitter_name,
+                    twitter_screen_name: post.user_twitter_screen_name,
+                    date_str: post.created_at_formatted,
+                  })= post.text
             else 
               div(class="flex items-center text-gray-300 dark:text-gray-500" id="no-posts-msg")
                 ion-icon(name="pulse-outline" class="text-3xl mr-4")
@@ -73,18 +83,12 @@ block content
             p No pinned posts
 
   template(id="post-tpl")
-    div(class="p-4 rounded-xl border border-gray-300 dark:border-gray-700 mb-4")
-      div(class="flex items-center mb-4")
-        img(src=user.twitter_profile_image_url class="w-10 h-10 rounded-full mr-4")
-        div(class="flex flex-col")
-          span(class="font-bold")= user.twitter_name
-          div(class="flex items-center text-xs text-gray-600 dark:text-gray-400")
-            a(class="mr-2" href=`https://twitter.com/${user.twitter_screen_name}` target="_blank" rel="noreferrer noopener")= `@${user.twitter_screen_name}`
-            span(class="mr-2") &mdash;
-            span(class="flex items-center")
-              ion-icon(name="time-outline" class="mr-2")
-              span Now
-      p(data-content="data-content")
+    +post({
+      img: user.twitter_profile_image_url,
+      twitter_name: user.twitter_name,
+      twitter_screen_name: user.twitter_screen_name,
+      date_str: 'Now'
+    })
 
 block append scripts
   script(src="/static/js/posts.js")

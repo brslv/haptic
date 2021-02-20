@@ -8,7 +8,7 @@ function actions({ db, user }) {
       db.transaction((trx) => {
         // insert in posts
 
-        return db("posts")
+        db("posts")
           .transacting(trx)
           .insert({ type: TEXT_TYPE, product_id: product.id, user_id: user.id })
           .returning("id")
@@ -91,8 +91,7 @@ function actions({ db, user }) {
   function getAllPosts(productId) {
     return new Promise((res, rej) => {
       return db.transaction().then((trx) => {
-        return db
-          .transacting(trx)
+        db.transacting(trx)
           .select(
             "posts.id",
             "posts.type",
