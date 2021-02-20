@@ -20,7 +20,7 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
       block
     if disabled
       span(class="text-xs px-2 py-1 ml-4 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
-    span(class="hidden block absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
+    span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
       ion-icon(name="close-outline")
 
 mixin post({ post_id, img, twitter_name, twitter_screen_name, date_str })

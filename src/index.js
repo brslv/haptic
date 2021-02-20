@@ -407,6 +407,17 @@ app.get("/p/:slug", (req, res, next) => {
         });
       }
 
+      if (!result.is_public && (!req.user || req.user.id !== result.user_id)) {
+        return res.render("private-product", {
+          meta: {
+            ...defaultMetas,
+            title: "Private product | Haptic",
+            og: { ...defaultMetas.og, title: "Private product | Haptic" },
+          },
+          user: req.user,
+        });
+      }
+
       res.render("product", {
         meta: {
           ...defaultMetas,
