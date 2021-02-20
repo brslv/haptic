@@ -105,6 +105,19 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
         if (data.ok) {
           var post = details.post;
           var tplEl = document.querySelector("#post-tpl").cloneNode(true);
+
+          // setup events for the newly added post
+          registerCtxMenus([
+            tplEl.content.querySelector("[data-ctx-menu-trigger]"),
+          ]);
+          // update data-post-id attribute
+          var elsWithDataPostIdAttr = tplEl.content.querySelectorAll(
+            "[data-post-id]"
+          );
+          elsWithDataPostIdAttr.forEach(function updateDataPostIdAttrs(el) {
+            el.dataset.postId = post.id;
+          });
+
           var contentEl = tplEl.content.querySelector("[data-content]");
 
           contentEl.innerHTML = post.text;
@@ -149,72 +162,88 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
   }
 
   // handle ctx menu
-  // data-ctx-menu-trigger -> a button, which when clicked, opens a menu (data-ctx-menu)
-  var ctxMenuTriggers = document.querySelectorAll("[data-ctx-menu-trigger]");
-  [].forEach.call(ctxMenuTriggers, function mapCtxMenuTriggers(triggerEl) {
-    triggerEl.addEventListener("click", function ctxMenuClick(e) {
-      var menu = e.currentTarget.parentElement.querySelector("[data-ctx-menu]");
-      var btns = menu.querySelectorAll("[data-ctx-action]");
-
-      if (!menu) {
-        console.log(
-          "No ctx menu found for trigger " + e.currentTarget.dataset.ctxTrigger
+  // data-ctx-menu-trigger -> a button which when clicked opens a menu (data-ctx-menu)
+  function registerCtxMenus(ctxMenuTriggers) {
+    ctxMenuTriggers.forEach(function mapCtxMenuTriggers(triggerEl) {
+      triggerEl.addEventListener("click", function ctxMenuClick(e) {
+        var menu = e.currentTarget.parentElement.querySelector(
+          "[data-ctx-menu]"
         );
-        return;
-      }
+        var btns = menu.querySelectorAll("[data-ctx-action]");
 
-      // show the ctx menu
-      menu.classList.remove("hidden");
-      menu.parentElement.classList.add("z-10");
+        if (!menu) {
+          console.log(
+            "No ctx menu found for trigger " +
+              e.currentTarget.dataset.ctxTrigger
+          );
+          return;
+        }
 
-      // btn handlers
-      function deletePost(postId) {
-        axios
-          .delete("/post/" + postId)
-          .then(function postDelResponse(response) {
-            console.log(response);
-            // remove the post element
-            var post = document.querySelector(
-              '[data-post-id="' + postId + '"]'
-            );
-            if (!post) {
-              console.warn("No post with post_id" + postId + " to remove.");
-              return;
-            }
+        // show the ctx menu
+        menu.classList.remove("hidden");
+        menu.parentElement.classList.add("z-10");
 
-            post.remove();
-          });
-      }
+        // btn handlers
+        function deletePost(postId) {
+          axios
+            .delete("/post/" + postId)
+            .then(function postDelResponse(response) {
+              console.log(response);
+              // remove the post element
+              var post = document.querySelector(
+                '[data-post-id="' + postId + '"]'
+              );
+              if (!post) {
+                console.warn("No post with post_id" + postId + " to remove.");
+                return;
+              }
 
-      function handleCtxBtnClick(e) {
-        var action = e.currentTarget.dataset.ctxAction;
-        switch (action) {
-          case "delete": {
-            var ok = window.confirm(
-              "Deleting a post is irreversible. Delete post anyway?"
-            );
-            if (ok) deletePost(e.currentTarget.dataset.postId);
-            break;
+              post.remove();
+
+              // show no posts message if needed
+              showNoPostsMsg();
+            });
+        }
+
+        function showNoPostsMsg() {
+          var noPostsMsg = document.getElementById("no-posts-msg");
+          if (!postsContainer.childNodes.length) {
+            noPostsMsg.classList.remove("hidden");
           }
         }
-      }
 
-      // register ctx btn handlers
-      [].forEach.call(btns, function(ctxBtn) {
-        ctxBtn.addEventListener("click", handleCtxBtnClick);
-      });
+        function handleCtxBtnClick(e) {
+          var action = e.currentTarget.dataset.ctxAction;
+          switch (action) {
+            case "delete": {
+              var ok = window.confirm(
+                "Deleting a post is irreversible. Delete post anyway?"
+              );
+              if (ok) deletePost(e.currentTarget.dataset.postId);
+              break;
+            }
+          }
+        }
 
-      // listen for outside clicks and clean up event handlers
-      function closeCtxMenu(e) {
-        if (menu.contains(e.target) || triggerEl.contains(e.target)) return;
-        menu.classList.add("hidden");
-        menu.parentElement.classList.remove("z-10");
-        document.body.removeEventListener("click", closeCtxMenu);
+        // register ctx btn handlers
         [].forEach.call(btns, function(ctxBtn) {
-          ctxBtn.removeEventListener("click", handleCtxBtnClick);
+          ctxBtn.addEventListener("click", handleCtxBtnClick);
         });
-      }
-      document.body.addEventListener("click", closeCtxMenu);
+
+        // listen for outside clicks and clean up event handlers
+        function closeCtxMenu(e) {
+          if (menu.contains(e.target) || triggerEl.contains(e.target)) return;
+          menu.classList.add("hidden");
+          menu.parentElement.classList.remove("z-10");
+          document.body.removeEventListener("click", closeCtxMenu);
+          [].forEach.call(btns, function(ctxBtn) {
+            ctxBtn.removeEventListener("click", handleCtxBtnClick);
+          });
+        }
+        document.body.addEventListener("click", closeCtxMenu);
+      });
     });
-  });
+  }
+
+  registerCtxMenus(document.querySelectorAll("[data-ctx-menu-trigger]"));
 });
