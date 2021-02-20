@@ -128,7 +128,45 @@ function actions({ db, user }) {
     }
   }
 
-  return { publish, getPost, getAllPosts };
+  function removePost(postId) {
+    return new Promise((res, rej) => {
+      db.transaction().then((trx) => {
+        db.transacting(trx)
+          .table("posts")
+          .select("user_id")
+          .where({ id: postId })
+          .first()
+          .then((postResult) => {
+            if (!postResult) {
+              throw new Error("Invalid post id: " + postId);
+            }
+
+            if (user.id !== postResult.user_id) {
+              throw new Error("Wrong post owner.");
+            }
+
+            return true;
+          })
+          .then(() => {
+            db.transacting(trx)
+              .table("posts")
+              .select()
+              .where({ id: postId })
+              .del()
+              .then((postDelResult) => {
+                trx.commit();
+                res(postDelResult);
+              });
+          })
+          .catch((err) => {
+            rej(err);
+            trx.rollback();
+          });
+      });
+    });
+  }
+
+  return { publish, getPost, getAllPosts, removePost };
 }
 
 module.exports = {
