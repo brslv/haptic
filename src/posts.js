@@ -27,20 +27,22 @@ function actions({ db, user }) {
               })
               .returning("id")
               .then(function postTextInsertSuccess([postTextId]) {
-                return { postId, postTextId };
+                trx.commit().then(() => {
+                  _getPostText(postId)
+                    .then((post) => {
+                      res(post);
+                    })
+                    .catch((err) => {
+                      throw err;
+                    });
+                });
               })
               .catch((err) => {
-                trx.rollback();
                 throw err;
               });
           })
-          .then(function handleSuccess({ postId, postTextId }) {
-            trx.commit();
-            res({ postId, postTextId });
-          })
           .catch((err) => {
-            trx.rollback();
-            rej(err);
+            trx.rollback().then(() => rej(err));
           });
       });
     });
@@ -63,7 +65,6 @@ function actions({ db, user }) {
       .leftJoin("users", "posts.user_id", "users.id")
       .where({ "posts_text.post_id": postId })
       .first()
-      .debug()
       .then((result) => {
         return result;
       })
@@ -100,12 +101,10 @@ function actions({ db, user }) {
           .where({ "posts.product_id": productId })
           .orderBy("posts.created_at", "DESC")
           .then((result) => {
-            trx.commit();
-            res(result);
+            trx.commit().then(() => res(result));
           })
           .catch((err) => {
-            trx.rollback();
-            rej(err);
+            trx.rollback().then(() => rej(err));
           });
       });
     });
@@ -146,13 +145,11 @@ function actions({ db, user }) {
               .where({ id: postId })
               .del()
               .then((postDelResult) => {
-                trx.commit();
-                res(postDelResult);
+                trx.commit().then(() => res(postDelResult));
               });
           })
           .catch((err) => {
-            rej(err);
-            trx.rollback();
+            trx.rollback().then(() => rej(err));
           });
       });
     });

@@ -165,6 +165,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
 
       // show the ctx menu
       menu.classList.remove("hidden");
+      menu.parentElement.classList.add("z-10");
 
       // btn handlers
       function deletePost(postId) {
@@ -207,6 +208,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       function closeCtxMenu(e) {
         if (menu.contains(e.target) || triggerEl.contains(e.target)) return;
         menu.classList.add("hidden");
+        menu.parentElement.classList.remove("z-10");
         document.body.removeEventListener("click", closeCtxMenu);
         [].forEach.call(btns, function(ctxBtn) {
           ctxBtn.removeEventListener("click", handleCtxBtnClick);

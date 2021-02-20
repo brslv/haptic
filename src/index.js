@@ -569,9 +569,6 @@ app.post(
       .then((productResult) => {
         postsActions
           .publish(type, productResult, req.body)
-          .then((publishResult) => {
-            return postsActions.getPost(type, { postId: publishResult.postId });
-          })
           .then((post) => {
             res.json({ ok: 1, err: null, details: { post } });
           })

@@ -42,12 +42,17 @@ mixin post({ post_id, img, twitter_name, twitter_screen_name, date_str })
         div(class="relative inline-block")
           button(class="btn btn-icon btn-small icon-container" data-ctx-menu-trigger)
             ion-icon(name="ellipsis-horizontal-outline" class="text-xl")
-          div(data-ctx-menu class="hidden absolute top-8 right-0 bg-white border border-gray-300 rounded-xl dark:bg-gray-800 dark:border-gray-700 shadow" style="min-width: 150px;")
-            +page-title(class="px-4 py-2") Actions
-            button(data-ctx-action="delete" data-post-id=post_id class="flex items-center btn btn-danger px-4 btn-text w-full text-left border-t border-gray-300 dark:border-gray-700 rounded-none")
-              span(class="icon-container mr-2")
-                ion-icon(name="trash-outline")
-              span Delete
+          div(data-ctx-menu class="hidden absolute top-8 -right-2 bg-white border border-gray-300 rounded-xl dark:bg-gray-800 dark:border-gray-700 shadow" style="min-width: 150px;")
+            +page-title(class="px-4 py-2 border-b border-gray-300 dark:border-gray-700 inline-block w-full") Actions
+            div(class="py-2")
+              button(data-ctx-action="delete" data-post-id=post_id class="flex items-center btn btn-default pb-0 px-4 btn-text w-full text-left rounded-none")
+                span(class="icon-container mr-2")
+                  ion-icon(name="pin-outline")
+                span Pin
+              button(data-ctx-action="delete" data-post-id=post_id class="flex items-center btn btn-danger px-4 btn-text w-full text-left rounded-none")
+                span(class="icon-container mr-2")
+                  ion-icon(name="trash-outline")
+                span Delete
     p(data-content="data-content")
       if block
         block
