@@ -9,7 +9,7 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
     data-bind=bind
     data-disabled=disabled
     class={
-      "relative flex items-center py-1.5 px-2.5 rounded-xl border border-gray-300 dark:border-gray-700": true,
+      "relative flex items-center py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700": true,
       "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700": !disabled,
       "text-gray-500": disabled
     }
@@ -45,10 +45,6 @@ mixin post({ post_id, img, twitter_name, twitter_screen_name, date_str })
           div(data-ctx-menu class="hidden absolute top-8 -right-2 bg-white shadow-md rounded-xl dark:bg-gray-800" style="min-width: 150px;")
             +page-title(class="px-4 py-2 inline-block w-full") Actions
             div(class="py-2")
-              button(data-ctx-action="delete" data-post-id=post_id class="flex items-center btn btn-default px-4 btn-text w-full text-left rounded-none")
-                span(class="icon-container mr-2")
-                  ion-icon(name="pin-outline")
-                span Pin
               button(data-ctx-action="delete" data-post-id=post_id class="flex items-center btn btn-danger px-4 btn-text w-full text-left rounded-none")
                 span(class="icon-container mr-2")
                   ion-icon(name="trash-outline")
@@ -61,44 +57,35 @@ block content
   +top-bar
   +product-header(product, links, 'posts')
   div(class="container mx-auto px-4 pt-4")
-    div
-      div(class="grid gap-4 grid-cols-1 md:grid-cols-8")
-        div(class="md:col-span-5")
-          +page-title(class="mb-4") Publish new
-          div(class="gap-1 flex flex-wrap pb-2")
-            +post-type-btn({ bind: "text", icon: "document-text-outline", disabled: false }) Text
-            +post-type-btn({ bind: "youtube", icon: "play-outline", disabled: true }) YouTube
-            +post-type-btn({ bind: "survey", icon: "checkbox-outline", disabled: true }) Survey
-            +post-type-btn({ bind: "milestone", icon: "happy-outline", disabled: true }) Milestone
-            +post-type-btn({ bind: "roadmap", icon: "map-outline", disabled: true }) Roadmap
+    +page-title(class="mb-4") Publish new
+    div(class="gap-2 flex flex-wrap pb-2")
+      +post-type-btn({ bind: "text", icon: "document-text-outline", disabled: false }) Text &bull; Images
+      +post-type-btn({ bind: "youtube", icon: "play-outline", disabled: true }) YouTube
+      +post-type-btn({ bind: "survey", icon: "checkbox-outline", disabled: true }) Survey
+      +post-type-btn({ bind: "milestone", icon: "happy-outline", disabled: true }) Milestone
+      +post-type-btn({ bind: "roadmap", icon: "map-outline", disabled: true }) Roadmap
 
-          form(id="form-post-text" class="hidden" data-show="text")
-            input(type="hidden" name="id" value=product.id)
-            label
-              textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." name="text" id="text")
-              p(class="hidden text-red-500" id="text-error")
-            button(type="submit" class="btn btn-primary") Publish
+    form(id="form-post-text" class="hidden" data-show="text")
+      input(type="hidden" name="id" value=product.id)
+      label
+        textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." name="text" id="text")
+        p(class="hidden text-red-500" id="text-error")
+      button(type="submit" class="btn btn-primary") Publish
 
-          div(class="pt-16")
-            div(class={ "hidden": posts.length, "flex items-center text-gray-300 dark:text-gray-500": true } id="no-posts-msg")
-              ion-icon(name="pulse-outline" class="text-3xl mr-4")
-              p Still no public updates available
-            div(id="posts-container")
-              if posts && posts.length
-                each post in posts
-                  +post({
-                    post_id: post.id,
-                    img: post.user_twitter_profile_image_url,
-                    twitter_name: post.user_twitter_name,
-                    twitter_screen_name: post.user_twitter_screen_name,
-                    date_str: post.created_at_formatted,
-                    })= post.text
-
-        aside(class="hidden md:block md:col-span-3")
-          +page-title(class="mb-4") Pinned updates
-          div(class="flex items-center text-gray-300 dark:text-gray-500")
-            ion-icon(name="attach-outline" class="text-3xl mr-4")
-            p No pinned posts
+    div(class="pt-16")
+      div(class={ "hidden": posts.length, "flex items-center text-gray-300 dark:text-gray-500": true } id="no-posts-msg")
+        ion-icon(name="pulse-outline" class="text-3xl mr-4")
+        p Still no public updates available
+      div(id="posts-container")
+        if posts && posts.length
+          each post in posts
+            +post({
+              post_id: post.id,
+              img: post.user_twitter_profile_image_url,
+              twitter_name: post.user_twitter_name,
+              twitter_screen_name: post.user_twitter_screen_name,
+              date_str: post.created_at_formatted,
+              })= post.text
 
   template(id="post-tpl")
     +post({

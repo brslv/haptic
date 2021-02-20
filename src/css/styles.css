@@ -120,12 +120,6 @@
     grid-template-columns: 7fr 4fr;
   }
 
-  .product-main {
-    @apply gap-4;
-    display: grid;
-    grid-template-columns: 7fr 4fr;
-  }
-
   .logo-dark {
     display: block;
   }

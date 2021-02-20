@@ -6,9 +6,6 @@ exports.up = function(knex) {
       return knex.schema.createTable("posts", function(t) {
         t.increments("id").primary();
         t.enu("type", ["text"]).notNullable();
-        t.boolean("pinned")
-          .notNullable()
-          .defaultTo(false);
         t.integer("product_id")
           .unsigned()
           .notNullable();

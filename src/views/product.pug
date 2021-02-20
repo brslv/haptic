@@ -9,7 +9,7 @@ block content
       div(class="flex items-center")
         h1(class="text-2xl font-bold inline-block mr-4")= product.name
         if product.website
-          a(href=`${product.website}` class="icon-container" target="_blank" rel="noreferrer noopener")
+          a(href=product.website class="icon-container" target="_blank" rel="noreferrer noopener" title=product.website)
             ion-icon(name="globe-outline" class="text-2xl")
       div(class="relative flex items-center")
         span(class="text-xs text-gray-500 uppercase mr-2 bg-gray-100 dark:bg-gray-700 rounded-xl px-2 py-1") Creator
@@ -38,18 +38,11 @@ block content
 
     hr(class="border-gray-300 dark:border-gray-700 mb-8")
 
-    main(class="product-main" id="product-main")
+    main(id="product-main")
       section(id="product-feed")
         div(class="flex items-center text-gray-300 dark:text-gray-500")
           ion-icon(name="pulse-outline" class="text-6xl mr-4")
           p(class="text-xl") Still no public updates available
-
-        // div(class="p-4 rounded-xl bg-gray-100 dark:bg-gray-700")
-        //   Some update
-      div
-        div(class="flex items-center text-gray-300 dark:text-gray-500")
-          ion-icon(name="attach-outline" class="text-6xl mr-4")
-          p(class="text-xl") No pinned updates
 
 block append scripts
   script(src="/static/js/product.js")
