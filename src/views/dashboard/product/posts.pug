@@ -3,6 +3,7 @@ extends ../../layouts/base.layout.pug
 include ../../partials/top-bar.pug
 include ../../partials/product-header.pug
 include ../../partials/page-title.pug
+include ../../partials/modal.pug
 
 mixin post-type-btn({bind, icon, disabled}, attr = {})
   div(
@@ -15,7 +16,7 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
     }
   )&attributes(attr)
     span(class="icon-container")
-    ion-icon(class="mr-2 text-lg" name=icon)
+      ion-icon(class="mr-2 text-lg" name=icon)
     if block
       block
     if disabled
@@ -66,11 +67,21 @@ block content
       +post-type-btn({ bind: "roadmap", icon: "map-outline", disabled: true }) Roadmap
 
     form(id="form-post-text" class="hidden" data-show="text")
+      input(type="file" id="image-upload" class="hidden")
+      input(type="hidden" id="uploaded-image" name="uploaded_image" value="")
       input(type="hidden" name="id" value=product.id)
       label
         textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." name="text" id="text")
         p(class="hidden text-red-500" id="text-error")
-      button(type="submit" class="btn btn-primary") Publish
+      div(class="flex flex-row-reverse items-center justify-between")
+        button(type="submit" class="btn btn-primary") Publish
+        div(class="flex items-center")
+          button(type="button" class="mr-4 btn btn-default flex items-center" id="add-image-btn")
+            span(class="icon-container")
+              ion-icon(name="image-outline" class="mr-2")
+            span Attach image
+          span(id="image-upload-preview")
+
 
     div(class="pt-16")
       div(class={ "hidden": posts.length, "flex items-center text-gray-300 dark:text-gray-500": true } id="no-posts-msg")

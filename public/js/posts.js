@@ -246,4 +246,84 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
   }
 
   registerCtxMenus(document.querySelectorAll("[data-ctx-menu-trigger]"));
+
+  // handling images
+  var addImgBtnEl = document.getElementById("add-image-btn");
+  var fileUploadEl = document.getElementById("image-upload");
+  var uploadedImageEl = document.getElementById("uploaded-image");
+  var imageInput = document.getElementById("image");
+  if (addImgBtnEl) {
+    function previewImage(image, previewEl) {
+      // for (var i = 0; i < images.length; i++) {
+      var file = image;
+
+      if (!file.type.startsWith("image/")) {
+        return;
+      }
+
+      var imgContainer = document.createElement("div");
+      var rmBtn = document.createElement("button");
+      rmBtn.className += "ml-2 btn btn-danger btn-text text-xs";
+      rmBtn.innerHTML = "Remove image";
+      rmBtn.addEventListener("click", function rmBtnClick(e) {
+        imgContainer.remove();
+        uploadedImageEl.value = "";
+      });
+      var img = document.createElement("img");
+
+      imgContainer.className += "flex items-center";
+      imgContainer.appendChild(img);
+      imgContainer.appendChild(rmBtn);
+      img.className =
+        "w-10 h-10 rounded-xl inline-block border border-gray-300 dark:border-gray-700";
+      img.file = file;
+      imgContainer.appendChild(img);
+      imgContainer.appendChild(rmBtn);
+      previewEl.appendChild(imgContainer);
+
+      var reader = new FileReader();
+      reader.onload = (function(aImg) {
+        return function(e) {
+          aImg.src = e.target.result;
+        };
+      })(img);
+      reader.readAsDataURL(file);
+      // }
+    }
+
+    function uploadImageToServer(image) {
+      var formData = new FormData();
+      formData.append("image", image);
+      return axios.post("/upload-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    }
+
+    addImgBtnEl.addEventListener("click", function addImgBtnClick() {
+      fileUploadEl.click();
+    });
+    fileUploadEl.addEventListener(
+      "change",
+      function fileUploadElChange() {
+        var image = this.files[0];
+        if (!image.type.startsWith("image/")) {
+          alert("Invalid file format.");
+          return;
+        }
+
+        var previewEl = document.getElementById("image-upload-preview");
+        if (previewEl) {
+          previewImage(image, previewEl);
+        }
+
+        uploadImageToServer().then(function uploadImageResponse(response) {
+          console.log(response);
+          uploadedImageEl.value = "test";
+        });
+      },
+      false
+    );
+  }
 });

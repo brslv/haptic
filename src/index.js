@@ -609,6 +609,10 @@ app.delete("/post/:id", ajaxOnly, authOnly, (req, res, next) => {
     });
 });
 
+app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
+  res.json({ ok: 1, data: req.body });
+});
+
 // error handler
 app.use((err, req, res, next) => {
   console.log("An error occurred.", err);

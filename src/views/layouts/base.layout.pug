@@ -54,6 +54,11 @@ html(lang="en" id="html" class="")
       gtag('js', new Date());
 
       gtag('config', 'G-DD6BBRSV9W');
+
+    script(type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js")
+    script(nomodule="" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js")
+
+    block head
   body(class="dark:bg-gray-800 bg-white" id="body")
     div(class="text-gray-800 dark:text-gray-200" id="root")
       div(class="z-20 border border-gray-100 hidden fixed bottom-0 right-0 m-8 p-4 rounded-xl bg-white shadow-2xl text-sm" id="cookies-consent")
@@ -70,6 +75,7 @@ html(lang="en" id="html" class="")
       block modals
 
     block scripts
+      script(src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js")
       script(src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/dayjs.min.js" integrity="sha512-0fcCRl828lBlrSCa8QJY51mtNqTcHxabaXVLPgw/jPA5Nutujh6CbTdDgRzl9aSPYW/uuE7c4SffFUQFBAy6lg==" crossorigin="anonymous")
       script(
         src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
@@ -77,7 +83,6 @@ html(lang="en" id="html" class="")
         crossorigin="anonymous"
       )
       script(src="/static/js/axios-setup.js")
-      script(src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js")
       script(src="/static/js/cookies-consent.js")
       script(src="/static/js/dark-mode.js")
       script(src="/static/js/ta-autoresize.js")
