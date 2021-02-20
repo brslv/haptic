@@ -51,6 +51,14 @@
     @apply text-gray-400 bg-gray-100 cursor-auto dark:bg-gray-500 !important;
   }
 
+  .btn-icon {
+    @apply px-1 py-1 p-1 text-gray-800 hover:text-gray-500 dark:text-gray-200 dark:hover:text-gray-400;
+  }
+
+  .btn-icon-active {
+    @apply text-yellow-300 hover:text-yellow-300 dark:text-yellow-300 dark:hover:text-yellow-300;
+  }
+
   .input {
     @apply px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 w-full dark:bg-transparent;
     outline: none !important;
