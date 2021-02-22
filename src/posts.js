@@ -34,11 +34,9 @@ function actions({ db, user }) {
                     .insert({ post_id: postId, url: image })
                     .returning("id")
                     .then((imageResult) => {
-                      console.log("insert image result", imageResult);
                       trx.commit().then(() => {
                         _getPostText(postId)
                           .then((post) => {
-                            console.log("post", post);
                             res(post);
                           })
                           .catch((err) => {

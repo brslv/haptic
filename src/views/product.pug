@@ -1,6 +1,7 @@
 extends layouts/base.layout.pug
 
 include partials/top-bar.pug
+include partials/post.pug
 
 block content
   +top-bar
@@ -46,9 +47,29 @@ block content
 
     main(id="product-main")
       section(id="product-feed")
-        div(class="flex items-center text-gray-300 dark:text-gray-500")
-          ion-icon(name="pulse-outline" class="text-6xl mr-4")
-          p(class="text-xl") Still no public updates available
+        if posts.length
+          each post in posts
+            +post({
+              product_name: product.name,
+              post_id: post.id,
+              img: post.user_twitter_profile_image_url,
+              img_url: post.image_url,
+              twitter_name: post.user_twitter_name,
+              twitter_screen_name: post.user_twitter_screen_name,
+              date_str: post.created_at_formatted,
+              show_opts: false
+              })= post.text
+        else
+          div(class="flex items-center text-gray-300 dark:text-gray-500")
+            ion-icon(name="pulse-outline" class="text-6xl mr-4")
+            p(class="text-xl") Still no public updates available
 
 block append scripts
+  script.
+    window.App = {}
+    window.App.MediumZoom = mediumZoom('[data-zoomable]', {
+      margin: 50,
+      background: `rgba(0,0,0,0.5)`,
+    })
+  script(async src="https://platform.twitter.com/widgets.js" charset="utf-8")
   script(src="/static/js/product.js")

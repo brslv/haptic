@@ -223,7 +223,6 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
         .actions({ db, user: req.user })
         .getAllPosts(productResult.id)
         .then((postsResult) => {
-          console.log("postsResult", postsResult);
           res.render("dashboard/product/posts", {
             meta: {
               ...defaultMetas,
@@ -372,6 +371,7 @@ app.get("/dashboard/profile", authOnly, (req, res, next) => {
 
 app.get("/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
+  const postsActions = posts.actions({ db, user: req.user });
 
   db.select(
     "products.id",
@@ -421,22 +421,30 @@ app.get("/p/:slug", (req, res, next) => {
         });
       }
 
-      res.render("product", {
-        meta: {
-          ...defaultMetas,
-          title: `${result.name} | Haptic`,
-          og: {
-            ...defaultMetas.og,
+      postsActions.getAllPosts(result.id).then((postsResult) => {
+        res.render("product", {
+          meta: {
+            ...defaultMetas,
             title: `${result.name} | Haptic`,
+            og: {
+              ...defaultMetas.og,
+              title: `${result.name} | Haptic`,
+            },
           },
-        },
-        user: req.user,
-        product: { ...result },
-        links: {
-          posts: `/dashboard/product/${slug}/posts`,
-          settings: `/dashboard/product/${slug}/settings`,
-          url: `/p/${slug}`,
-        },
+          user: req.user,
+          product: { ...result },
+          posts: [
+            ...postsResult.map((post) => ({
+              ...post,
+              created_at_formatted: dateFmt(post.created_at),
+            })),
+          ],
+          links: {
+            posts: `/dashboard/product/${slug}/posts`,
+            settings: `/dashboard/product/${slug}/settings`,
+            url: `/p/${slug}`,
+          },
+        });
       });
     })
     .catch((err) => {
