@@ -65,6 +65,7 @@ block content
         if posts && posts.length
           each post in posts
             +post({
+              product_slug: product.slug,
               product_name: product.name,
               post_id: post.id,
               img: post.user_twitter_profile_image_url,
@@ -76,6 +77,7 @@ block content
 
   template(id="post-tpl")
     +post({
+      product_slug: product.slug,
       product_name: product.name,
       post_id: -1,
       img: user.twitter_profile_image_url,

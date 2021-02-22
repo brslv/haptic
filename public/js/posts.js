@@ -116,13 +116,15 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
               registerCtxMenus([
                 tplEl.content.querySelector("[data-ctx-menu-trigger]"),
               ]);
-              // update data-post-id attribute
+              // update data-post-id attribute and the link to the post
               var elsWithDataPostIdAttr = tplEl.content.querySelectorAll(
                 "[data-post-id]"
               );
               elsWithDataPostIdAttr.forEach(function updateDataPostIdAttrs(el) {
                 el.dataset.postId = post.id;
               });
+              var link = tplEl.content.querySelector("[data-post-link]");
+              link.href = link.href.replace("-1", post.id);
 
               var contentEl = tplEl.content.querySelector("[data-content]");
 

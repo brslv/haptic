@@ -452,6 +452,77 @@ app.get("/p/:slug", (req, res, next) => {
     });
 });
 
+app.get("/p/:slug/:postId", (req, res, next) => {
+  const postsActions = posts.actions({ db, user: req.user });
+  const slug = req.params.slug;
+  const postId = req.params.postId;
+  if (isNaN(postId)) {
+    return res.status(404).render("404", {
+      meta: {
+        ...defaultMetas,
+        title: "Page not found | Haptic",
+        og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+      },
+      user: req.user,
+    });
+  }
+
+  db.select(
+    "products.id",
+    "products.name",
+    "products.slug",
+    "products.description",
+    "products.website",
+    "products.is_public",
+    "products.is_listed",
+    "products.created_at as product_created_at",
+    "products.updated_at as product_updated_at",
+    "users.id as user_id",
+    "users.bio as user_bio",
+    "users.twitter_id as user_twitter_id",
+    "users.twitter_name as user_twitter_name",
+    "users.twitter_screen_name as user_twitter_screen_name",
+    "users.twitter_location as user_twitter_location",
+    "users.twitter_url as user_twitter_url",
+    "users.twitter_profile_image_url as user_twitter_profile_image_url",
+    "users.created_at as user_created_at",
+    "users.updated_at as user_updated_at"
+  )
+    .table("products")
+    .leftJoin("users", "products.user_id", "users.id")
+    .where({ "products.slug": slug })
+    .first()
+    .then((productResult) => {
+      return postsActions
+        .getPost("text", { postId })
+        .then((result) => {
+          const title =
+            result.text.length > 100
+              ? result.text.slice(0, 100) + "..."
+              : result.text;
+          return res.render("post", {
+            meta: {
+              ...defaultMetas,
+              title: `${title} | Haptic`,
+              og: { ...defaultMetas.og, title: `${title} | Haptic` },
+            },
+            product: productResult,
+            post: {
+              ...result,
+              created_at_formatted: dateFmt(result.created_at),
+            },
+            user: req.user,
+          });
+        })
+        .catch((err) => {
+          next(err);
+        });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
 app.get("/login", guestsOnly, (req, res) => {
   res.render("login", { meta: defaultMetas });
 });
