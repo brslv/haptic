@@ -26,9 +26,11 @@ block content
           p(class="text-gray-600 dark:text-gray-400")= product.user_bio
 
     
-    div(class={"my-8": true, "product-header": product.description})
+    div(class={"my-8": true, "product-header": true})
       if product.description
         p(class="text-xl")= product.description
+      else
+        p(class="text-gray-500") No product description, yet
       nav(id="product-nav")
         ul
           li(class="w-full mb-2")

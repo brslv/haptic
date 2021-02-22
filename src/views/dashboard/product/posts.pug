@@ -24,7 +24,7 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
     span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
       ion-icon(name="close-outline")
 
-mixin post({ post_id, img, img_url, twitter_name, twitter_screen_name, date_str })
+mixin post({ product_name, post_id, img, img_url, twitter_name, twitter_screen_name, date_str })
   div(class="p-4 rounded-xl bg-gray-100 dark:bg-gray-700 dark:border-gray-700 mb-4" data-post-id=post_id)
     div(class="flex items-center justify-between mb-4")
       div(class="flex items-center")
@@ -37,10 +37,9 @@ mixin post({ post_id, img, img_url, twitter_name, twitter_screen_name, date_str 
             span(class="flex items-center")
               ion-icon(name="time-outline" class="mr-2")
               span= date_str
-      div
-        button(class="btn btn-icon icon-container inline-block mr-2")
-          ion-icon(name="share-social-outline" class="text-xl")
-        div(class="relative inline-block")
+      div(class="flex items-center")
+        a(href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-text=`Update on ${product_name} 🚀` data-url="https://haptic.so" data-via="hapticso" data-hashtags="buildinpublic #onhapticso" data-show-count="false")
+        div(class="relative inline-block ml-4")
           button(class="btn btn-icon btn-small icon-container" data-ctx-menu-trigger)
             ion-icon(name="ellipsis-horizontal-outline" class="text-xl")
           div(data-ctx-menu class="hidden absolute top-8 -right-2 bg-white shadow-md rounded-xl dark:bg-gray-800" style="min-width: 150px;")
@@ -96,6 +95,7 @@ block content
         if posts && posts.length
           each post in posts
             +post({
+              product_name: product.name,
               post_id: post.id,
               img: post.user_twitter_profile_image_url,
               img_url: post.image_url,
@@ -106,6 +106,7 @@ block content
 
   template(id="post-tpl")
     +post({
+      product_name: product.name,
       post_id: -1,
       img: user.twitter_profile_image_url,
       img_url: null,
@@ -122,3 +123,4 @@ block append scripts
       background: `rgba(0,0,0,0.5)`,
     })
   script(src="/static/js/posts.js")
+  script(async src="https://platform.twitter.com/widgets.js" charset="utf-8")

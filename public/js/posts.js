@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       // for (var i = 0; i < images.length; i++) {
       var file = image;
 
-      if (!file.type.startsWith("image/")) {
+      if (!validateImageFiletype(file)) {
         return;
       }
 
@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       function fileUploadElChange() {
         var image = this.files[0];
 
-        if (!image.type.startsWith("image/")) {
+        if (!validateImageFiletype(image)) {
           alert("Invalid file format.");
           return;
         }
@@ -374,5 +374,16 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
         document.querySelectorAll("[data-zoomable]")
       );
     }
+  }
+
+  function validateImageFiletype(image) {
+    console.log(image);
+    var filetypeWhitelist = [
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+      "image/gif",
+    ];
+    return filetypeWhitelist.includes(image.type);
   }
 });
