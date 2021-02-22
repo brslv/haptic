@@ -16,6 +16,7 @@ const { nanoid } = require("nanoid");
 const { flash } = require("express-flash-message");
 const day = require("dayjs");
 const posts = require("./posts");
+const boosts = require("./boosts");
 const upload = require("./img-upload");
 const singleUpload = upload.single("image");
 
@@ -372,6 +373,7 @@ app.get("/dashboard/profile", authOnly, (req, res, next) => {
 app.get("/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
   const postsActions = posts.actions({ db, user: req.user });
+  const boostsActions = boosts.actions({ db });
 
   db.select(
     "products.id",
@@ -421,30 +423,35 @@ app.get("/p/:slug", (req, res, next) => {
         });
       }
 
-      postsActions.getAllPosts(result.id).then((postsResult) => {
-        res.render("product", {
-          meta: {
-            ...defaultMetas,
-            title: `${result.name} | Haptic`,
-            og: {
-              ...defaultMetas.og,
-              title: `${result.name} | Haptic`,
-            },
-          },
-          user: req.user,
-          product: { ...result },
-          posts: [
-            ...postsResult.map((post) => ({
-              ...post,
-              created_at_formatted: dateFmt(post.created_at),
-            })),
-          ],
-          links: {
-            posts: `/dashboard/product/${slug}/posts`,
-            settings: `/dashboard/product/${slug}/settings`,
-            url: `/p/${slug}`,
-          },
-        });
+      return postsActions.getAllPosts(result.id).then((postsResult) => {
+        return boostsActions
+          .getProductBoosts(result.id)
+          .then((boostsResult) => {
+            res.render("product", {
+              meta: {
+                ...defaultMetas,
+                title: `${result.name} | Haptic`,
+                og: {
+                  ...defaultMetas.og,
+                  title: `${result.name} | Haptic`,
+                },
+              },
+              user: req.user,
+              product: { ...result },
+              boosts: boostsResult,
+              posts: [
+                ...postsResult.map((post) => ({
+                  ...post,
+                  created_at_formatted: dateFmt(post.created_at),
+                })),
+              ],
+              links: {
+                posts: `/dashboard/product/${slug}/posts`,
+                settings: `/dashboard/product/${slug}/settings`,
+                url: `/p/${slug}`,
+              },
+            });
+          });
       });
     })
     .catch((err) => {
@@ -687,6 +694,49 @@ app.delete("/post/:id", ajaxOnly, authOnly, (req, res, next) => {
       }
     })
     .catch((err) => {
+      next(err);
+    });
+});
+
+app.post("/p/:slug/boost", ajaxOnly, authOnly, (req, res, next) => {
+  const slug = req.params.slug;
+  const user = req.user;
+
+  db("products")
+    .select("id")
+    .where({ slug })
+    .first()
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(400).json({
+          ok: 0,
+          err: `No such product (slug: ${slug}).`,
+          details: null,
+        });
+      }
+
+      return db("product_boosts")
+        .insert({ product_id: productResult.id, user_id: user.id })
+        .then((boostResult) => {
+          return db("product_boosts")
+            .select("id")
+            .where({ product_id: productResult.id })
+            .then((allBoostsResult) => {
+              res.json({
+                ok: 1,
+                err: null,
+                details: { boosts: allBoostsResult },
+              });
+            });
+        });
+    })
+    .catch((err) => {
+      if (err.code === dbErrCodes.DUP_CODE)
+        return res.status(400).json({
+          ok: 0,
+          err: "You've already boosted this product. 🚀",
+          details: null,
+        });
       next(err);
     });
 });

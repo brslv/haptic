@@ -26,7 +26,6 @@ block content
           a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
           p(class="text-gray-600 dark:text-gray-400")= product.user_bio
 
-    
     div(class={"my-8": true, "product-header": true})
       if product.description
         p(class="text-xl")= product.description
@@ -35,13 +34,13 @@ block content
       nav(id="product-nav")
         ul
           li(class="w-full mb-2")
-            a(title=`Boost ${product.name} to show it's creator that you care about it. This also helps the product get better haptic rank.` href="/" class="block px-4 py-2 rounded-xl border border-gray-300 hover:border-transparent dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700")
+            div(title=`Boost ${product.name} to show it's creator that you care about it. This also helps the product get better haptic rank.` href="/" class="select-none cursor-pointer block px-4 py-2 rounded-xl border border-gray-300 hover:border-transparent dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700" data-product-boost-btn)
               span(class="flex justify-between")
                 span(class="flex items-center")
                   span(class="icon-container")
                     ion-icon(name="rocket-outline" class="text-2xl mr-4")
                   span(class="mr-4")= `Boost`
-                span(class="px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase") 0
+                span(class="px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase" data-product-boost-counter)= boosts.length
 
     hr(class="border-gray-300 dark:border-gray-700 mb-8")
 
@@ -73,4 +72,9 @@ block append scripts
       background: `rgba(0,0,0,0.5)`,
     })
   script(async src="https://platform.twitter.com/widgets.js" charset="utf-8")
+  script.
+    var App = {}
+    App.Product = {};
+    App.Product.slug = '#{product.slug}';
+    App.Product.boostCount = '#{boosts.length}';
   script(src="/static/js/product.js")
