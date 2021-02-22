@@ -3,7 +3,7 @@ const TEXT_TYPE = "text";
 const types = [TEXT_TYPE];
 
 function actions({ db, user }) {
-  function _publishText(product, text) {
+  function _publishText(product, text, image) {
     return new Promise((res, rej) => {
       db.transaction((trx) => {
         // insert in posts
@@ -27,15 +27,40 @@ function actions({ db, user }) {
               })
               .returning("id")
               .then(function postTextInsertSuccess([postTextId]) {
-                trx.commit().then(() => {
-                  _getPostText(postId)
-                    .then((post) => {
-                      res(post);
+                if (image) {
+                  // insert image then commit
+                  return db("images")
+                    .transacting(trx)
+                    .insert({ post_id: postId, url: image })
+                    .returning("id")
+                    .then((imageResult) => {
+                      console.log("insert image result", imageResult);
+                      trx.commit().then(() => {
+                        _getPostText(postId)
+                          .then((post) => {
+                            console.log("post", post);
+                            res(post);
+                          })
+                          .catch((err) => {
+                            throw err;
+                          });
+                      });
                     })
                     .catch((err) => {
                       throw err;
                     });
-                });
+                } else {
+                  // no image - commit trx
+                  trx.commit().then(() => {
+                    _getPostText(postId)
+                      .then((post) => {
+                        res(post);
+                      })
+                      .catch((err) => {
+                        throw err;
+                      });
+                  });
+                }
               })
               .catch((err) => {
                 throw err;
@@ -58,11 +83,15 @@ function actions({ db, user }) {
         "posts_text.text",
         "users.twitter_name as user_twitter_name",
         "users.twitter_profile_image_url as user_twitter_profile_image_url",
-        "users.twitter_screen_name as user_twitter_screen_name"
+        "users.twitter_screen_name as user_twitter_screen_name",
+        "images.id as image_id",
+        "images.url as image_url",
+        "images.created_at as image_created_at"
       )
       .table("posts_text")
       .leftJoin("posts", "posts_text.post_id", "posts.id")
       .leftJoin("users", "posts.user_id", "users.id")
+      .leftJoin("images", "images.post_id", "posts.id")
       .where({ "posts_text.post_id": postId })
       .first()
       .then((result) => {
@@ -93,11 +122,15 @@ function actions({ db, user }) {
             "posts_text.text",
             "users.twitter_name as user_twitter_name",
             "users.twitter_profile_image_url as user_twitter_profile_image_url",
-            "users.twitter_screen_name as user_twitter_screen_name"
+            "users.twitter_screen_name as user_twitter_screen_name",
+            "images.id as image_id",
+            "images.url as image_url",
+            "images.created_at as image_created_at"
           )
           .table("posts_text")
           .leftJoin("posts", "posts_text.post_id", "posts.id")
           .leftJoin("users", "posts.user_id", "users.id")
+          .leftJoin("images", "images.post_id", "posts.id")
           .where({ "posts.product_id": productId })
           .orderBy("posts.created_at", "DESC")
           .then((result) => {
@@ -113,7 +146,7 @@ function actions({ db, user }) {
   function publish(type, product, reqBody) {
     switch (type) {
       case "text": {
-        return _publishText(product, reqBody.text);
+        return _publishText(product, reqBody.text, reqBody.image);
         break;
       }
     }

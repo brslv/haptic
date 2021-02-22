@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
   // handling text form submit
   var formPostTextEl = document.getElementById("form-post-text");
   var textEl = formPostTextEl.querySelector("#text");
+  var imageEl = formPostTextEl.querySelector("#uploaded-image");
   var textErrorEl = document.getElementById("text-error");
   var postsContainer = document.getElementById("posts-container");
   var noPostsMsg = document.getElementById("no-posts-msg");
@@ -80,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
     e.preventDefault();
 
     var text = textEl.value;
+    var image = imageEl.value;
     var productIdInputEl = formPostTextEl.querySelector("input[name=id]");
     if (!productIdInputEl) {
       console.error("Couldn't find product id. 👀");
@@ -97,6 +99,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
     axios
       .post(`/post/${productId}/text`, {
         text,
+        image,
       })
       .then(function handleSuccess(response) {
         var data = response.data;
@@ -121,10 +124,24 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
           var contentEl = tplEl.content.querySelector("[data-content]");
 
           contentEl.innerHTML = post.text;
+          var imageEl = tplEl.content.querySelector("[data-image]");
+          if (post.image_url) {
+            imageEl.src = post.image_url;
+            imageEl.classList.remove("hidden");
+          }
 
           postsContainer.parentNode.prepend(tplEl.content);
 
+          reloadMediumZoom();
+
           textEl.value = "";
+
+          var imgContainer = document.getElementById("img-container");
+          var uploadedImageEl = document.getElementById("uploaded-image");
+          if (imgContainer) {
+            imgContainer.remove();
+          }
+          uploadedImageEl.value = "";
         }
 
         // hide the no-posts message
@@ -252,6 +269,9 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
   var fileUploadEl = document.getElementById("image-upload");
   var uploadedImageEl = document.getElementById("uploaded-image");
   var imageInput = document.getElementById("image");
+  var formPostTextSubmitBtnEl = formPostTextEl.querySelector(
+    'button[type="submit"]'
+  );
   if (addImgBtnEl) {
     function previewImage(image, previewEl) {
       // for (var i = 0; i < images.length; i++) {
@@ -262,6 +282,8 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       }
 
       var imgContainer = document.createElement("div");
+      imgContainer.className += "flex items-center";
+      imgContainer.id = "img-container";
       var rmBtn = document.createElement("button");
       rmBtn.className += "ml-2 btn btn-danger btn-text text-xs";
       rmBtn.innerHTML = "Remove image";
@@ -271,12 +293,12 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       });
       var img = document.createElement("img");
 
-      imgContainer.className += "flex items-center";
       imgContainer.appendChild(img);
       imgContainer.appendChild(rmBtn);
-      img.className =
-        "w-10 h-10 rounded-xl inline-block border border-gray-300 dark:border-gray-700";
+      img.className = "inline-block";
+      img.style = "max-height: 35px;";
       img.file = file;
+      img.dataset.zoomable = "data-zoomable";
       imgContainer.appendChild(img);
       imgContainer.appendChild(rmBtn);
       previewEl.appendChild(imgContainer);
@@ -285,6 +307,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       reader.onload = (function(aImg) {
         return function(e) {
           aImg.src = e.target.result;
+          reloadMediumZoom();
         };
       })(img);
       reader.readAsDataURL(file);
@@ -308,22 +331,48 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       "change",
       function fileUploadElChange() {
         var image = this.files[0];
+
         if (!image.type.startsWith("image/")) {
           alert("Invalid file format.");
           return;
         }
 
-        var previewEl = document.getElementById("image-upload-preview");
-        if (previewEl) {
-          previewImage(image, previewEl);
-        }
+        var imgUploadLoaderEl = document.getElementById("image-upload-loader");
+        addImgBtnEl.setAttribute("disabled", "disabled");
+        if (imgUploadLoaderEl) imgUploadLoaderEl.classList.remove("hidden");
+        if (formPostTextSubmitBtnEl)
+          formPostTextSubmitBtnEl.setAttribute("disabled", "disabled");
 
-        uploadImageToServer().then(function uploadImageResponse(response) {
-          console.log(response);
-          uploadedImageEl.value = "test";
+        uploadImageToServer(image).then(function uploadImageResponse(response) {
+          var uploadedImagePreview = document.getElementById("img-container");
+          if (uploadedImagePreview) {
+            // there's already uploaded image preview. Remove it, as a new image has been uploaded.
+            uploadedImagePreview.remove();
+          }
+
+          uploadedImageEl.value = response.data.details.url;
+          if (imgUploadLoaderEl) imgUploadLoaderEl.classList.add("hidden");
+          if (formPostTextSubmitBtnEl)
+            formPostTextSubmitBtnEl.removeAttribute("disabled");
+          addImgBtnEl.removeAttribute("disabled");
+          var previewEl = document.getElementById("image-upload-preview");
+          previewImage(image, previewEl);
         });
       },
       false
     );
+  }
+
+  function reloadMediumZoom() {
+    if (
+      window.App.MediumZoom &&
+      typeof window.App.MediumZoom.detach === "function" &&
+      typeof window.App.MediumZoom.attach === "function"
+    ) {
+      window.App.MediumZoom.detach();
+      window.App.MediumZoom.attach(
+        document.querySelectorAll("[data-zoomable]")
+      );
+    }
   }
 });

@@ -24,7 +24,7 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
     span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
       ion-icon(name="close-outline")
 
-mixin post({ post_id, img, twitter_name, twitter_screen_name, date_str })
+mixin post({ post_id, img, img_url, twitter_name, twitter_screen_name, date_str })
   div(class="p-4 rounded-xl bg-gray-100 dark:bg-gray-700 dark:border-gray-700 mb-4" data-post-id=post_id)
     div(class="flex items-center justify-between mb-4")
       div(class="flex items-center")
@@ -50,9 +50,11 @@ mixin post({ post_id, img, twitter_name, twitter_screen_name, date_str })
                 span(class="icon-container mr-2")
                   ion-icon(name="trash-outline")
                 span Delete
-    p(data-content="data-content")
-      if block
-        block
+    div(class="flex items-start")
+      img(data-image data-zoomable src=img_url class={"hidden": !img_url, "cursor-pointer mr-4": true} style="border-radius: 2px; max-height: 75px; max-width: 175px;")
+      p(data-content="data-content" class="inline-block")
+        if block
+          block
 
 block content
   +top-bar
@@ -80,6 +82,9 @@ block content
             span(class="icon-container")
               ion-icon(name="image-outline" class="mr-2")
             span Attach image
+          span(id="image-upload-loader" class="hidden mr-2")
+            span(class="icon-container opacity-75 my-0 block relative")
+              ion-icon(name="sync-outline" class="animate-spin w-5 h-5")
           span(id="image-upload-preview")
 
 
@@ -93,6 +98,7 @@ block content
             +post({
               post_id: post.id,
               img: post.user_twitter_profile_image_url,
+              img_url: post.image_url,
               twitter_name: post.user_twitter_name,
               twitter_screen_name: post.user_twitter_screen_name,
               date_str: post.created_at_formatted,
@@ -102,10 +108,17 @@ block content
     +post({
       post_id: -1,
       img: user.twitter_profile_image_url,
+      img_url: null,
       twitter_name: user.twitter_name,
       twitter_screen_name: user.twitter_screen_name,
       date_str: 'Now'
     })
 
 block append scripts
+  script.
+    window.App = {}
+    window.App.MediumZoom = mediumZoom('[data-zoomable]', {
+      margin: 50,
+      background: `rgba(0,0,0,0.5)`,
+    })
   script(src="/static/js/posts.js")

@@ -16,6 +16,8 @@ const { nanoid } = require("nanoid");
 const { flash } = require("express-flash-message");
 const day = require("dayjs");
 const posts = require("./posts");
+const upload = require("./img-upload");
+const singleUpload = upload.single("image");
 
 // constants
 const HOUR_IN_MS = 3600000;
@@ -221,6 +223,7 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
         .actions({ db, user: req.user })
         .getAllPosts(productResult.id)
         .then((postsResult) => {
+          console.log("postsResult", postsResult);
           res.render("dashboard/product/posts", {
             meta: {
               ...defaultMetas,
@@ -610,7 +613,14 @@ app.delete("/post/:id", ajaxOnly, authOnly, (req, res, next) => {
 });
 
 app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
-  res.json({ ok: 1, data: req.body });
+  singleUpload(req, res, function handleUpload(err) {
+    if (err) {
+      next(err);
+      return;
+    }
+
+    res.json({ ok: 1, err: null, details: { url: req.file.location } });
+  });
 });
 
 // error handler
