@@ -2,15 +2,15 @@ extends ../../layouts/base.layout.pug
 
 include ../../partials/top-bar.pug
 include ../../partials/product-header.pug
+include ../../partials/flash-msg.pug
 
 block content
   +top-bar
   +product-header(product, links, 'settings')
   div(class="container mx-auto px-4 pt-4")
-    if flash.success.length
-      div(class="success-container mb-8")= flash.success[0]
-    if flash.error.length
-      div(class="error-container mb-8")= flash.error[0]
+    +flash-msg(flash)
+
+    form(action=`${form.delete.action}` method="POST" id="product-delete-form" class="hidden")
 
     form(action=`${form.action}` method="POST" id="product-settings-form")
       div(class="pb-8")
@@ -41,4 +41,14 @@ block content
             input(type="checkbox" class="mr-2" name="is_listed" id="is-listed" checked=(product.is_listed ? 'checked' : false))
             span(class="label") List on Haptic
           span(class="text-sm text-gray-500") By having this on, you agree that we can list your product on our homepage
+
+      div(class="relative border border-red-300 rounded-xl p-4 mb-8")
+        div(class="px-2 py-1 bg-red-300 rounded-full absolute -top-4 right-4 text-xs text-gray-800") Danger zone
+
+        button(type="button" class="btn btn-danger" data-delete-product-btn) Delete product
+        span(class="text-gray-500 text-xs pt-1") Cannot be undone!
+      
       button(type="submit" class="btn btn-primary") Save
+
+block append scripts
+  script(src="/static/js/settings.js")

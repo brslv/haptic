@@ -178,7 +178,10 @@ app.get("/", (req, res) => {
   res.render("index", { meta: defaultMetas, user: req.user });
 });
 
-app.get("/dashboard", authOnly, (req, res) => {
+app.get("/dashboard", authOnly, async (req, res, next) => {
+  const flash = {
+    success: await req.consumeFlash("success"),
+  };
   db("products")
     .select()
     .where({ user_id: req.user.id })
@@ -191,6 +194,7 @@ app.get("/dashboard", authOnly, (req, res) => {
         },
         user: req.user,
         products: result,
+        flash,
       });
     })
     .catch((err) => {
@@ -298,6 +302,9 @@ app.get(
           },
           form: {
             action: `/dashboard/product/${slug}/settings/update`,
+            delete: {
+              action: `/dashboard/product/${slug}/delete`,
+            },
           },
           flash,
         });
@@ -359,6 +366,25 @@ app.post(
       });
   }
 );
+
+app.post("/dashboard/product/:slug/delete", authOnly, (req, res, next) => {
+  const slug = req.params.slug;
+  const user = req.user;
+  db("products")
+    .select()
+    .where({ slug, user_id: user.id })
+    .del()
+    .then((result) => {
+      if (result) {
+        req.flash("success", "Product deleted ✅").then(() => {
+          res.redirect("/dashboard");
+        });
+      }
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
 
 app.get("/dashboard/profile", authOnly, (req, res, next) => {
   return res.render("dashboard/profile", {

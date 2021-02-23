@@ -1,0 +1,6 @@
+mixin flash-msg(flash)
+  if flash
+    if flash.success && flash.success.length
+      div(class="success-container mb-8")= flash.success[0]
+    if flash.error && flash.error.length
+      div(class="error-container mb-8")= flash.error[0]

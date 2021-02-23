@@ -39,7 +39,13 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       axios
         .post("/p/" + App.Product.slug + "/boost")
         .then(function boostProductResponse(response) {
-          var newCount = App.Product.boostCount + 1;
+          var newCount;
+          if (isNaN(App.Product.boostCount)) {
+            newCount = 0;
+          } else {
+            newCount = Number(App.Product.boostCount) + 1;
+          }
+
           counter.innerHTML = newCount;
           App.Product.boostCount = newCount;
         })

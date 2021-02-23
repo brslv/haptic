@@ -43,6 +43,14 @@
     @apply bg-yellow-400;
   }
 
+  .btn-danger {
+    @apply bg-red-400 hover:bg-red-500 text-gray-800 dark:text-gray-800 hover:text-gray-800 dark:hover:text-gray-800;
+  }
+
+  .btn-danger:focus {
+    @apply bg-red-500;
+  }
+
   .btn-twitter {
     @apply bg-twitter hover:bg-twitter-dark text-white hover:text-white dark:hover:text-white;
   }
