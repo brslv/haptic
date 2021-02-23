@@ -75,6 +75,8 @@ html(lang="en" id="html" class="dark")
       block modals
 
     block scripts
+      script(src="https://unpkg.com/@popperjs/core@2")
+      script(src="https://unpkg.com/tippy.js@6")
       script(src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous")
       script(src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js")
       script(src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/dayjs.min.js" integrity="sha512-0fcCRl828lBlrSCa8QJY51mtNqTcHxabaXVLPgw/jPA5Nutujh6CbTdDgRzl9aSPYW/uuE7c4SffFUQFBAy6lg==" crossorigin="anonymous")
@@ -87,3 +89,5 @@ html(lang="en" id="html" class="dark")
       script(src="/static/js/cookies-consent.js")
       //- script(src="/static/js/dark-mode.js")
       script(src="/static/js/ta-autoresize.js")
+      script.
+        tippy('[data-tippy-content]', { arrow: false, animation: 'fade', delay: [300, 0], inlinePositioning: true, placement: 'bottom', theme: 'haptic' })

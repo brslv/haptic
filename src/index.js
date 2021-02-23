@@ -19,6 +19,7 @@ const posts = require("./posts");
 const boosts = require("./boosts");
 const upload = require("./img-upload");
 const singleUpload = upload.single("image");
+const showdown = require("showdown");
 
 // constants
 const HOUR_IN_MS = 3600000;
@@ -146,6 +147,13 @@ app.use(passport.session());
 app.use(flash({ sessionKeyName: SID }));
 
 // helpers / middlewares
+const mdConverter = new showdown.Converter({
+  noHeaderId: true,
+  simplifiedAutoLink: true,
+  tasklists: true,
+  openLinksInNewWindow: true,
+  emoji: true,
+});
 const isAjaxCall = (req) =>
   req.headers["accept"] && req.headers["accept"].includes("application/json");
 const ajaxOnly = (req, res, next) => {
@@ -242,6 +250,7 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
             posts: [
               ...postsResult.map((post) => ({
                 ...post,
+                text: mdConverter.makeHtml(post.text),
                 created_at_formatted: dateFmt(post.created_at),
               })),
             ],
@@ -468,6 +477,7 @@ app.get("/p/:slug", (req, res, next) => {
               posts: [
                 ...postsResult.map((post) => ({
                   ...post,
+                  text: mdConverter.makeHtml(post.text),
                   created_at_formatted: dateFmt(post.created_at),
                 })),
               ],
@@ -542,6 +552,7 @@ app.get("/p/:slug/:postId", (req, res, next) => {
             product: productResult,
             post: {
               ...result,
+              text: mdConverter.makeHtml(result.text),
               created_at_formatted: dateFmt(result.created_at),
             },
             user: req.user,

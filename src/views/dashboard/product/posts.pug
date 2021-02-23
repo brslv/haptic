@@ -64,6 +64,7 @@ block content
       div(id="posts-container")
         if posts && posts.length
           each post in posts
+            - var post_text = post.text
             +post({
               product_slug: product.slug,
               product_name: product.name,
@@ -73,7 +74,7 @@ block content
               twitter_name: post.user_twitter_name,
               twitter_screen_name: post.user_twitter_screen_name,
               date_str: post.created_at_formatted,
-              })= post.text
+            }) !{post_text}
 
   template(id="post-tpl")
     +post({

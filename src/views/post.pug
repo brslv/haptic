@@ -3,7 +3,9 @@ extends layouts/base.layout.pug
 include partials/top-bar.pug
 include partials/post.pug
 
+
 block content
+  - var post_text = post.text;
   +top-bar
   div(class="container mx-auto p-4")
     +post({
@@ -15,8 +17,9 @@ block content
       twitter_name: post.user_twitter_name,
       twitter_screen_name: post.user_twitter_screen_name,
       date_str: post.created_at_formatted,
-      show_opts: false
-    })= post.text
+      show_opts: false,
+      show_view_btn: false,
+    }) !{post_text}
 
 block append scripts
   script.

@@ -145,6 +145,32 @@
     @apply border border-red-500 !important;
   }
 
+  .tippy-box[data-theme~="haptic"] {
+    @apply text-gray-800 bg-gray-100 border border-gray-300 rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200;
+  }
+
+  .__md h1 {
+    @apply text-2xl;
+  }
+  .__md h2 {
+    @apply text-xl;
+  }
+  .__md h3 {
+    @apply text-lg;
+  }
+  .__md h4 {
+    @apply text-lg;
+  }
+  .__md h6 {
+    @apply text-sm;
+  }
+  .__md strong {
+    @apply font-bold;
+  }
+  .__md ul {
+    @apply ml-12;
+  }
+
   @keyframes shake {
     10%,
     90% {

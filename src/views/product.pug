@@ -48,6 +48,7 @@ block content
       section(id="product-feed")
         if posts.length
           each post in posts
+            - var post_text = post.text;
             +post({
               product_slug: product.slug,
               product_name: product.name,
@@ -58,7 +59,7 @@ block content
               twitter_screen_name: post.user_twitter_screen_name,
               date_str: post.created_at_formatted,
               show_opts: false
-              })= post.text
+            }) !{post_text}
         else
           div(class="flex items-center text-gray-300 dark:text-gray-500")
             ion-icon(name="pulse-outline" class="text-6xl mr-4")

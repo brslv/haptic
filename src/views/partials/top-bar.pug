@@ -10,18 +10,18 @@ mixin top-bar()
                     //- li(class="btn btn-icon icon-container mr-4" data-dark-mode-toggle)
                     //-     ion-icon(name="sunny-outline" class="text-2xl")
                     if user
-                        a(href="/dashboard" class="btn btn-icon mr-4")
+                        a(href="/dashboard" class="btn btn-icon mr-4" data-tippy-content="Dashboard")
                             li(class="icon-container")
                                 ion-icon(name="prism-outline" class="text-2xl")
 
-                        a(href="/dashboard/profile" class="btn btn-icon mr-4")
+                        a(href="/dashboard/profile" class="btn btn-icon mr-4" data-tippy-content="Profile settings")
                             li(class="icon-container")
                                 img(class="rounded-full w-8 h-8" src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
 
-                        a(href="/logout" class="btn btn-icon mr-4")
+                        a(href="/logout" class="btn btn-icon mr-4" data-tippy-content="Log out")
                             li(class="icon-container")
                                 ion-icon(name="log-out-outline" class="text-2xl")
                     else
-                        a(href="/login" class="btn btn-icon")
+                        a(href="/login" class="btn btn-icon" data-tippy-content="Log in")
                             li(class="icon-container")
                                 ion-icon(name="log-in-outline" class="text-2xl")

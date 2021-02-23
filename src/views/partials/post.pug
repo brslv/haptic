@@ -1,6 +1,6 @@
 include ./page-title.pug
 
-mixin post({ product_name, product_slug, post_id, img, img_url, twitter_name, twitter_screen_name, date_str, show_opts = true })
+mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true })
   div(class="p-4 rounded-xl bg-gray-100 dark:bg-gray-700 dark:border-gray-700 mb-4" data-post-id=post_id)
     div(class="flex items-center justify-between mb-4")
       div(class="flex items-center")
@@ -14,10 +14,12 @@ mixin post({ product_name, product_slug, post_id, img, img_url, twitter_name, tw
               ion-icon(name="time-outline" class="mr-2")
               span= date_str
       div(class="flex items-center")
+        if show_view_btn
+          a(href=`/p/${product_slug}/${post_id}` class="btn btn-small btn-primary text-xs mr-2" data-post-link) View
         a(href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-text=`Update on ${product_name} 🚀` data-url="https://haptic.so" data-via="hapticso" data-hashtags="buildinpublic #onhapticso" data-show-count="false")
         if show_opts
           div(class="relative inline-block ml-4")
-            button(class="btn btn-icon btn-small icon-container" data-ctx-menu-trigger)
+            button(class="btn btn-icon btn-small icon-container" data-ctx-menu-trigger data-tippy-content="Actions")
               ion-icon(name="ellipsis-horizontal-outline" class="text-xl")
             div(data-ctx-menu class="hidden absolute top-8 -right-2 bg-white shadow-md rounded-xl dark:bg-gray-800" style="min-width: 150px;")
               +page-title(class="px-4 py-2 inline-block w-full") Actions
@@ -26,9 +28,7 @@ mixin post({ product_name, product_slug, post_id, img, img_url, twitter_name, tw
                   span(class="icon-container mr-2")
                     ion-icon(name="trash-outline")
                   span Delete
-    div(class="flex items-start")
+    div(class="flex items-start __md")
       img(data-image data-zoomable src=img_url class={"hidden": !img_url, "cursor-pointer mr-4": true} style="border-radius: 2px; max-height: 75px; max-width: 175px;")
-      a(href=`/p/${product_slug}/${post_id}` data-post-link)
-        p(data-content="data-content" class="inline-block")
-          if block
-            block
+      div(data-content="data-content" class="inline-block")
+        block
