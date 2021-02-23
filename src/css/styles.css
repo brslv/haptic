@@ -164,11 +164,20 @@
   .__md h6 {
     @apply text-sm;
   }
+  .__md h1,
+  .__md h2,
+  .__md h3,
+  .__md h3 {
+    @apply font-bold py-2;
+  }
   .__md strong {
     @apply font-bold;
   }
   .__md ul {
     @apply ml-12;
+  }
+  .__md li {
+    list-style-type: disc;
   }
 
   @keyframes shake {

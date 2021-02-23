@@ -14,9 +14,17 @@ mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitt
               ion-icon(name="time-outline" class="mr-2")
               span= date_str
       div(class="flex items-center")
+        button(type="button" class="z-10 btn btn-primary btn-small flex items-center")
+          span(class="icon-container mr-4")
+            ion-icon(name="rocket-outline" class="text-2xl")
+          span Boost
+        div(class="rounded-xl pl-8 pr-3 py-1 bg-yellow-50 text-gray-800 -ml-6 font-medium mr-4")
+          span 5
+        a(href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="icon-container" data-text=`Update on ${product_name} 🚀` data-url="https://haptic.so" data-via="hapticso" data-hashtags="buildinpublic #onhapticso" data-show-count="false")
+          ion-icon(name="logo-twitter")
         if show_view_btn
-          a(href=`/p/${product_slug}/${post_id}` class="btn btn-small btn-primary text-xs mr-2" data-post-link) View
-        a(href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-text=`Update on ${product_name} 🚀` data-url="https://haptic.so" data-via="hapticso" data-hashtags="buildinpublic #onhapticso" data-show-count="false")
+          a(href=`/p/${product_slug}/${post_id}` class="icon-container btn btn-icon ml-4" data-post-link data-tippy-content="Open") 
+            ion-icon(name="eye-outline" class="text-xl")
         if show_opts
           div(class="relative inline-block ml-4")
             button(class="btn btn-icon btn-small icon-container" data-ctx-menu-trigger data-tippy-content="Actions")
@@ -28,7 +36,7 @@ mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitt
                   span(class="icon-container mr-2")
                     ion-icon(name="trash-outline")
                   span Delete
-    div(class="flex items-start __md")
-      img(data-image data-zoomable src=img_url class={"hidden": !img_url, "cursor-pointer mr-4": true} style="border-radius: 2px; max-height: 75px; max-width: 175px;")
-      div(data-content="data-content" class="inline-block")
+    div(class="__md")
+      img(data-image data-zoomable src=img_url class={"hidden": !img_url, "cursor-pointer mr-4 mb-4 rounded-md": true})
+      div(data-content="data-content")
         block
