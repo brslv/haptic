@@ -5,6 +5,7 @@ include ../../partials/product-header.pug
 include ../../partials/page-title.pug
 include ../../partials/modal.pug
 include ../../partials/post.pug
+include ../../partials/icon.pug
 
 mixin post-type-btn({bind, icon, disabled}, attr = {})
   div(
@@ -16,14 +17,14 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
       "text-gray-500": disabled
     }
   )&attributes(attr)
-    span(class="icon-container")
-      ion-icon(class="mr-2 text-lg" name=icon)
+    span(class="mr-2")
+      +icon(icon, { width: '18', height: '18', stroke: disabled ? "muted" : "white" })
     if block
       block
     if disabled
       span(class="text-xs px-2 py-1 ml-4 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
     span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
-      ion-icon(name="close-outline")
+      +icon("x", { width: 14, height: 14 })
 
 block content
   +top-bar
@@ -31,11 +32,11 @@ block content
   div(class="container mx-auto px-4 pt-4")
     +page-title(class="mb-4") Publish new
     div(class="gap-2 flex flex-wrap pb-2")
-      +post-type-btn({ bind: "text", icon: "document-text-outline", disabled: false }) Text &bull; Images
-      +post-type-btn({ bind: "youtube", icon: "play-outline", disabled: true }) YouTube
-      +post-type-btn({ bind: "survey", icon: "checkbox-outline", disabled: true }) Survey
-      +post-type-btn({ bind: "milestone", icon: "happy-outline", disabled: true }) Milestone
-      +post-type-btn({ bind: "roadmap", icon: "map-outline", disabled: true }) Roadmap
+      +post-type-btn({ bind: "text", icon: "file-text", disabled: false }) Text &bull; Images
+      +post-type-btn({ bind: "youtube", icon: "youtube", disabled: true }) YouTube
+      +post-type-btn({ bind: "survey", icon: "check-circle", disabled: true }) Survey
+      +post-type-btn({ bind: "milestone", icon: "smile", disabled: true }) Milestone
+      +post-type-btn({ bind: "roadmap", icon: "map", disabled: true }) Roadmap
 
     form(id="form-post-text" class="hidden" data-show="text")
       input(type="file" id="image-upload" class="hidden")
@@ -48,18 +49,19 @@ block content
         button(type="submit" class="btn btn-primary") Publish
         div(class="flex items-center")
           button(type="button" class="mr-4 btn btn-default flex items-center" id="add-image-btn")
-            span(class="icon-container")
-              ion-icon(name="image-outline" class="mr-2")
+            span(class="mr-2")
+              +icon('image', { width: '18', height: '18' })
             span Attach image
           span(id="image-upload-loader" class="hidden mr-2")
             span(class="icon-container opacity-75 my-0 block relative")
-              ion-icon(name="sync-outline" class="animate-spin w-5 h-5")
+              +icon("refresh-cw")
           span(id="image-upload-preview")
 
 
     div(class="pt-16")
       div(class={ "hidden": posts.length, "flex items-center text-gray-300 dark:text-gray-500": true } id="no-posts-msg")
-        ion-icon(name="pulse-outline" class="text-3xl mr-4")
+        span(class="mr-2")
+          +icon("activity", { stroke: "muted" })
         p Still no public updates available
       div(id="posts-container")
         if posts && posts.length

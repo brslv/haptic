@@ -1,0 +1,18 @@
+mixin icon(name, { width = '24', height = '24', fill = 'none', stroke = 'white', strokeWidth = '2', active = false } = { width: '24', height: '24', fill: 'none', stroke: 'white', strokeWidth: '2', active: false })
+  -
+    var strokeColors = {
+      muted: '#4B5563',
+      white: 'white',
+      primary: '#FCD34D',
+      danger: '#EF4444'
+    };
+  svg(
+    width=width
+    height=height
+    fill="none"
+    stroke=`${active ? strokeColors.primary : (strokeColors[stroke] || 'white')}`
+    stroke-width=`${strokeWidth}`
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  )
+    use(xlink:href=`/static/images/icons/feather-sprite.svg#${name}`)
