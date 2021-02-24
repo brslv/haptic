@@ -128,7 +128,13 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
 
               var contentEl = tplEl.content.querySelector("[data-content]");
 
-              contentEl.innerHTML = post.text;
+              contentEl.innerHTML = new showdown.Converter({
+                noHeaderId: true,
+                simplifiedAutoLink: true,
+                tasklists: true,
+                openLinksInNewWindow: true,
+                emoji: true,
+              }).makeHtml(post.text);
               var imageEl = tplEl.content.querySelector("[data-image]");
               if (post.image_url) {
                 imageEl.src = post.image_url;

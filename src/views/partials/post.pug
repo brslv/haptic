@@ -14,7 +14,6 @@ mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitt
               ion-icon(name="time-outline" class="mr-2")
               span= date_str
       div(class="icon-container")
-        ion-icon(name="link-outline" class="text-xl" data-tippy-content="Copy link")
         if show_opts
           div(class="relative inline-block ml-4")
             button(class="btn btn-icon btn-small icon-container" data-ctx-menu-trigger data-tippy-content="Actions")
