@@ -1,8 +1,8 @@
-mixin icon(name, { width = '24', height = '24', fill = 'none', stroke = 'white', strokeWidth = '2', active = false } = { width: '24', height: '24', fill: 'none', stroke: 'white', strokeWidth: '2', active: false })
+mixin icon(name, { width = '24', height = '24', fill = 'none', stroke = 'default', strokeWidth = '2', active = false } = { width: '24', height: '24', fill: 'none', stroke: 'default', strokeWidth: '2', active: false })
   -
     var strokeColors = {
       muted: '#4B5563',
-      white: 'white',
+      default: 'black',
       primary: '#FCD34D',
       danger: '#EF4444'
     };
@@ -10,7 +10,7 @@ mixin icon(name, { width = '24', height = '24', fill = 'none', stroke = 'white',
     width=width
     height=height
     fill="none"
-    stroke=`${active ? strokeColors.primary : (strokeColors[stroke] || 'white')}`
+    stroke=`${active ? strokeColors.primary : (strokeColors[stroke] || strokeColors.default)}`
     stroke-width=`${strokeWidth}`
     stroke-linecap="round"
     stroke-linejoin="round"

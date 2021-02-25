@@ -40,7 +40,7 @@ mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitt
         class={
           "text-xs select-none block px-2 py-1 mr-4 rounded-xl border border-gray-300 hover:border-transparent dark:border-gray-600": true,
           "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600": !disable_boost_btn,
-          "text-gray-500 hover:bg-transparent dark:hover:bg-transparent": disable_boost_btn
+          "text-gray-500 hover:border-gray-300 hover:bg-transparent dark:hover:bg-transparent": disable_boost_btn
         }
         data-post-boost-btn
         data-post-id=post_id
@@ -52,7 +52,14 @@ mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitt
                 span(class="icon-container mr-2")
                   +icon("star", { width: '18', height: '18', stroke: disable_boost_btn ? "muted" : "white" })
                 span(class="mr-4")= `Boost`
-              span(class={"px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase": true, "text-gray-300 dark:bg-gray-600 dark:text-gray-400": disable_boost_btn} data-post-boost-counter)= boosts_count
+              span(
+                class={
+                  "px-4 py-1 font-medium text-gray-800 rounded-full text-xs uppercase": true,
+                  "bg-yellow-300": !disable_boost_btn,
+                  "bg-gray-200 text-gray-300 dark:bg-gray-600 dark:text-gray-400": disable_boost_btn
+                }
+                data-post-boost-counter
+              )= boosts_count
       div(class="flex items-center")
         a(href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-text=`Update on ${product_name} 🚀` data-url="https://haptic.so" data-via="hapticso" data-hashtags="buildinpublic #onhapticso" data-show-count="false" data-tippy-content="Share on Twitter")
         if show_view_btn
