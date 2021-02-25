@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
               if (post.image_url) {
                 imageEl.src = post.image_url;
                 imageEl.classList.remove("hidden");
+                imageEl.parentElement.classList.remove("hidden");
               }
 
               postsContainer.parentNode.prepend(tplEl.content);
@@ -406,4 +407,41 @@ document.addEventListener("DOMContentLoaded", function domLoaded() {
       }
     })(); // end text form context
   }
+
+  // handling post boosts
+  (function() {
+    var boostBtns = document.querySelectorAll("[data-post-boost-btn]");
+    boostBtns.forEach(function registerBoostPostBtn(btn) {
+      if (btn.dataset.disabled !== undefined) return; // skip listening
+      btn.addEventListener("click", function onBoostPostBtnClick(e) {
+        e.preventDefault();
+        var postId = btn.dataset.postId;
+        axios
+          .post("/post/" + postId + "/boost")
+          .then(function handleBoostPostResponse(response) {
+            var boostsCount = Number(btn.dataset.boostsCount);
+            var boostsCounterEl = btn.querySelector(
+              "[data-post-boost-counter]"
+            );
+
+            var newCount;
+            if (isNaN(boostsCount)) {
+              newCount = 0;
+            } else {
+              newCount = boostsCount + 1;
+            }
+
+            btn.dataset.boostsCount = newCount;
+            boostsCounterEl.innerHTML = newCount;
+          })
+          .catch(function handleBoostPostFail(error) {
+            if (error.response && error.response.data) {
+              var msg = error.response.data.err;
+              alert(msg);
+            }
+            console.error(error);
+          });
+      });
+    });
+  })();
 });

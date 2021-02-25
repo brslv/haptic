@@ -76,6 +76,8 @@ block content
               twitter_name: post.user_twitter_name,
               twitter_screen_name: post.user_twitter_screen_name,
               date_str: post.created_at_formatted,
+              disable_boost_btn: true,
+              boosts_count: post.boosts_count,
             }) !{post_text}
 
   template(id="post-tpl")
@@ -87,7 +89,9 @@ block content
       img_url: null,
       twitter_name: user.twitter_name,
       twitter_screen_name: user.twitter_screen_name,
-      date_str: 'Now'
+      date_str: 'Now',
+      disable_boost_btn: true,
+      boosts_count: 0
     })
 
 block append scripts

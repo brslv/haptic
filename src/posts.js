@@ -84,7 +84,11 @@ function actions({ db, user }) {
         "users.twitter_screen_name as user_twitter_screen_name",
         "images.id as image_id",
         "images.url as image_url",
-        "images.created_at as image_created_at"
+        "images.created_at as image_created_at",
+        db("post_boosts")
+          .count()
+          .whereRaw("post_id = posts.id")
+          .as("boosts_count")
       )
       .table("posts_text")
       .leftJoin("posts", "posts_text.post_id", "posts.id")
@@ -123,7 +127,11 @@ function actions({ db, user }) {
             "users.twitter_screen_name as user_twitter_screen_name",
             "images.id as image_id",
             "images.url as image_url",
-            "images.created_at as image_created_at"
+            "images.created_at as image_created_at",
+            db("post_boosts")
+              .count()
+              .whereRaw("post_id = posts.id")
+              .as("boosts_count")
           )
           .table("posts_text")
           .leftJoin("posts", "posts_text.post_id", "posts.id")
@@ -131,6 +139,7 @@ function actions({ db, user }) {
           .leftJoin("images", "images.post_id", "posts.id")
           .where({ "posts.product_id": productId })
           .orderBy("posts.created_at", "DESC")
+          .debug()
           .then((result) => {
             trx.commit().then(() => res(result));
           })

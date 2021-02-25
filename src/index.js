@@ -666,6 +666,35 @@ app.post("/product", ajaxOnly, authOnly, express.json(), (req, res, next) => {
     });
 });
 
+app.post("/post/:id/boost", ajaxOnly, authOnly, (req, res, next) => {
+  const id = req.params.id;
+  const user = req.user;
+
+  db.table("post_boosts")
+    .insert({ post_id: id, user_id: user.id })
+    .then((boostResult) => {
+      return db("post_boosts")
+        .select("id")
+        .where({ post_id: id })
+        .then((allBoostsResult) => {
+          res.json({
+            ok: 1,
+            err: null,
+            details: { boosts: allBoostsResult },
+          });
+        });
+    })
+    .catch((err) => {
+      if (err.code === dbErrCodes.DUP_CODE)
+        return res.status(400).json({
+          ok: 0,
+          err: "You've already boosted this post. 🚀",
+          details: null,
+        });
+      next(err);
+    });
+});
+
 app.post(
   "/post/:pid/:type",
   ajaxOnly,
