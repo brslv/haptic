@@ -23,11 +23,4 @@ block content
     }) !{post_text}
 
 block append scripts
-  script.
-    window.App = {}
-    window.App.MediumZoom = mediumZoom('[data-zoomable]', {
-      margin: 50,
-      background: `rgba(0,0,0,0.5)`,
-    })
-  script(async src="https://platform.twitter.com/widgets.js" charset="utf-8")
-  script(src="/static/js/posts.js")
+  script(src="/static/js/new/post.js")

@@ -44,7 +44,7 @@
   }
 
   .btn-danger {
-    @apply bg-red-400 hover:bg-red-500 text-gray-800 dark:text-gray-800 hover:text-gray-800 dark:hover:text-gray-800;
+    @apply bg-red-400 hover:bg-red-500 text-white hover:text-white dark:text-gray-800 dark:hover:text-gray-800;
   }
 
   .btn-danger:focus {
@@ -68,7 +68,7 @@
   }
 
   .btn-text {
-    @apply bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent px-0;
+    @apply bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent px-0 !important;
   }
   .btn-text.btn-default {
     @apply text-gray-800 hover:text-gray-600 dark:text-gray-200 dark:hover:text-gray-400;
