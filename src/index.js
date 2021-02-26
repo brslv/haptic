@@ -138,7 +138,7 @@ app.use(
     saveUninitialized: true,
     cookie: {
       secure: IS_PROD,
-      maxAge: HOUR_IN_MS,
+      maxAge: HOUR_IN_MS * 24, // one day
     },
   })
 );
@@ -536,6 +536,31 @@ app.get("/p/:slug/:postId", (req, res, next) => {
     .where({ "products.slug": slug })
     .first()
     .then((productResult) => {
+      if (!productResult) {
+        return res.status(404).render("404", {
+          meta: {
+            ...defaultMetas,
+            title: "Page not found | Haptic",
+            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+          },
+          user: req.user,
+        });
+      }
+
+      if (
+        !productResult.is_public &&
+        (!req.user || req.user.id !== productResult.user_id)
+      ) {
+        return res.render("private-product", {
+          meta: {
+            ...defaultMetas,
+            title: "Private product | Haptic",
+            og: { ...defaultMetas.og, title: "Private product | Haptic" },
+          },
+          user: req.user,
+        });
+      }
+
       return postsActions
         .getPost("text", { postId })
         .then((result) => {
