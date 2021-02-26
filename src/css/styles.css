@@ -196,6 +196,49 @@
     @apply block my-2 px-4 py-2 rounded-xl border bg-gray-100 dark:bg-gray-500 border-gray-300 dark:border-gray-600;
   }
 
+  .fade-in {
+    opacity: 1;
+    transform: scale(1);
+    visibility: visible;
+    animation: fadeIn 0.15s;
+  }
+  .fade-out {
+    opacity: 0;
+    visibility: none;
+    transform: scale(0.95);
+    animation: fadeOut 0.15s;
+  }
+
+  @keyframes fadeIn {
+    from {
+      margin-top: -5px;
+      transform: scale(0.95);
+      opacity: 0;
+      visibility: none;
+    }
+    to {
+      margin-top: 0px;
+      transform: scale(1);
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      margin-top: 0px;
+      transform: scale(1);
+      opacity: 1;
+      visibility: visible;
+    }
+    to {
+      margin-top: -5px;
+      transform: scale(0.95);
+      opacity: 0;
+      visibility: none;
+    }
+  }
+
   @keyframes shake {
     10%,
     90% {
