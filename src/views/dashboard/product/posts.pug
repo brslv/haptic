@@ -18,7 +18,7 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
     }
   )&attributes(attr)
     span(class="mr-2")
-      +icon(icon, { width: '18', height: '18', stroke: disabled ? "muted" : "white" })
+      +icon(icon, { width: '18', height: '18', stroke: disabled ? "muted" : "default" })
     if block
       block
     if disabled
