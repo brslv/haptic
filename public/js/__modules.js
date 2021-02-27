@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         handlers[eventName].splice(idx, 1);
       }
       function emit(eventName, data) {
-        console.log("emitting", eventName, data);
+        // console.log("emitting", eventName, data);
         if (eventName === undefined) {
           return console.warn("Invalid event name: " + eventName);
         }
@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   emitter.events = {
     newPostAdded: "newPostAdded",
     imageUploaded: "imageUploaded",
+    imagePreviewRendered: "imagePreviewRendered",
     ctxMenuItemClicked: "ctxMenuItemClicked",
     postRemoved: "postRemoved",
   };
@@ -279,10 +280,10 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
               imageEl.parentElement.classList.remove("hidden");
             }
 
+            postsContainerEl.parentNode.prepend(clone.content);
             emitter.emit(emitter.events.newPostAdded, {
               el: clone.content,
             });
-            postsContainerEl.parentNode.prepend(clone.content);
           }
 
           function handleFormSubmit(e) {
@@ -299,7 +300,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
                 var data = response.data;
                 var details = data.details;
                 if (data.ok) {
-                  console.warn("data submitted successfully ", data);
                   var post = details.post;
                   renderNewPost(post);
                 }
@@ -330,6 +330,9 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
             if (submitBtnEl) submitBtnEl.removeAttribute("disabled");
             uploadImgBtnEl.removeAttribute("disabled");
             previewImage(url, previewEl);
+            emitter.emit(emitter.events.imagePreviewRendered, {
+              previewEl: previewEl,
+            });
           });
 
           function handleFileSelected() {
@@ -566,6 +569,8 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
+  // posts actions ------------------------------------------------------------
+
   m.postActions = m.postActions || {
     register: function register() {
       function deletePost(postId) {
@@ -609,6 +614,8 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
+  // posts wall ------------------------------------------------------------
+
   m.postsWall = m.postsWall || {
     register: function register() {
       var postsContainerEl = document.querySelector("[data-posts-container]");
@@ -626,8 +633,239 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
+  // delete product ------------------------------------------------------------
+
+  m.deleteProduct = m.deleteProduct || {
+    register: function register() {
+      var delBtnEl = document.querySelector("[data-delete-product-btn]");
+      var productDelFormEl = document.getElementById("product-delete-form");
+      if (!delBtnEl || !productDelFormEl) return;
+
+      delBtnEl.addEventListener("click", function delBtnElClick(e) {
+        e.preventDefault();
+        var ok = window.confirm(
+          "Deleting a product is irreversible. Delete it anyway?"
+        );
+        if (ok) deleteProduct(e.currentTarget.dataset.postId);
+      });
+
+      function deleteProduct() {
+        productDelFormEl.submit();
+      }
+    },
+  };
+
+  // create product ------------------------------------------------------------
+
+  m.createProduct = m.createProduct || {
+    register: function register() {
+      var createBtn = document.getElementById("create-product-btn");
+      var modal = document.querySelector(
+        '[data-modal-name="create-product-modal"]'
+      );
+      var close = document.querySelector(
+        '[data-modal-name="create-product-modal"] [data-modal-close]'
+      );
+      var form = document.getElementById("create-product-form");
+      var productNameEl = document.getElementById("product-name");
+
+      if (createBtn && modal) {
+        createBtn.addEventListener("click", function onCreate() {
+          modal.classList.remove("hidden");
+          if (productNameEl) productNameEl.focus();
+        });
+      }
+
+      if (close && modal) {
+        close.addEventListener("click", function onClose() {
+          modal.classList.add("hidden");
+        });
+      }
+
+      if (form) {
+        (function() {
+          var productSlugEl = document.getElementById("product-slug");
+          var submitBtn = document.querySelector(
+            '#create-product-form button[type="submit"]'
+          );
+          var genSlugBtn = document.querySelector(
+            "#create-product-form button[data-form-gen-slug-btn]"
+          );
+
+          genSlugBtn.addEventListener("click", function productNameElBlur() {
+            var productName = productNameEl.value;
+            submitBtn.setAttribute("disabled", "disabled");
+            utils.req(
+              "/product-slug",
+              { name: productName },
+              {
+                method: "post",
+                ok: function getProductSlug(result) {
+                  if (result.data.ok) {
+                    productSlugEl.value = result.data.details.slug;
+                  }
+                  submitBtn.removeAttribute("disabled");
+                },
+              }
+            );
+          });
+
+          function validation(e) {
+            if (productNameEl.value.length && productSlugEl.value.length) {
+              submitBtn.removeAttribute("disabled");
+            } else {
+              submitBtn.setAttribute("disabled", "disabled");
+            }
+
+            if (productNameEl.value.length) {
+              genSlugBtn.removeAttribute("disabled");
+              productSlugEl.removeAttribute("disabled");
+            } else {
+              genSlugBtn.setAttribute("disabled", "disabled");
+              productSlugEl.setAttribute("disabled", "disabled");
+            }
+          }
+
+          productNameEl.addEventListener("blur", validation);
+          productSlugEl.addEventListener("blur", validation);
+          productNameEl.addEventListener("input", validation);
+          productSlugEl.addEventListener("input", validation);
+
+          form.addEventListener("submit", function asyncFormSubmit(e) {
+            e.preventDefault();
+            var productName = productNameEl.value;
+            var productSlug = productSlugEl.value;
+
+            function submit() {
+              utils.req(
+                "/product",
+                { name: productName, slug: productSlug },
+                {
+                  method: "post",
+                  ok: function createProduct(result) {
+                    var slug = result.data.details.slug;
+                    window.location.href =
+                      "/dashboard/product/" + slug + "/settings";
+                  },
+                  fail: function fail(err) {
+                    var errorEl = document.querySelector(
+                      "#create-product-form [data-form-error]"
+                    );
+                    errorEl.classList.remove("hidden");
+                    errorEl.innerHTML = err.response.data.err;
+                  },
+                }
+              );
+            }
+
+            setTimeout(submit, 0);
+          });
+        })();
+      }
+    },
+  };
+
+  // cookies consent ------------------------------------------------------------
+
+  m.cookiesConsent =
+    m.cookiesConsent ||
+    (function() {
+      var cookiesConsentEl = document.getElementById("cookies-consent");
+      var consentAccepted = localStorage.getItem("cookies-consent");
+
+      function showConsent() {
+        if (consentAccepted === "true") return;
+
+        var consentOkButton = document.getElementById("cookies-consent-ok-btn");
+        cookiesConsentEl.classList.remove("hidden");
+
+        consentOkButton.addEventListener("click", function consentBtnClick() {
+          localStorage.setItem("cookies-consent", "true");
+          cookiesConsentEl.classList.add("hidden");
+        });
+      }
+
+      showConsent();
+    })();
+
+  // axios setup ------------------------------------------------------------
+
+  m.axiosSetup =
+    m.axiosSetup ||
+    (function() {
+      axios.interceptors.response.use(
+        function(response) {
+          return response;
+        },
+        function(error) {
+          if (error.response.status === 401) window.location.href = "/login";
+          if (error.response.status === 500) alert(error.response.data.err);
+          return Promise.reject(error);
+        }
+      );
+    })();
+
+  // dark mode ------------------------------------------------------------
+
+  m.darkMode = m.darkMode || {
+    register: function register() {
+      var toggle = document.querySelector("[data-dark-mode-toggle]");
+      var htmlEl = document.getElementsByTagName("html")[0];
+      var isDark = localStorage.getItem("dark-mode");
+
+      if (isDark === "true") {
+        htmlEl.classList.add("dark");
+      } else {
+        htmlEl.classList.remove("dark");
+      }
+
+      toggle.addEventListener("click", function toggleDarkMode() {
+        htmlEl.classList.toggle("dark");
+        var isDark = htmlEl.classList.contains("dark");
+        localStorage.setItem("dark-mode", isDark);
+      });
+    },
+  };
+
+  // ta autoresize ------------------------------------------------------------
+
+  m.textAreaAutoresize = m.textAreaAutoresize || {
+    register: function register() {
+      function addAutoResize() {
+        document
+          .querySelectorAll("[data-autoresize]")
+          .forEach(function(element) {
+            element.style.boxSizing = "border-box";
+            var offset = element.offsetHeight - element.clientHeight;
+            element.addEventListener("input", function(event) {
+              event.target.style.height = "auto";
+              event.target.style.height =
+                event.target.scrollHeight + offset + "px";
+            });
+            element.removeAttribute("data-autoresize");
+          });
+      }
+      addAutoResize();
+    },
+  };
+
+  // tooltips ------------------------------------------------------------
+
+  m.tooltips =
+    m.tooltips ||
+    (function() {
+      tippy("[data-tippy-content]", {
+        arrow: false,
+        animation: "fade",
+        delay: [150, 0],
+        inlinePositioning: true,
+        placement: "bottom",
+        theme: "haptic",
+      });
+    })();
+
   // medium zoom ------------------------------------------------------------
-  // autoloaded, no need to register it.
+
   m.mediumZoom =
     m.mediumZoom ||
     (function() {
@@ -636,13 +874,13 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         background: `rgba(0,0,0,0.5)`,
       });
 
-      function reload() {
+      function reload(data) {
         mz.detach();
         mz.attach(document.querySelectorAll("[data-zoomable]"));
       }
 
       emitter.on(
-        [emitter.events.imageUploaded, emitter.events.newPostAdded],
+        [emitter.events.imagePreviewRendered, emitter.events.newPostAdded],
         reload
       );
     })();

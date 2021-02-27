@@ -1,3 +1,3 @@
 document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
-  window._hpt.modules.deleteProduct.register();
+  window._hpt.modules.textAreaAutoresize.register();
 });

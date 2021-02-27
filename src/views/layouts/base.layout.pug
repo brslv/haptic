@@ -72,6 +72,7 @@ html(lang="en" id="html" class="")
       block modals
 
     block scripts
+      script(src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous")
       script(src="https://unpkg.com/@popperjs/core@2")
       script(src="https://unpkg.com/tippy.js@6")
       script(src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous")
@@ -82,12 +83,5 @@ html(lang="en" id="html" class="")
         integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
         crossorigin="anonymous"
       )
-
-      script(src="/static/js/axios-setup.js")
-      script(src="/static/js/new/__modules.js")
-        
-      script(src="/static/js/cookies-consent.js")
-      //- script(src="/static/js/dark-mode.js")
-      script(src="/static/js/ta-autoresize.js")
-      script.
-        tippy('[data-tippy-content]', { arrow: false, animation: 'fade', delay: [300, 0], inlinePositioning: true, placement: 'bottom', theme: 'haptic' })
+      script(src="/static/js/__modules.js")
+      script(src="/static/js/base.js")
