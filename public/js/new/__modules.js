@@ -453,7 +453,43 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
+  // product boosts ------------------------------------------------------------
+
+  m.productBoosts = m.productBoosts || {
+    register: function register() {
+      var btnEl = document.querySelector("[data-product-boost-btn]");
+      var counterEl = document.querySelector("[data-product-boost-counter]");
+      var slugEl = document.querySelector("[data-product-slug]");
+      var boostsCountEl = document.querySelector("[data-product-boosts-count]");
+      var slug = slugEl.dataset.productSlug;
+      var boostsCount = boostsCountEl.dataset.productBoostsCount;
+      if (!btnEl || !slug) return;
+
+      btnEl.addEventListener("click", function productBoostBtnElClick() {
+        utils.req("/p/" + slug + "/boost", {
+          method: "post",
+          ok: function ok(response) {
+            var newCount;
+            if (isNaN(boostsCount)) {
+              newCount = 0;
+            } else {
+              newCount = Number(boostsCount) + 1;
+            }
+
+            counter.innerHTML = newCount;
+            boostsCountEl.dataset.productBoostsCount = newCount;
+          },
+          fail: function boostProductResponseError(err) {
+            var data = err.response.data;
+            alert(data.err);
+          },
+        });
+      });
+    },
+  };
+
   // ctxMenus ------------------------------------------------------------
+
   m.ctxMenus = m.ctxMenus || {
     register: function register() {
       emitter.on(emitter.events.newPostAdded, function(data) {
@@ -468,6 +504,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
               '[data-ctx-menu="' + e.currentTarget.dataset.ctxMenuTrigger + '"]'
             );
             var actions = menu.querySelectorAll("[data-ctx-action]");
+            var closeEls = menu.querySelectorAll("[data-ctx-menu-close]");
 
             if (!menu) {
               console.log(
@@ -496,17 +533,31 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
             });
 
             function closeCtxMenu(e) {
-              if (menu.contains(e.target) || triggerEl.contains(e.target))
-                return;
               menu.classList.add("hidden");
               menu.parentElement.classList.remove("z-10");
               document.body.removeEventListener("click", closeCtxMenu);
               actions.forEach(function(actionEl) {
                 actionEl.removeEventListener("click", handleActionClick);
               });
+              closeEls.forEach(function(closeEl) {
+                closeEl.removeEventListener("click", closeCtxMenu);
+              });
             }
 
-            document.body.addEventListener("click", closeCtxMenu);
+            // register ctx close btn handlers
+            closeEls.forEach(function(closeEl) {
+              closeEl.addEventListener("click", function(e) {
+                closeCtxMenu(e);
+              });
+            });
+
+            // register outside click handlers
+            document.body.addEventListener("click", function(e) {
+              if (menu.contains(e.target) || triggerEl.contains(e.target))
+                return;
+
+              closeCtxMenu(e);
+            });
           });
         });
       }

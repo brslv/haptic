@@ -12,7 +12,7 @@ block content
         span(class="mr-2")
           +icon("lock")
         span(class="border-b-4 border-purple-400") Private
-    div(class="flex items-center justify-between")
+    div(class="flex items-center justify-between" data-product-slug=product.slug data-product-boosts-count=boosts.length)
       div(class="flex items-center")
         h1(class="text-2xl font-bold inline-block mr-4")= product.name
         if product.website
@@ -20,9 +20,9 @@ block content
             +icon("globe")
       div(class="relative flex items-center")
         span(class="text-xs text-gray-500 uppercase mr-2 bg-gray-100 dark:bg-gray-700 rounded-xl px-2 py-1") Creator
-        img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class="cursor-pointer w-12 h-12 rounded-full border-2 border-yellow-300 hover:border-yellow-400" id="creator")
-        div(class="hidden z-20 absolute top-14 right-0 p-4 bg-white border boder-gray-100 dark:bg-gray-800 dark:border-gray-700 rounded-xl shadow-xl" style="width: 300px;" id="creator-details")
-          div(class="icon-container absolute top-4 right-4 cursor-pointer text-2xl" id="close-creator-details-btn")
+        img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class="cursor-pointer w-12 h-12 rounded-full border-2 border-yellow-300 hover:border-yellow-400" data-ctx-menu-trigger="creator-mini-profile")
+        div(class="hidden z-20 absolute top-14 right-0 p-4 bg-white border boder-gray-100 dark:bg-gray-800 dark:border-gray-700 rounded-xl shadow-xl" style="width: 300px;" data-ctx-menu="creator-mini-profile")
+          div(class="icon-container absolute top-4 right-4 cursor-pointer text-2xl" data-ctx-menu-close)
             +icon("x")
           h2(class="text-lg font-bold")= product.user_twitter_name
           a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
@@ -70,18 +70,6 @@ block content
             p(class="text-xl") Still no public updates available
 
 block append scripts
-  script.
-    window.App = {}
-    window.App.MediumZoom = mediumZoom('[data-zoomable]', {
-      margin: 50,
-      background: `rgba(0,0,0,0.5)`,
-    })
-  script(async src="https://platform.twitter.com/widgets.js" charset="utf-8")
-  script.
-    var App = {}
-    App.Product = {};
-    App.Product.slug = '#{product.slug}';
-    App.Product.boostCount = '#{boosts.length}';
-  script(src="/static/js/product.js")
+  //- script(src="/static/js/product.js")
   script(src="/static/js/new/product.js")
   //- script(src="/static/js/posts.js")

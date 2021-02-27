@@ -16,5 +16,5 @@ mixin icon(name, { width = '24', height = '24', fill = 'none', stroke = 'default
     stroke-width=`${strokeWidth}`
     stroke-linecap="round"
     stroke-linejoin="round"
-  )
+  )&attributes(attributes)
     use(xlink:href=`/static/images/icons/feather-sprite.svg#${name}`)
