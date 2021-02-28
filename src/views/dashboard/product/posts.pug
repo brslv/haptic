@@ -14,15 +14,15 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
     class={
       "relative flex items-center py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700": true,
       "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700": !disabled,
-      "text-gray-500": disabled
+      "text-gray-300": disabled
     }
   )&attributes(attr)
     span(class="mr-2")
-      +icon(icon, { width: '18', height: '18', stroke: disabled ? "muted" : "default" })
+      +icon(icon, { width: '18', height: '18', stroke: disabled ? "disabled" : "default" })
     if block
       block
     if disabled
-      span(class="text-xs px-2 py-1 ml-4 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
+      span(class="text-xs px-2 py-1 ml-4 bg-yellow-100 dark:bg-gray-700 rounded-full text-gray-500") Soon!
     span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
       +icon("x", { width: 14, height: 14 })
 
@@ -54,7 +54,7 @@ block content
                 +icon('image', { width: '18', height: '18' })
               span Attach image
             span(data-image-upload-loader class="hidden mr-2")
-              span(class="icon-container opacity-75 my-0 block relative")
+              span(class="animate-spin icon-container opacity-75 my-0 block relative")
                 +icon("refresh-cw")
             span(data-upload-image-preview)
 
