@@ -1,0 +1,47 @@
+extends layouts/base.layout.pug
+
+include partials/top-bar.pug
+include partials/page-title.pug
+include partials/flash-msg.pug
+
+block content
+  +top-bar
+  div(class="container p-4 mx-auto")
+    +page-title(class="mb-4") Notifications
+    +flash-msg(flash)
+
+    div(class="mb-4")
+      form(action="/mark-notifications-read" method="POST")
+        button(type="submit" class="btn btn-primary") Clear notifications
+    div(class="mb-4")
+      div(class="mb-2 text-gray-500") Unread
+      if notifications && notifications.unread && notifications.unread.length
+        each notif in notifications.unread
+          if notif.type === 'post_boosts'
+            div(class="p-4 rounded-xl bg-gray-100 dark:bg-gray-700 dark:border-gray-700 mb-4" data-notification-id=notif.id)
+              div(class="flex items-center mb-2")
+                div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
+                a(href=`/p/${notif.product_slug}`)
+                  span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
+              div
+                span(class="font-bold")= `${notif.author_twitter_name} `
+                span boosted your 
+                a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
+                span .
+      else
+        div No unread notifications.
+
+    if notifications && notifications.read && notifications.read.length
+      div(class="mb-2 text-gray-500") Read
+      each notif in notifications.read
+        if notif.type === 'post_boosts'
+          div(class="p-4 rounded-xl bg-gray-100 dark:bg-gray-700 dark:border-gray-700 mb-4 opacity-50" data-notification-id=notif.id)
+            div(class="flex items-center mb-2")
+              div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
+              a(href=`/p/${notif.product_slug}`)
+                span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
+            div
+              span(class="font-bold")= `${notif.author_twitter_name} `
+              span boosted your 
+              a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
+              span .

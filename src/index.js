@@ -20,6 +20,7 @@ const boosts = require("./boosts");
 const upload = require("./img-upload");
 const singleUpload = upload.single("image");
 const showdown = require("showdown");
+const notifications = require("./notifications");
 
 // constants
 const HOUR_IN_MS = 3600000;
@@ -62,6 +63,7 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(user, done) {
+  app.locals.user = user;
   done(null, user);
 });
 
@@ -177,19 +179,36 @@ const guestsOnly = (req, res, next) => {
   if (!req.user) next();
   else res.redirect("/dashboard");
 };
+const loadNotifications = (req, res, next) => {
+  if (!req.user) return next();
+  const notificationsActions = notifications.actions({ db, user: req.user });
+  notificationsActions
+    .getAll()
+    .then((notificationsResult) => {
+      console.log(notificationsResult);
+      app.locals.notifications = notificationsResult;
+      next();
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+app.use(loadNotifications);
+
 const dateFmt = (dateStr) => {
   return day(dateStr).format("DD MMM, HH:mm");
 };
 
 // setup routes
 app.get("/", (req, res) => {
-  res.render("index", { meta: defaultMetas, user: req.user });
+  res.render("index", { meta: defaultMetas });
 });
 
 app.get("/dashboard", authOnly, async (req, res, next) => {
   const flash = {
     success: await req.consumeFlash("success"),
   };
+
   db("products")
     .select()
     .where({ user_id: req.user.id })
@@ -200,7 +219,6 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
           title: "Dashboard | Haptic",
           og: { title: "Dashboard | Haptic" },
         },
-        user: req.user,
         products: result,
         flash,
       });
@@ -228,7 +246,6 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
             title: "Page not found | Haptic",
             og: { ...defaultMetas.og, title: "Page not found | Haptic" },
           },
-          user: req.user,
         });
       }
 
@@ -245,7 +262,6 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
                 title: `${productResult.name} | Haptic`,
               },
             },
-            user: req.user,
             product: { ...productResult },
             posts: [
               ...postsResult.map((post) => ({
@@ -289,7 +305,6 @@ app.get(
               title: "Page not found | Haptic",
               og: { ...defaultMetas.og, title: "Page not found | Haptic" },
             },
-            user: req.user,
           });
         }
 
@@ -302,7 +317,6 @@ app.get(
               title: `${result.name} | Haptic`,
             },
           },
-          user: req.user,
           product: { ...result },
           links: {
             posts: `/dashboard/product/${slug}/posts`,
@@ -344,7 +358,6 @@ app.post(
               title: "Page not found | Haptic",
               og: { ...defaultMetas.og, title: "Page not found | Haptic" },
             },
-            user: req.user,
           });
         }
 
@@ -398,7 +411,6 @@ app.post("/dashboard/product/:slug/delete", authOnly, (req, res, next) => {
 app.get("/dashboard/profile", authOnly, (req, res, next) => {
   return res.render("dashboard/profile", {
     meta: defaultMetas,
-    user: req.user,
     form: {
       action: "/dashboard/profile/update",
     },
@@ -443,7 +455,6 @@ app.get("/p/:slug", (req, res, next) => {
             title: "Page not found | Haptic",
             og: { ...defaultMetas.og, title: "Page not found | Haptic" },
           },
-          user: req.user,
         });
       }
 
@@ -454,7 +465,6 @@ app.get("/p/:slug", (req, res, next) => {
             title: "Private product | Haptic",
             og: { ...defaultMetas.og, title: "Private product | Haptic" },
           },
-          user: req.user,
         });
       }
 
@@ -471,7 +481,6 @@ app.get("/p/:slug", (req, res, next) => {
                   title: `${result.name} | Haptic`,
                 },
               },
-              user: req.user,
               product: { ...result },
               boosts: boostsResult,
               posts: [
@@ -506,7 +515,6 @@ app.get("/p/:slug/:postId", (req, res, next) => {
         title: "Page not found | Haptic",
         og: { ...defaultMetas.og, title: "Page not found | Haptic" },
       },
-      user: req.user,
     });
   }
 
@@ -543,7 +551,6 @@ app.get("/p/:slug/:postId", (req, res, next) => {
             title: "Page not found | Haptic",
             og: { ...defaultMetas.og, title: "Page not found | Haptic" },
           },
-          user: req.user,
         });
       }
 
@@ -557,7 +564,6 @@ app.get("/p/:slug/:postId", (req, res, next) => {
             title: "Private product | Haptic",
             og: { ...defaultMetas.og, title: "Private product | Haptic" },
           },
-          user: req.user,
         });
       }
 
@@ -580,12 +586,33 @@ app.get("/p/:slug/:postId", (req, res, next) => {
               text: mdConverter.makeHtml(result.text),
               created_at_formatted: dateFmt(result.created_at),
             },
-            user: req.user,
           });
         })
         .catch((err) => {
           next(err);
         });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get("/notifications", authOnly, async (req, res, next) => {
+  const flash = {
+    success: await req.consumeFlash("success"),
+  };
+  res.render("notifications", { meta: defaultMetas, flash });
+});
+
+app.post("/mark-notifications-read", authOnly, (req, res, next) => {
+  const notificationsActions = notifications.actions({ db, user: req.user });
+  notificationsActions
+    .readAll()
+    .then((result) => {
+      console.log(result);
+      req.flash("success", "Notifications cleared 🎉").then(() => {
+        res.redirect(`/notifications`);
+      });
     })
     .catch((err) => {
       next(err);
@@ -694,19 +721,24 @@ app.post("/product", ajaxOnly, authOnly, express.json(), (req, res, next) => {
 app.post("/post/:id/boost", ajaxOnly, authOnly, (req, res, next) => {
   const id = req.params.id;
   const user = req.user;
+  const notificationsActions = notifications.actions({ db, user });
 
   db.table("post_boosts")
     .insert({ post_id: id, user_id: user.id })
     .then((boostResult) => {
-      return db("post_boosts")
-        .select("id")
-        .where({ post_id: id })
-        .then((allBoostsResult) => {
-          res.json({
-            ok: 1,
-            err: null,
-            details: { boosts: allBoostsResult },
-          });
+      return notificationsActions
+        .add("post_boosts", { post_id: id })
+        .then((notificationsResult) => {
+          return db("post_boosts")
+            .select("id")
+            .where({ post_id: id })
+            .then((allBoostsResult) => {
+              res.json({
+                ok: 1,
+                err: null,
+                details: { boosts: allBoostsResult },
+              });
+            });
         });
     })
     .catch((err) => {
