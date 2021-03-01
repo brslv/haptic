@@ -12,24 +12,35 @@ function actions({ db, user }) {
   function _addPostBoost({ post_id }) {
     return new Promise((res, rej) => {
       db.transaction((trx) => {
-        db.table("notifications")
-          .transacting(trx)
-          .insert({ user_id: user.id })
-          .returning("id")
-          .then(([notificationId]) => {
+        db.transacting(trx)
+          .table("posts")
+          .select("user_id")
+          .where({ id: post_id })
+          .first()
+          .then((postResult) => {
+            if (!postResult) throw Error("Non-existing post");
+
             return db
+              .table("notifications")
               .transacting(trx)
-              .table("notifications_post_boosts")
-              .insert({
-                notification_id: notificationId,
-                post_id,
-              })
-              .then((notificationsPostBoostsResult) => {
-                trx.commit().then(
-                  res({
-                    id: notificationId,
+              .insert({ user_id: postResult.user_id })
+              .returning("id")
+              .then(([notificationId]) => {
+                return db
+                  .transacting(trx)
+                  .table("notifications_post_boosts")
+                  .insert({
+                    notification_id: notificationId,
+                    post_id,
+                    origin_user_id: user.id,
                   })
-                );
+                  .then((notificationsPostBoostsResult) => {
+                    trx.commit().then(
+                      res({
+                        id: notificationId,
+                      })
+                    );
+                  });
               });
           })
           .catch((err) => {
@@ -58,9 +69,12 @@ function actions({ db, user }) {
           "posts.id as post_id",
           "products.slug as product_slug",
           "products.name as product_name",
-          "users.id as user_id",
-          "users.twitter_name as author_twitter_name",
-          "users.twitter_profile_image_url as author_twitter_profile_image_url"
+          "user.id as user_id",
+          "user.twitter_name as user_twitter_name",
+          "user.twitter_profile_image_url as user_twitter_profile_image_url",
+          "origin_user.id as origin_user_id",
+          "origin_user.twitter_name as origin_user_twitter_name",
+          "user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
         )
         .from("notifications")
         .innerJoin(
@@ -69,7 +83,12 @@ function actions({ db, user }) {
           "notifications.id"
         )
         .innerJoin("posts", "notifications_post_boosts.post_id", "posts.id")
-        .innerJoin("users", "notifications.user_id", "users.id")
+        .innerJoin("users as user", "notifications.user_id", "user.id")
+        .innerJoin(
+          "users as origin_user",
+          "notifications_post_boosts.origin_user_id",
+          "origin_user.id"
+        )
         .innerJoin("products", "posts.product_id", "products.id")
         .where({ "posts.user_id": user.id })
         .orderBy("notifications.created_at", "DESC")
@@ -99,7 +118,7 @@ function actions({ db, user }) {
   function readAll() {
     return new Promise((res, rej) => {
       db("notifications")
-        .where({ user_id: user.id })
+        .where({ user_id: user.id, is_read: false })
         .update({ is_read: true })
         .then((result) => {
           res(result);

@@ -871,7 +871,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     (function() {
       var mz = mediumZoom("[data-zoomable]", {
         margin: 50,
-        background: `rgba(0,0,0,0.5)`,
+        background: `rgba(255,255,255,0.9)`,
       });
 
       function reload(data) {

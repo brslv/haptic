@@ -609,7 +609,6 @@ app.post("/mark-notifications-read", authOnly, (req, res, next) => {
   notificationsActions
     .readAll()
     .then((result) => {
-      console.log(result);
       req.flash("success", "Notifications cleared 🎉").then(() => {
         res.redirect(`/notifications`);
       });

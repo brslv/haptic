@@ -11,6 +11,14 @@ exports.up = function(knex) {
         ) {
           t.increments("id").primary();
 
+          t.integer("origin_user_id")
+            .unsigned()
+            .notNullable();
+          t.foreign("origin_user_id")
+            .references("id")
+            .inTable("users")
+            .onDelete("CASCADE");
+
           t.integer("notification_id")
             .unsigned()
             .notNullable();

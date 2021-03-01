@@ -8,6 +8,7 @@ exports.up = function(knex) {
       if (!exists) {
         return knex.schema.createTable("notifications", function(t) {
           t.increments("id").primary();
+
           t.integer("user_id")
             .unsigned()
             .notNullable();
@@ -15,6 +16,7 @@ exports.up = function(knex) {
             .references("id")
             .inTable("users")
             .onDelete("CASCADE");
+
           t.boolean("is_read")
             .notNullable()
             .defaultTo(false);

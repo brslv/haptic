@@ -24,7 +24,7 @@ block content
                 a(href=`/p/${notif.product_slug}`)
                   span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
               div
-                span(class="font-bold")= `${notif.author_twitter_name} `
+                span(class="font-bold")= `${notif.origin_user_twitter_name} `
                 span boosted your 
                 a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
                 span .
@@ -41,7 +41,7 @@ block content
               a(href=`/p/${notif.product_slug}`)
                 span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
             div
-              span(class="font-bold")= `${notif.author_twitter_name} `
+              span(class="font-bold")= `${notif.origin_user_twitter_name} `
               span boosted your 
               a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
               span .
