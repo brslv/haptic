@@ -1,27 +1,34 @@
 include ./icon.pug
 
 mixin top-bar()
-    div(class="z-10 relative p-4 w-full container mx-auto")
-        div(class="flex items-center justify-between")
-            a(href="/")
-                div(class="flex items-center")
-                    img(src="/static/images/logo/logo-main.svg" class="h-8 logo-dark")
-                    img(src="/static/images/logo/logo-main-light.svg" class="h-8 logo-light")
-            nav
-                ul(class="flex items-center -mr-4")
-                    if user
-                        a(href="/dashboard" class="btn btn-icon mr-4" data-tippy-content="Dashboard")
-                            li
-                                +icon('box')
+    div(class="relative w-full bg-white shadow-sm border-b border-gray-100 mb-8")
+        div(class="container p-4 mx-auto")
+            div(class="flex items-center justify-between")
+                a(href="/")
+                    div(class="flex items-center")
+                        img(src="/static/images/logo/logo-main.svg" class="h-8 logo-dark")
+                        img(src="/static/images/logo/logo-main-light.svg" class="h-8 logo-light")
+                nav
+                    ul(class="flex items-center -mr-4")
+                        if user
+                            a(href="/dashboard" class="btn btn-icon mr-4" data-tippy-content="Dashboard")
+                                li
+                                    +icon('box')
 
-                        a(href="/dashboard/profile" class="btn btn-icon mr-4" data-tippy-content="Profile settings")
-                            li
-                                img(class="rounded-full w-8 h-8" src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
+                            a(href="/notifications" class="btn btn-icon mr-4" data-tippy-content=`Notifications (${notifications && notifications.length || 0})`)
+                                li(class="relative")
+                                    +icon('mail')
+                                    if notifications && notifications.unread && notifications.unread.length > 0
+                                        span(class="absolute -top-3 -right-3 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notifications.unread.length
 
-                        a(href="/logout" class="btn btn-icon mr-4" data-tippy-content="Log out")
-                            li
-                                +icon('log-out')
-                    else
-                        a(href="/login" class="btn btn-icon" data-tippy-content="Log in")
-                            li
-                                +icon('log-in')
+                            a(href="/dashboard/profile" class="btn btn-icon mr-4" data-tippy-content="Profile settings")
+                                li
+                                    img(class="rounded-full w-8 h-8" src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
+
+                            a(href="/logout" class="btn btn-icon mr-4" data-tippy-content="Log out")
+                                li
+                                    +icon('log-out')
+                        else
+                            a(href="/login" class="btn btn-icon" data-tippy-content="Log in")
+                                li
+                                    +icon('log-in')

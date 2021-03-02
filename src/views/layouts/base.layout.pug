@@ -56,7 +56,7 @@ html(lang="en" id="html" class="")
       gtag('config', 'G-DD6BBRSV9W');
 
     block head
-  body(class="dark:bg-gray-800 bg-white" id="body")
+  body(class="dark:bg-gray-800 bg-gray-50" id="body")
     div(class="text-gray-800 dark:text-gray-200" id="root")
       div(class="z-20 border border-gray-100 hidden fixed bottom-0 right-0 m-8 p-4 rounded-xl bg-white shadow-2xl text-sm dark:bg-gray-800 dark:border-gray-700" id="cookies-consent")
         p(class="w-60 mb-4").
@@ -72,6 +72,7 @@ html(lang="en" id="html" class="")
       block modals
 
     block scripts
+      script(src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous")
       script(src="https://unpkg.com/@popperjs/core@2")
       script(src="https://unpkg.com/tippy.js@6")
       script(src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous")
@@ -82,9 +83,5 @@ html(lang="en" id="html" class="")
         integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
         crossorigin="anonymous"
       )
-      script(src="/static/js/axios-setup.js")
-      script(src="/static/js/cookies-consent.js")
-      //- script(src="/static/js/dark-mode.js")
-      script(src="/static/js/ta-autoresize.js")
-      script.
-        tippy('[data-tippy-content]', { arrow: false, animation: 'fade', delay: [300, 0], inlinePositioning: true, placement: 'bottom', theme: 'haptic' })
+      script(src="/static/js/__modules.js")
+      script(src="/static/js/base.js")

@@ -1,6 +1,7 @@
 mixin icon(name, { width = '24', height = '24', fill = 'none', stroke = 'default', strokeWidth = '2', active = false } = { width: '24', height: '24', fill: 'none', stroke: 'default', strokeWidth: '2', active: false })
   -
     var strokeColors = {
+      disabled: '#D1D5DB',
       white: "white",
       black: "black",
       muted: '#4B5563',
@@ -16,5 +17,5 @@ mixin icon(name, { width = '24', height = '24', fill = 'none', stroke = 'default
     stroke-width=`${strokeWidth}`
     stroke-linecap="round"
     stroke-linejoin="round"
-  )
+  )&attributes(attributes)
     use(xlink:href=`/static/images/icons/feather-sprite.svg#${name}`)

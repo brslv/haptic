@@ -14,15 +14,15 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
     class={
       "relative flex items-center py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700": true,
       "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700": !disabled,
-      "text-gray-500": disabled
+      "text-gray-300": disabled
     }
   )&attributes(attr)
     span(class="mr-2")
-      +icon(icon, { width: '18', height: '18', stroke: disabled ? "muted" : "default" })
+      +icon(icon, { width: '18', height: '18', stroke: disabled ? "disabled" : "default" })
     if block
       block
     if disabled
-      span(class="text-xs px-2 py-1 ml-4 bg-yellow-100 dark:bg-gray-700 rounded-full") Soon!
+      span(class="text-xs px-2 py-1 ml-4 bg-yellow-100 dark:bg-gray-700 rounded-full text-gray-500") Soon!
     span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
       +icon("x", { width: 14, height: 14 })
 
@@ -30,57 +30,76 @@ block content
   +top-bar
   +product-header(product, links, 'posts')
   div(class="container mx-auto px-4 pt-4")
-    +page-title(class="mb-4") Publish new
-    div(class="gap-2 flex flex-wrap pb-2")
-      +post-type-btn({ bind: "text", icon: "file-text", disabled: false }) Text &bull; Images
-      +post-type-btn({ bind: "youtube", icon: "youtube", disabled: true }) YouTube
-      +post-type-btn({ bind: "survey", icon: "check-circle", disabled: true }) Survey
-      +post-type-btn({ bind: "milestone", icon: "smile", disabled: true }) Milestone
-      +post-type-btn({ bind: "roadmap", icon: "map", disabled: true }) Roadmap
+    div(class="grid grid-cols-7 gap-4")
+      div(class="col-span-5")
+        +page-title(class="mb-4") Publish new
+        div(class="bg-white p-4 mb-4 rounded-xl shadow-sm border border-gray-100")
+          div(class="gap-2 flex flex-wrap")
+            +post-type-btn({ bind: "text", icon: "file-text", disabled: false }) Short update
+            +post-type-btn({ bind: "youtube", icon: "youtube", disabled: true }) YouTube
+            +post-type-btn({ bind: "survey", icon: "check-circle", disabled: true }) Survey
+            +post-type-btn({ bind: "milestone", icon: "smile", disabled: true }) Milestone
+            +post-type-btn({ bind: "roadmap", icon: "map", disabled: true }) Roadmap
 
-    form(id="form-post-text" class="hidden" data-show="text")
-      input(type="file" id="image-upload" class="hidden")
-      input(type="hidden" id="uploaded-image" name="uploaded_image" value="")
-      input(type="hidden" name="id" value=product.id)
-      label
-        textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." name="text" id="text")
-        p(class="hidden text-red-500" id="text-error")
-      div(class="flex flex-row-reverse items-center justify-between")
-        button(type="submit" class="btn btn-primary") Publish
-        div(class="flex items-center")
-          button(type="button" class="mr-4 btn btn-default flex items-center" id="add-image-btn")
-            span(class="mr-2")
-              +icon('image', { width: '18', height: '18' })
-            span Attach image
-          span(id="image-upload-loader" class="hidden mr-2")
-            span(class="icon-container opacity-75 my-0 block relative")
-              +icon("refresh-cw")
-          span(id="image-upload-preview")
+          div(data-show="text" class="hidden pt-2")
+            form
+              input(type="file" id="image-upload" data-upload-file class="hidden")
+              input(type="hidden" name="uploaded_image" value="" data-uploaded)
+              input(type="hidden" name="id" value=product.id)
+              label
+                textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." data-text)
+                p(class="hidden text-red-500" data-error)
+              div(class="flex flex-row-reverse items-center justify-between")
+                button(type="submit" class="btn btn-primary") Publish
+                div(class="flex items-center")
+                  button(type="button" class="mr-4 btn btn-default flex items-center" data-upload-image-btn)
+                    span(class="mr-2")
+                      +icon('image', { width: '18', height: '18' })
+                    span Attach image
+                  span(data-image-upload-loader class="hidden mr-2")
+                    span(class="animate-spin icon-container opacity-75 my-0 block relative")
+                      +icon("refresh-cw")
+                  span(data-upload-image-preview)
 
+      
+        div
+          +page-title(class="mb-4") Posts
+          div(class={ "hidden": posts.length, "flex items-center text-gray-500 dark:text-gray-500": true } data-no-posts-msg)
+            span(class="mr-2 p-2 w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full")
+              +icon("activity", { stroke: "muted" })
+            p Still no public updates available
+          div(data-posts-container)
+            if posts && posts.length
+              each post in posts
+                - var post_text = post.text
+                +post({
+                  product_slug: product.slug,
+                  product_name: product.name,
+                  post_id: post.id,
+                  img: post.user_twitter_profile_image_url,
+                  img_url: post.image_url,
+                  twitter_name: post.user_twitter_name,
+                  twitter_screen_name: post.user_twitter_screen_name,
+                  date_str: post.created_at_formatted,
+                  disable_boost_btn: true,
+                  boosts_count: post.boosts_count,
+                }) !{post_text}
 
-    div(class="pt-16")
-      div(class={ "hidden": posts.length, "flex items-center text-gray-300 dark:text-gray-500": true } id="no-posts-msg")
-        span(class="mr-2")
-          +icon("activity", { stroke: "muted" })
-        p Still no public updates available
-      div(id="posts-container")
-        if posts && posts.length
-          each post in posts
-            - var post_text = post.text
-            +post({
-              product_slug: product.slug,
-              product_name: product.name,
-              post_id: post.id,
-              img: post.user_twitter_profile_image_url,
-              img_url: post.image_url,
-              twitter_name: post.user_twitter_name,
-              twitter_screen_name: post.user_twitter_screen_name,
-              date_str: post.created_at_formatted,
-              disable_boost_btn: true,
-              boosts_count: post.boosts_count,
-            }) !{post_text}
+      div(class="col-span-2")
+        +page-title(class="mb-4") Product details
+        div(class="relative p-4 bg-yellow-50 rounded-xl mb-4 border border-yellow-300")
+          +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-4 cursor-pointer")
+          span(class="font-medium") Tip!
+          p Make sure to fill in the most important product details on the side of your product's page. This will help visitors grasp your product in a blink of an eye.
+        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl")
+          span(class="font-medium text-sm mb-4 block") Tools
+          div(class="flex flex-wrap gap-2")
+            div(class="px-2 py-1 border border-gray-300 rounded-full") MERN!
+            div(class="px-2 py-1 border border-gray-300 rounded-full") PostgreSQL
+            div(class="px-2 py-1 border border-gray-300 rounded-full") RabbitMQ
+            div(class="px-2 py-1 border border-gray-300 rounded-full") Redis
 
-  template(id="post-tpl")
+  template(data-post-tpl)
     +post({
       product_slug: product.slug,
       product_name: product.name,
@@ -95,12 +114,4 @@ block content
     })
 
 block append scripts
-  script(src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous")
-  script.
-    window.App = {}
-    window.App.MediumZoom = mediumZoom('[data-zoomable]', {
-      margin: 50,
-      background: `rgba(0,0,0,0.5)`,
-    })
   script(src="/static/js/posts.js")
-  script(async src="https://platform.twitter.com/widgets.js" charset="utf-8")

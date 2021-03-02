@@ -1,0 +1,51 @@
+extends layouts/base.layout.pug
+
+include partials/top-bar.pug
+include partials/page-title.pug
+include partials/flash-msg.pug
+
+block content
+  +top-bar
+  div(class="container p-4 mx-auto")
+    +page-title(class="mb-4") Notifications
+    +flash-msg(flash)
+
+    div(class="mb-8")
+      div(class="flex items-center mb-4")
+        +page-title(class="bg-gray-200 px-4 py-1 rounded-full mr-4") Unread
+        if notifications && notifications.unread && notifications.unread.length
+          form(action="/mark-notifications-read" method="POST")
+            button(type="submit" class="btn btn-primary btn-small") Mark as read
+      if notifications && notifications.unread && notifications.unread.length
+        each notif in notifications.unread
+          if notif.type === 'post_boosts'
+            div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
+              div(class="flex items-center mb-2")
+                div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
+                a(href=`/p/${notif.product_slug}`)
+                  span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
+              div
+                span(class="font-bold")= `${notif.origin_user_twitter_name} `
+                span boosted your 
+                a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
+                span .
+      else
+        p(class="text-gray-500") No unread notifications.
+
+    div(class="flex items-center justify-between mb-4")
+      +page-title(class="bg-gray-200 px-4 py-1 rounded-full") Read
+    if notifications && notifications.read && notifications.read.length
+      each notif in notifications.read
+        if notif.type === 'post_boosts'
+          div(class="p-4 shadow-sm rounded-xl bg-white mt-4" data-notification-id=notif.id)
+            div(class="flex items-center mb-2")
+              div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
+              a(href=`/p/${notif.product_slug}`)
+                span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
+            div
+              span(class="font-bold")= `${notif.origin_user_twitter_name} `
+              span boosted your 
+              a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
+              span .
+    else
+      p(class="text-gray-500") No read notifications

@@ -6,9 +6,8 @@ block content
   div(class="relative" id="top")
     +top-bar
                 
-    div(class="z-10 relative p-4 w-full h-full container mx-auto")
+    div(class="relative p-4 w-full h-full container mx-auto")
       header(class="relative my-20 sm:my-0 sm:h-screen flex items-center")
-        img(class="hidden xl:block absolute top-20 right-0" src="/static/images/landing/img-1-mod.svg" alt="Happy customer with baloons - drawing")
         div(class="relative")
           h2(class="text-4xl md:text-6xl font-black max-w-xl mb-8")
             | The 
@@ -101,11 +100,6 @@ block content
           span Crafted by 
           span(id="me-target" class="text-yellow-400 underline cursor-pointer") me
           span .
-
-    div(
-      class="w-full h-full absolute top-0 left-0"
-      style="opacity: 0.55; background-image: url('/static/images/landing/bg-shapes-3.svg'); background-size: cover; background-position: top; background-repeat: no-repeat;"
-    )
 
 block append scripts
   script(src="/static/js/landing.js")

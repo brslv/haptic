@@ -9,10 +9,11 @@ block content
       h1(class="pr-4 text-2xl font-bold inline-block")= user.twitter_name
       span(class="text-gray-500")= `@${user.twitter_screen_name}`
 
-    form(action=`${form.action}` method="POST" id="profile-form")
-      div(class="pb-8")
-        label
-          div(class="label pb-1 pl-1") Bio
-          textarea(class="textarea w-full" placeholder="..." name="bio" id="bio")= user.bio
-        span(class="text-sm text-gray-500") Be brief. Max: 280 symbols.
-      button(type="submit" class="btn btn-primary") Save
+    div(class="p-4 rounded-xl border border-gray-100 bg-white shadow-sm")
+      form(action=`${form.action}` method="POST" id="profile-form")
+        div(class="pb-8")
+          label
+            div(class="label pb-1 pl-1") Bio
+            textarea(class="textarea w-full" placeholder="..." name="bio" id="bio")= user.bio
+          span(class="text-sm text-gray-500") Be brief. Max: 280 symbols.
+        button(type="submit" class="btn btn-primary") Save
