@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     imagePreviewRendered: "imagePreviewRendered",
     ctxMenuItemClicked: "ctxMenuItemClicked",
     postRemoved: "postRemoved",
+    productToolAdded: "productToolAdded",
   };
 
   // - updateTypeButtons ------------------------------------------------------------
@@ -884,4 +885,77 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         reload
       );
     })();
+
+  // - product tools ------------------------------------------------------------
+
+  m.productTools = m.productTools || {
+    register: function register() {
+      var rootEl = document.querySelector("[data-product-tools-root]");
+      var addBtnEl = rootEl.querySelector("[data-product-tools-add-btn]");
+      var form = rootEl.querySelector("[data-product-tools-form]");
+      var inputEl = rootEl.querySelector("[data-product-tools-input]");
+      var closeBtn = rootEl.querySelector("[data-product-tools-close-btn]");
+      var tpl = document.querySelector("[data-product-tool-tpl]");
+      var container = rootEl.querySelector("[data-product-tools-container]");
+
+      if (!rootEl || !rootEl.dataset.productToolsProductSlug) {
+        console.error(
+          "No product slug found. Missing data-product-tools-product-slug attribute."
+        );
+        return;
+      }
+
+      if (!tpl) {
+        console.error(
+          "No product tool template found template[data-product-tool-tip]."
+        );
+        return;
+      }
+
+      emitter.on(
+        emitter.events.productToolAdded,
+        function handleProductToolAdded(tool) {
+          addProductToolElement(tool);
+        }
+      );
+
+      function addProductToolElement(tool) {
+        var cloneEl = tpl.cloneNode(true);
+        cloneEl.content.querySelector("[data-text-container]").innerHTML =
+          tool.text;
+        container.appendChild(cloneEl.content);
+      }
+
+      var productSlug = rootEl.dataset.productToolsProductSlug;
+
+      addBtnEl.addEventListener("click", function openForm() {
+        form.classList.remove("hidden");
+        inputEl.focus();
+      });
+
+      closeBtn.addEventListener("click", function hideForm() {
+        form.classList.add("hidden");
+      });
+
+      form.addEventListener("submit", function formSubmit(e) {
+        e.preventDefault();
+        var value = inputEl.value;
+        utils.req(
+          "/product/" + productSlug + "/tool",
+          {
+            text: value,
+          },
+          {
+            method: "post",
+            ok: function handleAddTool(response) {
+              inputEl.value = "";
+              emitter.emit(emitter.events.productToolAdded, {
+                ...response.data.details.tool,
+              });
+            },
+          }
+        );
+      });
+    },
+  };
 });

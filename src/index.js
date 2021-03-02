@@ -251,33 +251,38 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
         });
       }
 
-      posts
+      return posts
         .actions({ db, user: req.user })
         .getAllPosts(productResult.id)
         .then((postsResult) => {
-          res.render("dashboard/product/posts", {
-            meta: {
-              ...defaultMetas,
-              title: `${productResult.name} | Haptic`,
-              og: {
-                ...defaultMetas.og,
-                title: `${productResult.name} | Haptic`,
-              },
-            },
-            product: { ...productResult },
-            posts: [
-              ...postsResult.map((post) => ({
-                ...post,
-                text: mdConverter.makeHtml(post.text),
-                created_at_formatted: dateFmt(post.created_at),
-              })),
-            ],
-            links: {
-              posts: `/dashboard/product/${slug}/posts`,
-              settings: `/dashboard/product/${slug}/settings`,
-              url: `/p/${slug}`,
-            },
-          });
+          return db("product_tools")
+            .where({ product_id: productResult.id })
+            .then((toolsResult) => {
+              res.render("dashboard/product/posts", {
+                meta: {
+                  ...defaultMetas,
+                  title: `${productResult.name} | Haptic`,
+                  og: {
+                    ...defaultMetas.og,
+                    title: `${productResult.name} | Haptic`,
+                  },
+                },
+                product: { ...productResult },
+                tools: [...toolsResult],
+                posts: [
+                  ...postsResult.map((post) => ({
+                    ...post,
+                    text: mdConverter.makeHtml(post.text),
+                    created_at_formatted: dateFmt(post.created_at),
+                  })),
+                ],
+                links: {
+                  posts: `/dashboard/product/${slug}/posts`,
+                  settings: `/dashboard/product/${slug}/settings`,
+                  url: `/p/${slug}`,
+                },
+              });
+            });
         });
     })
     .catch((err) => {
@@ -474,30 +479,35 @@ app.get("/p/:slug", (req, res, next) => {
         return boostsActions
           .getProductBoosts(result.id)
           .then((boostsResult) => {
-            res.render("product", {
-              meta: {
-                ...defaultMetas,
-                title: `${result.name} | Haptic`,
-                og: {
-                  ...defaultMetas.og,
-                  title: `${result.name} | Haptic`,
-                },
-              },
-              product: { ...result },
-              boosts: boostsResult,
-              posts: [
-                ...postsResult.map((post) => ({
-                  ...post,
-                  text: mdConverter.makeHtml(post.text),
-                  created_at_formatted: dateFmt(post.created_at),
-                })),
-              ],
-              links: {
-                posts: `/dashboard/product/${slug}/posts`,
-                settings: `/dashboard/product/${slug}/settings`,
-                url: `/p/${slug}`,
-              },
-            });
+            return db("product_tools")
+              .where({ product_id: result.id })
+              .then((productToolsResult) => {
+                res.render("product", {
+                  meta: {
+                    ...defaultMetas,
+                    title: `${result.name} | Haptic`,
+                    og: {
+                      ...defaultMetas.og,
+                      title: `${result.name} | Haptic`,
+                    },
+                  },
+                  product: { ...result },
+                  boosts: boostsResult,
+                  posts: [
+                    ...postsResult.map((post) => ({
+                      ...post,
+                      text: mdConverter.makeHtml(post.text),
+                      created_at_formatted: dateFmt(post.created_at),
+                    })),
+                  ],
+                  tools: productToolsResult,
+                  links: {
+                    posts: `/dashboard/product/${slug}/posts`,
+                    settings: `/dashboard/product/${slug}/settings`,
+                    url: `/p/${slug}`,
+                  },
+                });
+              });
           });
       });
     })
@@ -876,6 +886,49 @@ app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
     res.json({ ok: 1, err: null, details: { url: req.file.location } });
   });
 });
+
+app.post(
+  "/product/:slug/tool",
+  ajaxOnly,
+  ajaxOnly,
+  express.json(),
+  (req, res, next) => {
+    const data = req.body;
+    const slug = req.params.slug;
+    console.log("input", data);
+    db("products")
+      .select("id")
+      .where({ user_id: req.user.id, slug })
+      .first()
+      .then((productResult) => {
+        if (!productResult) {
+          return res.status(400).json({
+            ok: 0,
+            err: `No such product (slug: ${slug}).`,
+            details: null,
+          });
+        }
+
+        db("product_tools")
+          .insert({ text: data.text, product_id: productResult.id })
+          .returning(["id", "text"])
+          .then((productToolsResult) => {
+            res.json({
+              ok: 1,
+              err: null,
+              details: { tool: productToolsResult[0] },
+            });
+          })
+          .catch((err) => {
+            next(err);
+          });
+      })
+      .catch((err) => {
+        next(err);
+      });
+    db("product").insert("");
+  }
+);
 
 // error handler
 app.use((err, req, res, next) => {

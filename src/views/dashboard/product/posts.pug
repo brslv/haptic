@@ -85,7 +85,7 @@ block content
                   boosts_count: post.boosts_count,
                 }) !{post_text}
 
-      div(class="col-span-2")
+      div(class="col-span-2 mb-4")
         +page-title(class="mb-4") Product details
         div(class="relative p-4 bg-yellow-50 rounded-xl mb-4 border border-yellow-300")
           +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-4 cursor-pointer")
@@ -93,11 +93,18 @@ block content
           p Make sure to fill in the most important product details on the side of your product's page. This will help visitors grasp your product in a blink of an eye.
         div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl")
           span(class="font-medium text-sm mb-4 block") Tools
-          div(class="flex flex-wrap gap-2")
-            div(class="px-2 py-1 border border-gray-300 rounded-full") MERN!
-            div(class="px-2 py-1 border border-gray-300 rounded-full") PostgreSQL
-            div(class="px-2 py-1 border border-gray-300 rounded-full") RabbitMQ
-            div(class="px-2 py-1 border border-gray-300 rounded-full") Redis
+          div(data-product-tools-root data-product-tools-product-slug=product.slug)
+            div(class="flex flex-wrap gap-2 mb-2" data-product-tools-container)
+              each tool of tools
+                div(class="px-2 py-1 border border-gray-300 rounded-full")= tool.text
+            button(class="btn btn-primary rounded-full" data-product-tools-add-btn)
+              +icon("plus", { width: 18, height: 18 })
+            form(data-product-tools-form class="relative mt-4 -mx-4 -mb-4 p-4 bg-transparent border-t border-gray-100")
+              +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-2 cursor-pointer" data-product-tools-close-btn)
+              label(class="label" for="tools-input")
+                span Type and hit enter
+              input(class="input mb-2" placeholder="E.g. React" id="tools-input" data-product-tools-input)
+              button(type="submit" class="hidden") Submit
 
   template(data-post-tpl)
     +post({
@@ -112,6 +119,9 @@ block content
       disable_boost_btn: true,
       boosts_count: 0
     })
+
+  template(data-product-tool-tpl)
+    div(class="px-2 py-1 border border-gray-300 rounded-full" data-text-container)
 
 block append scripts
   script(src="/static/js/posts.js")
