@@ -1,6 +1,6 @@
 mixin flash-msg(flash)
   if flash
     if flash.success && flash.success.length
-      div(class="success-container mb-8 dark:text-gray-800")= flash.success[0]
+      div(class="success-container mb-4 shadow-sm")= flash.success[0]
     if flash.error && flash.error.length
-      div(class="error-container mb-8 dark:text-gray-800")= flash.error[0]
+      div(class="error-container mb-4 shadow-sm")= flash.error[0]
