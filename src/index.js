@@ -63,7 +63,6 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(user, done) {
-  app.locals.user = user;
   done(null, user);
 });
 
@@ -98,6 +97,7 @@ passport.use(
                   .table("users")
                   .first()
                   .then((result) => {
+                    app.locals.user = result;
                     done(null, result);
                   })
                   .catch((err) => done(err, null));
@@ -105,6 +105,7 @@ passport.use(
               .catch((err) => done(err, null));
           } else {
             // return the user
+            app.locals.user = result;
             done(null, result);
           }
         })
@@ -638,6 +639,7 @@ app.get(
 
 app.get("/logout", (req, res) => {
   req.logout();
+  app.locals.user = null;
   req.session.destroy(function(err) {
     res.redirect("/");
   });

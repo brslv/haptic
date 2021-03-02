@@ -102,7 +102,7 @@
   }
 
   .textarea {
-    @apply bg-transparent border border-gray-300 rounded-xl p-4 dark:border-gray-600 resize-none dark:bg-transparent;
+    @apply bg-white border border-gray-300 rounded-xl p-4 resize-none;
     outline: none !important;
   }
 

@@ -8,8 +8,8 @@ module.exports = {
       screens: {
         sm: "100%",
         md: "100%",
-        lg: "740px",
-        xl: "740px",
+        lg: "980px",
+        xl: "980px",
       },
     },
     extend: {

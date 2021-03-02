@@ -6,68 +6,123 @@ include partials/icon.pug
 
 block content
   +top-bar
-  div(class="container mx-auto p-4")
-    if !product.is_public
-      span(class="flex text-xs flex items-center pb-2")
-        span(class="mr-2")
-          +icon("lock")
-        span(class="border-b-4 border-purple-400") Private
-    div(class="flex items-center justify-between" data-product-slug=product.slug data-product-boosts-count=boosts.length)
-      div(class="flex items-center")
-        h1(class="text-2xl font-bold inline-block mr-4")= product.name
-        if product.website
-          a(href=product.website class="icon-container" target="_blank" rel="noreferrer noopener" title=product.website)
-            +icon("globe")
-      div(class="relative flex items-center")
-        span(class="text-xs text-gray-500 uppercase mr-2 bg-gray-100 dark:bg-gray-700 rounded-xl px-2 py-1") Creator
-        img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class="cursor-pointer w-12 h-12 rounded-full border-2 border-yellow-300 hover:border-yellow-400" data-ctx-menu-trigger="creator-mini-profile")
-        div(class="hidden z-20 absolute top-14 right-0 p-4 bg-white border boder-gray-100 dark:bg-gray-800 dark:border-gray-700 rounded-xl shadow-xl" style="width: 300px;" data-ctx-menu="creator-mini-profile")
-          div(class="icon-container absolute top-4 right-4 cursor-pointer text-2xl" data-ctx-menu-close)
-            +icon("x")
-          h2(class="text-lg font-bold")= product.user_twitter_name
-          a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
-          p(class="text-gray-600 dark:text-gray-400")= product.user_bio
-
-    div(class={"my-8": true, "product-header": true})
-      if product.description
-        p(class="text-xl")= product.description
-      else
-        p(class="text-gray-500") No product description, yet
-      nav(id="product-nav")
-        ul
-          li(class="w-full mb-2")
-            div(title=`Boost ${product.name} to show it's creator that you care about it. This also helps the product get better haptic rank.` class="select-none cursor-pointer block px-4 py-2 rounded-xl border border-gray-300 hover:border-transparent dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700" data-product-boost-btn)
-              span(class="flex justify-between")
-                span(class="flex items-center")
-                  span(class="mr-4")
-                    +icon("chevrons-up")
-                  span(class="mr-4")= `Boost`
-                span(class="px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase" data-product-boost-counter)= boosts.length
-
-    hr(class="border-gray-300 dark:border-gray-700 mb-8")
-
-    main(id="product-main")
-      section(id="product-feed")
-        if posts.length
-          each post in posts
-            - var post_text = post.text;
-            +post({
-              product_slug: product.slug,
-              product_name: product.name,
-              post_id: post.id,
-              img: post.user_twitter_profile_image_url,
-              img_url: post.image_url,
-              twitter_name: post.user_twitter_name,
-              twitter_screen_name: post.user_twitter_screen_name,
-              date_str: post.created_at_formatted,
-              show_opts: false,
-              boosts_count: post.boosts_count
-            }) !{post_text}
+  div(class="bg-white py-32 pb-56 -mt-8 -mb-24")
+    div(class="container mx-auto p-4")
+      div(class="flex flex-col items-center justify-center" data-product-slug=product.slug data-product-boosts-count=boosts.length)
+        if !product.is_public
+          div(class="mb-8")
+            span(class="flex text-xs flex items-center")
+              span(class="mr-2")
+                +icon("lock", { width: 18, height: 18 })
+              span(class="flex items-center border-b-4 border-purple-400")
+                span(class="mr-2") Private
+                +icon("info", { width: 12, height: 12 })(data-tippy-content="This product is private, which means that only you can see it. To make it public go to it's settings and check the 'Public' checkbox.")
+        h1(class="font-bold text-3xl sm:text-5xl mb-4")= product.name
+        if product.description
+          h2(class="font-medium text-gray-600 text-xl sm:text-2xl text-center" style="max-width: 26ch;")= product.description
         else
-          div(class="flex items-center text-gray-500")
-            span(class="mr-2 p-2 w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full")
-              +icon("activity", { width: '32', height: '32', stroke: "muted" })
-            p(class="text-xl") Still no public updates available
+          div(class="font-medium text-xl text-gray-600") No product description, yet.
+        if product.website
+          a(class="text-yellow-400 hover:text-yellow-500 font-medium mt-8" href=product.website target="_blank" rel="noreferrer noopener") Visit website
+
+
+
+    //- if !product.is_public
+    //-   span(class="flex text-xs flex items-center pb-2")
+    //-     span(class="mr-2")
+    //-       +icon("lock")
+    //-     span(class="border-b-4 border-purple-400") Private
+    //- div(class="flex items-center justify-between mb-8" data-product-slug=product.slug data-product-boosts-count=boosts.length)
+    //-   div(class="flex items-center")
+    //-     h1(class="text-2xl font-bold inline-block mr-4")= product.name
+    //-     if product.website
+    //-       a(href=product.website class="icon-container" target="_blank" rel="noreferrer noopener" title=product.website)
+    //-         +icon("globe")
+    //-   div(class="relative flex items-center")
+    //-     span(class="text-xs text-gray-500 uppercase mr-2 bg-gray-100 dark:bg-gray-700 rounded-xl px-2 py-1") Creator
+    //-     img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class="cursor-pointer w-12 h-12 rounded-full border-2 border-yellow-300 hover:border-yellow-400" data-ctx-menu-trigger="creator-mini-profile")
+    //-     div(class="hidden z-20 absolute top-14 right-0 p-4 bg-white border boder-gray-100 dark:bg-gray-800 dark:border-gray-700 rounded-xl shadow-xl" style="width: 300px;" data-ctx-menu="creator-mini-profile")
+    //-       div(class="icon-container absolute top-4 right-4 cursor-pointer text-2xl" data-ctx-menu-close)
+    //-         +icon("x")
+    //-       h2(class="text-lg font-bold")= product.user_twitter_name
+    //-       a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
+    //-       p(class="text-gray-600 dark:text-gray-400")= product.user_bio
+
+    //- div(class="product-header")
+    //-   if product.description
+    //-     p(class="text-xl")= product.description
+    //-   else
+    //-     p(class="text-gray-500") No product description, yet
+    //-   nav(id="product-nav")
+    //-     ul
+    //-       li(class="w-full mb-2")
+    //-         div(title=`Boost ${product.name} to show it's creator that you care about it. This also helps the product get better haptic rank.` class="select-none cursor-pointer block px-4 py-2 rounded-xl border border-gray-300 hover:border-transparent dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700" data-product-boost-btn)
+    //-           span(class="flex justify-between")
+    //-             span(class="flex items-center")
+    //-               span(class="mr-4")
+    //-                 +icon("chevrons-up")
+    //-               span(class="mr-4")= `Boost`
+    //-             span(class="px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase" data-product-boost-counter)= boosts.length
+  div(class="container mx-auto p-4")
+    div(class="flex flex-col-reverse md:flex-row items-start")
+
+      main(id="product-main" class="md:w-4/6 md:mr-4")
+        section(id="product-feed")
+          if posts.length
+            each post in posts
+              - var post_text = post.text;
+              +post({
+                product_slug: product.slug,
+                product_name: product.name,
+                post_id: post.id,
+                img: post.user_twitter_profile_image_url,
+                img_url: post.image_url,
+                twitter_name: post.user_twitter_name,
+                twitter_screen_name: post.user_twitter_screen_name,
+                date_str: post.created_at_formatted,
+                show_opts: false,
+                boosts_count: post.boosts_count
+              }) !{post_text}
+          else
+            div(class="flex items-center text-gray-500")
+              span(class="mr-2 p-2 w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full")
+                +icon("activity", { width: '32', height: '32', stroke: "muted" })
+              p(class="text-xl") Still no public updates available
+
+      aside(class="md:w-2/6 mb-16 md:mb-0")
+        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl mb-4")
+          span(class="flex items-center font-medium text-sm mb-4 block")
+            span(class="mr-2") Boost that product
+            +icon("info", { width: 12, height: 12 })(data-tippy-content="Boosting shows the creator that you have liked their project. You're also helping them to reach higher positions in the haptic's rankings.")
+          nav(id="product-nav")
+            ul
+              li(class="w-full")
+                div(title=`Boost ${product.name} to show it's creator that you care about it. This also helps the product get better haptic rank.` class="select-none cursor-pointer block px-4 py-2 rounded-xl border border-gray-300 hover:border-transparent dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700" data-product-boost-btn)
+                  span(class="flex justify-between")
+                    span(class="flex items-center")
+                      span(class="mr-4")
+                        +icon("chevrons-up")
+                      span(class="mr-4")= `Boost`
+                    span(class="px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase" data-product-boost-counter)= boosts.length
+
+        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl mb-4")
+          span(class="font-medium text-sm mb-4 block") Creator
+          div
+            div(class="flex items-start")
+              img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class="w-12 h-12 rounded-full border-2 border-yellow-300 mr-2")
+              div
+                h2(class="font-bold")= product.user_twitter_name
+                a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
+            p(class="text-gray-600 dark:text-gray-400")= product.user_bio
+
+
+        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl")
+          span(class="font-medium text-sm mb-4 block") Tools
+          div(class="flex flex-wrap gap-2")
+            div(class="px-2 py-1 border border-gray-300 rounded-full") MERN!
+            div(class="px-2 py-1 border border-gray-300 rounded-full") PostgreSQL
+            div(class="px-2 py-1 border border-gray-300 rounded-full") RabbitMQ
+            div(class="px-2 py-1 border border-gray-300 rounded-full") Redis
 
 block append scripts
   script(src="/static/js/product.js")

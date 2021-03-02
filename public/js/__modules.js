@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   window._hpt = window._hpt || {};
   var m = (window._hpt.modules = window._hpt.modules || {});
 
-  // utils ------------------------------------------------------------
+  // - utils ------------------------------------------------------------
 
   var utils = (window._hpt.utils = window._hpt.utils || {
     validateImageFiletype: function validateImageFiletype(image) {
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   });
 
-  // emitter ------------------------------------------------------------
+  // - emitter ------------------------------------------------------------
 
   var emitter = (window._hpt.emitter =
     window._hpt.emitter ||
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     postRemoved: "postRemoved",
   };
 
-  // updateTypeButtons ------------------------------------------------------------
+  // - updateTypeButtons ------------------------------------------------------------
 
   m.updateTypeButtons = m.updateTypeButtons || {
     register: function register() {
@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // updateTypes ------------------------------------------------------------
+  // - updateTypes ------------------------------------------------------------
   m.updateTypes = m.updateTypes || {
     textAndImage: {
       register: function register() {
@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           return;
         }
 
-        // Register text ------------------------------------------------------------
+        // - Register text ------------------------------------------------------------
         function registerText() {
           emitter.on(emitter.events.newPostAdded, function handleNewPostAdded(
             data
@@ -280,7 +280,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
               imageEl.parentElement.classList.remove("hidden");
             }
 
-            postsContainerEl.parentNode.prepend(clone.content);
+            postsContainerEl.prepend(clone.content);
             emitter.emit(emitter.events.newPostAdded, {
               el: clone.content,
             });
@@ -310,7 +310,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           formEl.addEventListener("submit", handleFormSubmit);
         }
 
-        // Register image ------------------------------------------------------------
+        // - Register image ------------------------------------------------------------
         function registerImage() {
           if (!uploadImgBtnEl) return;
 
@@ -411,7 +411,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // post boosts ------------------------------------------------------------
+  // - post boosts ------------------------------------------------------------
   m.postBoosts = m.postBoosts || {
     register: function register() {
       var boostBtns = document.querySelectorAll("[data-post-boost-btn]");
@@ -456,7 +456,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // product boosts ------------------------------------------------------------
+  // - product boosts ------------------------------------------------------------
 
   m.productBoosts = m.productBoosts || {
     register: function register() {
@@ -491,7 +491,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // ctxMenus ------------------------------------------------------------
+  // - ctxMenus ------------------------------------------------------------
 
   m.ctxMenus = m.ctxMenus || {
     register: function register() {
@@ -569,7 +569,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // posts actions ------------------------------------------------------------
+  // - posts actions ------------------------------------------------------------
 
   m.postActions = m.postActions || {
     register: function register() {
@@ -614,7 +614,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // posts wall ------------------------------------------------------------
+  // - posts wall ------------------------------------------------------------
 
   m.postsWall = m.postsWall || {
     register: function register() {
@@ -633,7 +633,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // delete product ------------------------------------------------------------
+  // - delete product ------------------------------------------------------------
 
   m.deleteProduct = m.deleteProduct || {
     register: function register() {
@@ -655,7 +655,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // create product ------------------------------------------------------------
+  // - create product ------------------------------------------------------------
 
   m.createProduct = m.createProduct || {
     register: function register() {
@@ -765,7 +765,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // cookies consent ------------------------------------------------------------
+  // - cookies consent ------------------------------------------------------------
 
   m.cookiesConsent =
     m.cookiesConsent ||
@@ -788,7 +788,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       showConsent();
     })();
 
-  // axios setup ------------------------------------------------------------
+  // - axios setup ------------------------------------------------------------
 
   m.axiosSetup =
     m.axiosSetup ||
@@ -805,7 +805,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       );
     })();
 
-  // dark mode ------------------------------------------------------------
+  // - dark mode ------------------------------------------------------------
 
   m.darkMode = m.darkMode || {
     register: function register() {
@@ -827,7 +827,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // ta autoresize ------------------------------------------------------------
+  // - ta autoresize ------------------------------------------------------------
 
   m.textAreaAutoresize = m.textAreaAutoresize || {
     register: function register() {
@@ -849,7 +849,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // tooltips ------------------------------------------------------------
+  // - tooltips ------------------------------------------------------------
 
   m.tooltips =
     m.tooltips ||
@@ -864,7 +864,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       });
     })();
 
-  // medium zoom ------------------------------------------------------------
+  // - medium zoom ------------------------------------------------------------
 
   m.mediumZoom =
     m.mediumZoom ||
