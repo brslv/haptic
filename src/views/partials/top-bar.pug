@@ -15,7 +15,7 @@ mixin top-bar()
                                 li
                                     +icon('box')
 
-                            a(href="/notifications" class="btn btn-icon mr-4" data-tippy-content=`Notifications (${notifications && notifications.length || 0})`)
+                            a(href="/notifications" class="btn btn-icon mr-4" data-tippy-content=`Notifications (${notifications && notifications.unread && notifications.unread.length || 0})`)
                                 li(class="relative")
                                     +icon('mail')
                                     if notifications && notifications.unread && notifications.unread.length > 0
