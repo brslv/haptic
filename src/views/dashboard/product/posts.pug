@@ -96,7 +96,9 @@ block content
           div(data-product-tools-root data-product-tools-product-slug=product.slug)
             div(class="flex flex-wrap gap-2 mb-2" data-product-tools-container)
               each tool of tools
-                div(class="px-2 py-1 border border-gray-300 rounded-full")= tool.text
+                div(class="px-2 py-1 border border-gray-300 rounded-full flex items-center justify-between" data-product-tool-id=tool.id)
+                  span(class="pr-2")= tool.text
+                  +icon("x", { width: 14, height: 14 })(class="cursor-pointer" data-product-tools-remove-btn)
             button(class="btn btn-primary rounded-full" data-product-tools-add-btn)
               +icon("plus", { width: 18, height: 18 })
             form(data-product-tools-form class="relative mt-4 -mx-4 -mb-4 p-4 bg-transparent border-t border-gray-100")
@@ -121,7 +123,9 @@ block content
     })
 
   template(data-product-tool-tpl)
-    div(class="px-2 py-1 border border-gray-300 rounded-full" data-text-container)
+    div(class="px-2 py-1 border border-gray-300 rounded-full flex items-center justify-between" data-product-tool-id="-1")
+      span(class="pr-2" data-text-container)
+      +icon("x", { width: 14, height: 14 })(class="cursor-pointer" data-product-tools-remove-btn)
 
 block append scripts
   script(src="/static/js/posts.js")

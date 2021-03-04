@@ -32,6 +32,42 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           else console.error(error);
         });
     },
+    getParents: function getParents(elem, selector) {
+      // Element.matches() polyfill
+      if (!Element.prototype.matches) {
+        Element.prototype.matches =
+          Element.prototype.matchesSelector ||
+          Element.prototype.mozMatchesSelector ||
+          Element.prototype.msMatchesSelector ||
+          Element.prototype.oMatchesSelector ||
+          Element.prototype.webkitMatchesSelector ||
+          function(s) {
+            var matches = (
+                this.document || this.ownerDocument
+              ).querySelectorAll(s),
+              i = matches.length;
+            while (--i >= 0 && matches.item(i) !== this) {}
+            return i > -1;
+          };
+      }
+
+      // Set up a parent array
+      var parents = [];
+
+      // Push each parent element to the array
+      for (; elem && elem !== document; elem = elem.parentNode) {
+        if (selector) {
+          if (elem.matches(selector)) {
+            parents.push(elem);
+          }
+          continue;
+        }
+        parents.push(elem);
+      }
+
+      // Return our parent array
+      return parents;
+    },
   });
 
   // - emitter ------------------------------------------------------------
@@ -86,6 +122,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     ctxMenuItemClicked: "ctxMenuItemClicked",
     postRemoved: "postRemoved",
     productToolAdded: "productToolAdded",
+    productToolMounted: "productToolMounted",
   };
 
   // - updateTypeButtons ------------------------------------------------------------
@@ -897,6 +934,9 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       var closeBtn = rootEl.querySelector("[data-product-tools-close-btn]");
       var tpl = document.querySelector("[data-product-tool-tpl]");
       var container = rootEl.querySelector("[data-product-tools-container]");
+      var removeToolBtns = rootEl.querySelectorAll(
+        "[data-product-tools-remove-btn]"
+      );
 
       if (!rootEl || !rootEl.dataset.productToolsProductSlug) {
         console.error(
@@ -919,14 +959,62 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         }
       );
 
+      emitter.on(
+        emitter.events.productToolMounted,
+        function handleProductToolMounted(data) {
+          addListenersToMountedTool(data);
+        }
+      );
+
       function addProductToolElement(tool) {
         var cloneEl = tpl.cloneNode(true);
+        var idEl = cloneEl.content.querySelector("[data-product-tool-id]");
+        idEl.dataset.productToolId = tool.id;
         cloneEl.content.querySelector("[data-text-container]").innerHTML =
           tool.text;
+        emitter.emit(emitter.events.productToolMounted, {
+          el: cloneEl.content,
+        });
         container.appendChild(cloneEl.content);
       }
 
+      function addListenersToMountedTool(data) {
+        var el = data.el;
+        if (!el) return;
+        var removeBtnEl = el.querySelector("[data-product-tools-remove-btn");
+        removeBtnEl.addEventListener("click", function(e) {
+          removeTool(e.currentTarget);
+        });
+      }
+
       var productSlug = rootEl.dataset.productToolsProductSlug;
+
+      removeToolBtns.forEach(function handleRemoveTool(removeToolBtnEl) {
+        removeToolBtnEl.addEventListener("click", function(e) {
+          removeTool(e.currentTarget);
+        });
+      });
+
+      function removeTool(currentTarget) {
+        var parents = utils.getParents(currentTarget, "[data-product-tool-id]");
+        if (!parents.length) {
+          console.warn(
+            "Cannot remove tool. No data-product-tool-id attribute found on any of the parent elements."
+          );
+          return;
+        }
+
+        var id = parents[0].dataset.productToolId;
+
+        utils.req("/product/" + productSlug + "/tool/" + id, {
+          method: "delete",
+          ok: function ok(result) {
+            if (result.data.ok) {
+              parents[0].remove();
+            }
+          },
+        });
+      }
 
       addBtnEl.addEventListener("click", function openForm() {
         form.classList.remove("hidden");

@@ -926,9 +926,43 @@ app.post(
       .catch((err) => {
         next(err);
       });
-    db("product").insert("");
   }
 );
+
+app.delete("/product/:slug/tool/:id", authOnly, ajaxOnly, (req, res, next) => {
+  const { id, slug } = req.params;
+  db("products")
+    .select("id")
+    .where({ user_id: req.user.id, slug })
+    .first()
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(400).json({
+          ok: 0,
+          err: `No such product (slug: ${slug}).`,
+          details: null,
+        });
+      }
+
+      db("product_tools")
+        .where({ id })
+        .del()
+        .debug()
+        .then((productToolsResult) => {
+          res.json({
+            ok: 1,
+            err: null,
+            details: null,
+          });
+        })
+        .catch((err) => {
+          next(err);
+        });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
 
 // error handler
 app.use((err, req, res, next) => {
