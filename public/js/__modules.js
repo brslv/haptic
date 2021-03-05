@@ -123,6 +123,8 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     postRemoved: "postRemoved",
     productToolAdded: "productToolAdded",
     productToolMounted: "productToolMounted",
+    productCollected: "productCollected",
+    collectionItemRemoved: "collectionItemRemoved",
   };
 
   // - updateTypeButtons ------------------------------------------------------------
@@ -541,6 +543,8 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       function setupListeners(triggers) {
         triggers.forEach(function mapCtxMenuTriggers(triggerEl) {
           triggerEl.addEventListener("click", function ctxMenuClick(e) {
+            e.stopPropagation();
+            e.preventDefault();
             var menu = document.querySelector(
               '[data-ctx-menu="' + e.currentTarget.dataset.ctxMenuTrigger + '"]'
             );
@@ -560,6 +564,9 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
             menu.parentElement.classList.add("z-10");
 
             function handleActionClick(e) {
+              e.stopPropagation();
+              e.preventDefault();
+
               var action = e.currentTarget.dataset.ctxAction;
               emitter.emit(emitter.events.ctxMenuItemClicked, {
                 ctx: menu,
@@ -1073,6 +1080,75 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           },
         });
       });
+    },
+  };
+
+  // collection list ------------------------------------------------------------
+
+  m.collectionList = m.collectionList || {
+    register: function register() {
+      var listEl = document.querySelector("[data-collections-list]");
+
+      emitter.on(emitter.events.collectionItemRemoved, handleRemove);
+
+      function handleRemove() {
+        if (listEl) {
+          if (!listEl.firstChild) {
+            var noItemsMsgEl = document.querySelector(
+              "[data-collections-no-items-msg]"
+            );
+            noItemsMsgEl.classList.remove("hidden");
+          }
+        }
+      }
+    },
+  };
+
+  // collection item ------------------------------------------------------------
+
+  m.collectionItemActions = m.collectionItemActions || {
+    register: function register() {
+      emitter.on(emitter.events.ctxMenuItemClicked, handleCtxMenuItemClicked);
+
+      function handleCtxMenuItemClicked(data) {
+        switch (data.action) {
+          case "delete": {
+            deleteCollectionItem(data);
+            break;
+          }
+        }
+      }
+
+      function deleteCollectionItem(data) {
+        var slug = data.clickedEl.dataset.productSlug;
+        if (!slug) {
+          console.warn("No available product slug.");
+          return;
+        }
+
+        utils.req("/p/" + slug + "/collect", {
+          method: "delete",
+          ok: function ok(response) {
+            var parents = utils.getParents(
+              data.clickedEl,
+              "[data-collected-product-root]"
+            );
+            if (!parents.length) {
+              console.warn(
+                "No data-collected-product-root parent found. Delete aborted."
+              );
+              return;
+            }
+
+            var root = parents[0];
+            root.remove();
+            emitter.emit(emitter.events.collectionItemRemoved);
+          },
+          fail: function fail(err) {
+            console.error(err.response);
+          },
+        });
+      }
     },
   };
 });

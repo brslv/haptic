@@ -84,11 +84,12 @@ block content
             p(class="text-gray-600 dark:text-gray-400")= product.user_bio
 
 
-        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl")
-          span(class="font-medium text-sm mb-4 block") Tools
-          div(class="flex flex-wrap gap-2")
-            each tool of tools
-              div(class="px-2 py-1 border border-gray-300 rounded-full")= tool.text
+        if tools.length
+          div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl")
+            span(class="font-medium text-sm mb-4 block") Tools
+            div(class="flex flex-wrap gap-2")
+              each tool of tools
+                div(class="px-2 py-1 border border-gray-300 rounded-full")= tool.text
 
 block append scripts
   script(src="/static/js/product.js")

@@ -758,7 +758,7 @@ app.post("/post/:id/boost", ajaxOnly, authOnly, (req, res, next) => {
     .insert({ post_id: id, user_id: user.id })
     .then((boostResult) => {
       return notificationsActions
-        .add("post_boosts", { post_id: id })
+        .add(notifications.typesMap.POST_BOOSTS_TYPE, { post_id: id })
         .then((notificationsResult) => {
           return db("post_boosts")
             .select("id")
@@ -898,6 +898,7 @@ app.post("/p/:slug/boost", ajaxOnly, authOnly, (req, res, next) => {
 app.post("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
   const slug = req.params.slug;
   const user = req.user;
+  const notificationsActions = notifications.actions({ db, user: req.user });
   db("products")
     .select("id")
     .where({ slug })
@@ -915,8 +916,19 @@ app.post("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
         .insert({ user_id: user.id, product_id: productResult.id })
         .returning("id")
         .then((collectionResult) => {
-          console.log("collectionResult", collectionResult);
-          res.json({ ok: 1, err: null, details: { id: collectionResult.id } });
+          notificationsActions
+            .add(notifications.typesMap.PRODUCT_COLLECTIONS_TYPE, {
+              product_id: productResult.id,
+            })
+            .then((notificationResult) => {
+              console.log("collectionResult", collectionResult);
+              console.log("notificationResult", notificationResult);
+              res.json({
+                ok: 1,
+                err: null,
+                details: { id: collectionResult.id },
+              });
+            });
         });
     })
     .catch((err) => {
@@ -926,6 +938,36 @@ app.post("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
           err: "You've already collected this product.",
           details: null,
         });
+      next(err);
+    });
+});
+
+app.delete("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
+  const slug = req.params.slug;
+  const user = req.user;
+  db("products")
+    .select("id")
+    .where({ slug })
+    .first()
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(400).json({
+          ok: 0,
+          err: `No such product (slug: ${slug}).`,
+          details: null,
+        });
+      }
+
+      return db
+        .table("collections")
+        .where({ user_id: user.id, product_id: productResult.id })
+        .del()
+        .then((collectionResult) => {
+          console.log("collectionResult", collectionResult);
+          res.json({ ok: 1, err: null, details: null });
+        });
+    })
+    .catch((err) => {
       next(err);
     });
 });

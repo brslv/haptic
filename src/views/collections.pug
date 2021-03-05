@@ -13,11 +13,32 @@ block content
       +page-title(class="mb-4") Collected products
       +flash-msg(flash)
 
-      div(class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3")
-        each product in collections
-          a(href=`/p/${product.slug}`)
-            div(class="relative bg-white shadow-sm hover:shadow-md border border-gray-100 transition-all h-full rounded-xl p-4 overflow-hidden" style="min-height: 100px;")
-              +icon("bookmark", { width: 18, height: 18, stroke: 'primary', fill: 'primary' })(class="absolute -top-1 right-4")
-              h1(class="text-xl font-bold pb-4")= product.name
-              if product.description
-                p= product.description
+      if collections.length
+        div(class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" data-collections-list)
+          each product in collections
+            a(href=`/p/${product.slug}` data-collected-product-root)
+              div(class="relative bg-white shadow-sm hover:shadow-md border border-gray-100 transition-all h-full rounded-xl p-4" style="min-height: 100px;")
+                +icon("bookmark", { width: 18, height: 18, stroke: 'primary', fill: 'primary' })(class="absolute -top-1 left-2")
+
+                div(class="flex items-center justify-between pb-4")
+                  h1(class="text-xl font-bold")= product.name
+                  div(class="relative inline-block ml-4")
+                    button(data-ctx-menu-trigger=`actions_${product.id}` class="btn btn-icon btn-small icon-container" data-tippy-content="Actions")
+                      +icon('more-horizontal', { width: '18', height: '18' })
+                    div(data-ctx-menu=`actions_${product.id}` class="hidden absolute top-8 -right-2 bg-white shadow-xl rounded-xl border border-gray-100" style="min-width: 150px;")
+                      +page-title(class="px-4 py-2 inline-block w-full") Actions
+                      div(class="py-2 pb-4 px-4")
+                        button(data-ctx-action="delete" data-product-slug=product.slug class="flex items-center btn btn-danger w-full text-sm")
+                          span(class="icon-container mr-2")
+                            +icon("trash-2", { stroke: "white", width: '18', height: '18' })
+                          span Delete
+
+                if product.description
+                  p= product.description
+
+      div(class={"hidden": collections.length > 0, "text-gray-500":true} data-collections-no-items-msg)
+        p(class="pb-2") No collected products found
+        button(class="btn btn-primary") Browse products
+
+block append scripts
+  script(src="/static/js/collections.js")
