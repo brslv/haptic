@@ -4,6 +4,32 @@ include partials/top-bar.pug
 include partials/page-title.pug
 include partials/flash-msg.pug
 
+mixin notif({ notif })
+  div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
+    div(class="flex items-center mb-2")
+      div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
+      a(href=`/p/${notif.product_slug}`)
+        span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
+    div(class="flex items-center")
+      if icon
+      if notif.type === 'post_boosts'
+        div(class={"w-8 h-8 rounded-full flex items-center justify-center mr-2": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
+          +icon("chevrons-up", { width: 18, height: 18 })
+        p
+          | #[span(class="font-bold")= notif.origin_user_twitter_name] boosted your 
+          a(href="/p/${notif.product_slug}/${notif.post_id}" class="font-bold text-yellow-300") post
+          |.
+      if notif.type === 'product_collections'
+        div(class={"w-8 h-8 rounded-full flex items-center justify-center mr-2": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
+          +icon("bookmark", { width: 18, height: 18 })
+        p
+          | #[span(class="font-bold")= notif.origin_user_twitter_name] collected your product.
+      if notif.type === 'product_boosts'
+        div(class={"w-8 h-8 rounded-full flex items-center justify-center mr-2": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
+          +icon("chevrons-up", { width: 18, height: 18 })
+        p
+          | #[span(class="font-bold")= notif.origin_user_twitter_name] boosted your product.
+
 block content
   +top-bar
   div(class="container p-4 mx-auto")
@@ -18,35 +44,7 @@ block content
             button(type="submit" class="btn btn-primary btn-small") Mark as read
       if notifications && notifications.unread && notifications.unread.length
         each notif in notifications.unread
-          if notif.type === 'post_boosts'
-            div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
-              div(class="flex items-center mb-2")
-                div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
-                a(href=`/p/${notif.product_slug}`)
-                  span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
-              div
-                span(class="font-bold")= `${notif.origin_user_twitter_name} `
-                span boosted your 
-                a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
-                span .
-          if notif.type === 'product_collections'
-            div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
-              div(class="flex items-center mb-2")
-                div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
-                a(href=`/p/${notif.product_slug}`)
-                  span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
-              div
-                span(class="font-bold")= `${notif.origin_user_twitter_name} `
-                span collected your product.
-          if notif.type === 'product_boosts'
-            div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
-              div(class="flex items-center mb-2")
-                div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
-                a(href=`/p/${notif.product_slug}`)
-                  span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
-              div
-                span(class="font-bold")= `${notif.origin_user_twitter_name} `
-                span boosted your product.
+          +notif({notif})
       else
         p(class="text-gray-500") No unread notifications.
 
@@ -54,34 +52,6 @@ block content
       +page-title(class="bg-gray-200 px-4 py-1 rounded-full") Read
     if notifications && notifications.read && notifications.read.length
       each notif in notifications.read
-        if notif.type === 'post_boosts'
-          div(class="p-4 shadow-sm rounded-xl bg-white mt-4" data-notification-id=notif.id)
-            div(class="flex items-center mb-2")
-              div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
-              a(href=`/p/${notif.product_slug}`)
-                span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
-            div
-              span(class="font-bold")= `${notif.origin_user_twitter_name} `
-              span boosted your 
-              a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
-              span .
-        if notif.type === 'product_collections'
-          div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
-            div(class="flex items-center mb-2")
-              div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
-              a(href=`/p/${notif.product_slug}`)
-                span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
-            div
-              span(class="font-bold")= `${notif.origin_user_twitter_name} `
-              span collected your product.
-        if notif.type === 'product_boosts'
-            div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
-              div(class="flex items-center mb-2")
-                div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
-                a(href=`/p/${notif.product_slug}`)
-                  span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
-              div
-                span(class="font-bold")= `${notif.origin_user_twitter_name} `
-                span boosted your product.
+        +notif({ notif })
     else
       p(class="text-gray-500") No read notifications

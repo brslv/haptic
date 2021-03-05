@@ -586,7 +586,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
             function closeCtxMenu(e) {
               menu.classList.add("hidden");
               menu.parentElement.classList.remove("z-10");
-              document.body.removeEventListener("click", closeCtxMenu);
+              document.removeEventListener("click", closeCtxMenu);
               actions.forEach(function(actionEl) {
                 actionEl.removeEventListener("click", handleActionClick);
               });
@@ -603,7 +603,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
             });
 
             // register outside click handlers
-            document.body.addEventListener("click", function(e) {
+            document.addEventListener("click", function(e) {
               if (menu.contains(e.target) || triggerEl.contains(e.target))
                 return;
 
