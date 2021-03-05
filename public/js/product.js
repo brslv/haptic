@@ -2,4 +2,5 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   window._hpt.modules.postBoosts.register();
   window._hpt.modules.productBoosts.register();
   window._hpt.modules.ctxMenus.register();
+  window._hpt.modules.collect.register();
 });

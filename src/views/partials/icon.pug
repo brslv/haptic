@@ -1,6 +1,6 @@
 mixin icon(name, { width = '24', height = '24', fill = 'none', stroke = 'default', strokeWidth = '2', active = false } = { width: '24', height: '24', fill: 'none', stroke: 'default', strokeWidth: '2', active: false })
   -
-    var strokeColors = {
+    var colors = {
       disabled: '#D1D5DB',
       white: "white",
       black: "black",
@@ -13,8 +13,8 @@ mixin icon(name, { width = '24', height = '24', fill = 'none', stroke = 'default
   svg(
     width=width
     height=height
-    fill="none"
-    stroke=`${active ? strokeColors.primary : (strokeColors[stroke] || strokeColors.default)}`
+    fill=colors[fill] ? colors[fill] : 'none'
+    stroke=`${active ? colors.primary : (colors[stroke] || colors.default)}`
     stroke-width=`${strokeWidth}`
     stroke-linecap="round"
     stroke-linejoin="round"

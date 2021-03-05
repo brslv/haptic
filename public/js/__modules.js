@@ -1046,4 +1046,33 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       });
     },
   };
+
+  // collect ------------------------------------------------------------
+
+  m.collect = m.collect || {
+    register: function register() {
+      var collectBtnEl = document.querySelector("[data-product-collect-btn]");
+      if (!collectBtnEl) {
+        console.warn("No collect btn found on the page.");
+        return;
+      }
+      var slug = collectBtnEl.dataset.productSlug;
+      if (!slug) {
+        console.warn("No product slug available.");
+        return;
+      }
+
+      collectBtnEl.addEventListener("click", function handleCollectClick(e) {
+        utils.req("/p/" + slug + "/collect", {
+          method: "post",
+          ok: function ok(response) {
+            emitter.emit(emitter.events.productCollected);
+          },
+          fail: function fail(err) {
+            alert(err.response.data.err);
+          },
+        });
+      });
+    },
+  };
 });

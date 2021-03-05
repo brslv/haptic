@@ -230,6 +230,25 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
     });
 });
 
+app.get("/collections", authOnly, (req, res, next) => {
+  db.select(
+    "collections.id",
+    "collections.created_at",
+    "products.name",
+    "products.description",
+    "products.slug"
+  )
+    .table("collections")
+    .innerJoin("products", "collections.product_id", "products.id")
+    .where({ "collections.user_id": req.user.id })
+    .then((result) => {
+      res.render("collections", { meta: defaultMetas, collections: result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
 app.get("/dashboard/product/:slug", authOnly, (req, res) => {
   return res.redirect(`/dashboard/product/${req.params.slug}/settings`);
 });
@@ -870,6 +889,41 @@ app.post("/p/:slug/boost", ajaxOnly, authOnly, (req, res, next) => {
         return res.status(400).json({
           ok: 0,
           err: "You've already boosted this product. 🚀",
+          details: null,
+        });
+      next(err);
+    });
+});
+
+app.post("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
+  const slug = req.params.slug;
+  const user = req.user;
+  db("products")
+    .select("id")
+    .where({ slug })
+    .first()
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(400).json({
+          ok: 0,
+          err: `No such product (slug: ${slug}).`,
+          details: null,
+        });
+      }
+
+      return db("collections")
+        .insert({ user_id: user.id, product_id: productResult.id })
+        .returning("id")
+        .then((collectionResult) => {
+          console.log("collectionResult", collectionResult);
+          res.json({ ok: 1, err: null, details: { id: collectionResult.id } });
+        });
+    })
+    .catch((err) => {
+      if (err.code === dbErrCodes.DUP_CODE)
+        return res.status(400).json({
+          ok: 0,
+          err: "You've already collected this product.",
           details: null,
         });
       next(err);
