@@ -204,24 +204,24 @@
     opacity: 1;
     transform: scale(1);
     visibility: visible;
-    animation: fadeIn 0.15s;
+    animation: fadeIn 0.3s;
   }
   .fade-out {
     opacity: 0;
     visibility: none;
     transform: scale(0.95);
-    animation: fadeOut 0.15s;
+    animation: fadeOut 0.3s;
   }
 
   @keyframes fadeIn {
     from {
-      margin-top: -5px;
+      /*margin-top: -5px;*/
       transform: scale(0.95);
       opacity: 0;
       visibility: none;
     }
     to {
-      margin-top: 0px;
+      /*margin-top: 0px;*/
       transform: scale(1);
       opacity: 1;
       visibility: visible;

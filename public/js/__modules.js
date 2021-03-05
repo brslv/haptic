@@ -128,6 +128,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     productToolMounted: "productToolMounted",
     productCollected: "productCollected",
     collectionItemRemoved: "collectionItemRemoved",
+    addToast: "addToast",
   };
 
   // - updateTypeButtons ------------------------------------------------------------
@@ -246,6 +247,13 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
             var imgContainer = document.getElementById("img-container");
             if (imgContainer) imgContainer.remove();
             uploadedImageEl.value = "";
+          });
+
+          emitter.on(emitter.events.newPostAdded, function() {
+            emitter.emit(emitter.events.addToast, {
+              content: "Your new post is live! 🎉",
+              type: m.toast.types.success,
+            });
           });
 
           function extractFormValues() {
@@ -485,7 +493,11 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           fail: function fail(error) {
             if (error.response && error.response.data) {
               var msg = error.response.data.err;
-              alert(msg);
+              emitter.emit(emitter.events.addToast, {
+                content: msg,
+                type: m.toast.types.error,
+              });
+              // alert(msg);
             }
             console.error(error);
           },
@@ -527,7 +539,11 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           },
           fail: function boostProductResponseError(err) {
             var data = err.response.data;
-            alert(data.err);
+            emitter.emit(emitter.events.addToast, {
+              content: data.err,
+              type: m.toast.types.error,
+            });
+            // alert(data.err);
           },
         });
       });
@@ -673,6 +689,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         if (!postsContainerEl.childNodes.length) {
           noPostsMsgEl.classList.remove("hidden");
         }
+        emitter.emit(emitter.events.addToast, { content: "Post removed" });
       });
 
       emitter.on(emitter.events.newPostAdded, function(data) {
@@ -847,7 +864,12 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         },
         function(error) {
           if (error.response.status === 401) window.location.href = "/login";
-          if (error.response.status === 500) alert(error.response.data.err);
+          if (error.response.status === 500) {
+            emitter.emit(emitter.events.addToast, {
+              content: error.response.data.err,
+              type: m.toast.types.error,
+            });
+          }
           return Promise.reject(error);
         }
       );
@@ -1153,5 +1175,73 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         });
       }
     },
+  };
+
+  // toast ------------------------------------------------------------
+
+  m.toast =
+    m.toast ||
+    (function() {
+      var toastsEl = document.querySelector("[data-toasts]");
+
+      if (!toastsEl) {
+        console.warn("Toasts failed to load. No data-toasts element.");
+        return;
+      }
+
+      emitter.on(emitter.events.addToast, addToast);
+
+      function addToast(data) {
+        var content = data.content;
+        var type = data.type || "default";
+        var tplEl = document.querySelector("[data-toast-tpl]");
+
+        if (!tplEl) {
+          console.warn("No toast tpl element.");
+          return;
+        }
+
+        var clone = tplEl.cloneNode(true);
+        var rootEl = clone.content.querySelector("[data-toast-id]");
+
+        // setup the toast color
+        var color;
+        if (type === m.toast.types.default) color = "bg-blue-400";
+        if (type === m.toast.types.success) color = "bg-green-400";
+        if (type === m.toast.types.error) color = "bg-red-400";
+        rootEl.firstChild.classList.add(color);
+
+        var randId = Math.random();
+        rootEl.dataset.toastId = randId;
+        var contentEl = clone.content.querySelector("[data-toast-content]");
+        contentEl.innerText = content;
+
+        var closeEl = clone.content.querySelector("[data-toast-close-btn]");
+        var closeClickHandler = hideToast.bind(null, { id: randId });
+        closeEl.addEventListener("click", closeClickHandler);
+
+        setTimeout(function() {
+          hideToast({ id: randId });
+        }, 4000);
+
+        toastsEl.prepend(rootEl);
+
+        function hideToast(data) {
+          var id = data.id;
+          var toastEl = toastsEl.querySelector('[data-toast-id="' + id + '"]');
+          if (!toastEl) return;
+          toastEl.remove();
+          closeEl.removeEventListener("click", closeClickHandler);
+        }
+      }
+
+      return {
+        addToast,
+      };
+    })();
+  m.toast.types = m.toast.types || {
+    default: "default",
+    success: "success",
+    error: "error",
   };
 });
