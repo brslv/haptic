@@ -855,6 +855,7 @@ app.delete("/post/:id", ajaxOnly, authOnly, (req, res, next) => {
 app.post("/p/:slug/boost", ajaxOnly, authOnly, (req, res, next) => {
   const slug = req.params.slug;
   const user = req.user;
+  const notificationsActions = notifications.actions({ db, user: req.user });
 
   db("products")
     .select("id")
@@ -872,15 +873,21 @@ app.post("/p/:slug/boost", ajaxOnly, authOnly, (req, res, next) => {
       return db("product_boosts")
         .insert({ product_id: productResult.id, user_id: user.id })
         .then((boostResult) => {
-          return db("product_boosts")
-            .select("id")
-            .where({ product_id: productResult.id })
-            .then((allBoostsResult) => {
-              res.json({
-                ok: 1,
-                err: null,
-                details: { boosts: allBoostsResult },
-              });
+          return notificationsActions
+            .add(notifications.typesMap.PRODUCT_BOOSTS_TYPE, {
+              product_id: productResult.id,
+            })
+            .then((notificationResult) => {
+              return db("product_boosts")
+                .select("id")
+                .where({ product_id: productResult.id })
+                .then((allBoostsResult) => {
+                  res.json({
+                    ok: 1,
+                    err: null,
+                    details: { boosts: allBoostsResult },
+                  });
+                });
             });
         });
     })

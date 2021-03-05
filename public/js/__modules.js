@@ -28,8 +28,11 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           opts.ok.call(null, response);
         })
         .catch(function handleFail(error) {
-          if (typeof opts.fail === "function") opts.fail.call(null, error);
-          else console.error(error);
+          if (error.response) {
+            if (typeof opts.fail === "function") opts.fail.call(null, error);
+            else console.error(error);
+          }
+          console.error(error);
         });
     },
     getParents: function getParents(elem, selector) {
@@ -519,7 +522,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
               newCount = Number(boostsCount) + 1;
             }
 
-            counter.innerHTML = newCount;
+            counterEl.innerHTML = newCount;
             boostsCountEl.dataset.productBoostsCount = newCount;
           },
           fail: function boostProductResponseError(err) {

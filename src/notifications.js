@@ -2,11 +2,13 @@ const day = require("dayjs");
 
 const POST_BOOSTS_TYPE = "post_boosts";
 const PRODUCT_COLLECTIONS_TYPE = "product_collections";
+const PRODUCT_BOOSTS_TYPE = "product_boosts";
 
-const types = [POST_BOOSTS_TYPE, PRODUCT_COLLECTIONS_TYPE];
+const types = [POST_BOOSTS_TYPE, PRODUCT_COLLECTIONS_TYPE, PRODUCT_BOOSTS_TYPE];
 const typesMap = {
   POST_BOOSTS_TYPE: POST_BOOSTS_TYPE,
   PRODUCT_COLLECTIONS_TYPE: PRODUCT_COLLECTIONS_TYPE,
+  PRODUCT_BOOSTS_TYPE: PRODUCT_BOOSTS_TYPE,
 };
 
 const dateFmt = (dateStr) => {
@@ -43,6 +45,50 @@ function actions({ db, user }) {
                     post_id,
                   })
                   .then((notificationsPostBoostsResult) => {
+                    trx.commit().then(
+                      res({
+                        id: notificationId,
+                      })
+                    );
+                  });
+              });
+          })
+          .catch((err) => {
+            trx.rollback().then(rej(err));
+          });
+      });
+    });
+  }
+
+  function _addProductBoost({ product_id }) {
+    return new Promise((res, rej) => {
+      db.transaction((trx) => {
+        db.transacting(trx)
+          .table("products")
+          .select("user_id")
+          .where({ id: product_id })
+          .first()
+          .then((productResult) => {
+            if (!productResult) throw Error("Non-existing product");
+
+            return db
+              .transacting(trx)
+              .table("notifications")
+              .insert({
+                user_id: productResult.user_id,
+                type: PRODUCT_BOOSTS_TYPE,
+                origin_user_id: user.id,
+              })
+              .returning("id")
+              .then(([notificationId]) => {
+                return db
+                  .transacting(trx)
+                  .table("notifications_product_boosts")
+                  .insert({
+                    notification_id: notificationId,
+                    product_id,
+                  })
+                  .then((notificationsProductBoostsResult) => {
                     trx.commit().then(
                       res({
                         id: notificationId,
@@ -108,6 +154,8 @@ function actions({ db, user }) {
         return _addPostBoost(data);
       case PRODUCT_COLLECTIONS_TYPE:
         return _addProductCollection(data);
+      case PRODUCT_BOOSTS_TYPE:
+        return _addProductBoost(data);
     }
 
     throw Error("Invalid notification type: ", type);
@@ -161,6 +209,11 @@ function actions({ db, user }) {
             "notifications.id"
           )
           .leftOuterJoin(
+            "notifications_product_boosts",
+            "notifications_product_boosts.notification_id",
+            "notifications.id"
+          )
+          .leftOuterJoin(
             "notifications_post_boosts",
             "notifications_post_boosts.notification_id",
             "notifications.id"
@@ -177,10 +230,12 @@ function actions({ db, user }) {
             "origin_user.id"
           )
           .leftOuterJoin("products", function() {
-            this.on("posts.product_id", "products.id").orOn(
-              "notifications_product_collections.product_id",
-              "products.id"
-            );
+            this.on("posts.product_id", "products.id")
+              .orOn(
+                "notifications_product_collections.product_id",
+                "products.id"
+              )
+              .orOn("notifications_product_boosts.product_id", "products.id");
           })
           .where({ "notifications.user_id": user.id })
           .orderBy("notifications.created_at", "DESC")

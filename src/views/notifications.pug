@@ -38,6 +38,15 @@ block content
               div
                 span(class="font-bold")= `${notif.origin_user_twitter_name} `
                 span collected your product.
+          if notif.type === 'product_boosts'
+            div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
+              div(class="flex items-center mb-2")
+                div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
+                a(href=`/p/${notif.product_slug}`)
+                  span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
+              div
+                span(class="font-bold")= `${notif.origin_user_twitter_name} `
+                span boosted your product.
       else
         p(class="text-gray-500") No unread notifications.
 
@@ -65,5 +74,14 @@ block content
             div
               span(class="font-bold")= `${notif.origin_user_twitter_name} `
               span collected your product.
+        if notif.type === 'product_boosts'
+            div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
+              div(class="flex items-center mb-2")
+                div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
+                a(href=`/p/${notif.product_slug}`)
+                  span(class="font-medium text-xs bg-white border border-gray-300 px-2 py-1 rounded-full mr-2")= `${notif.product_name}`
+              div
+                span(class="font-bold")= `${notif.origin_user_twitter_name} `
+                span boosted your product.
     else
       p(class="text-gray-500") No read notifications
