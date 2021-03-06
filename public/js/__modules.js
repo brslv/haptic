@@ -389,8 +389,13 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           function handleFileSelected() {
             var image = this.files[0];
 
-            if (!utils.validateImageFiletype(image))
-              return alert("Invalid file format.");
+            if (!utils.validateImageFiletype(image)) {
+              return emitter.emit(emitter.events.addToast, {
+                content: "Invalid file format",
+                type: error,
+              });
+              // return alert("Invalid file format.");
+            }
 
             uploadImgBtnEl.setAttribute("disabled", "disabled");
             if (submitBtnEl) submitBtnEl.setAttribute("disabled", "disabled");
@@ -689,7 +694,10 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         if (!postsContainerEl.childNodes.length) {
           noPostsMsgEl.classList.remove("hidden");
         }
-        emitter.emit(emitter.events.addToast, { content: "Post removed" });
+        emitter.emit(emitter.events.addToast, {
+          content: "Post removed",
+          type: m.toast.types.success,
+        });
       });
 
       emitter.on(emitter.events.newPostAdded, function(data) {
@@ -1099,9 +1107,17 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           method: "post",
           ok: function ok(response) {
             emitter.emit(emitter.events.productCollected);
+            emitter.emit(emitter.events.addToast, {
+              content: "Product collected.",
+              type: m.toast.types.success,
+            });
           },
           fail: function fail(err) {
-            alert(err.response.data.err);
+            emitter.emit(emitter.events.addToast, {
+              content: err.response.data.err,
+              type: m.toast.types.error,
+            });
+            // alert(err.response.data.err);
           },
         });
       });
@@ -1123,6 +1139,10 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
               "[data-collections-no-items-msg]"
             );
             noItemsMsgEl.classList.remove("hidden");
+            emitter.emit(emitter.events.addToast, {
+              content: "Product removed from your collection",
+              type: m.toast.types.success,
+            });
           }
         }
       }
