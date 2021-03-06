@@ -129,6 +129,8 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     productCollected: "productCollected",
     collectionItemRemoved: "collectionItemRemoved",
     addToast: "addToast",
+    showProgressBar: "showProgressBar",
+    hideProgressBar: "hideProgressBar",
   };
 
   // - updateTypeButtons ------------------------------------------------------------
@@ -286,6 +288,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
               textEl.classList.add("error-field");
               textErrorEl.innerHTML = errors.text;
               textErrorEl.classList.remove("hidden");
+              emitter.emit(emitter.events.hideProgressBar);
             }
           }
 
@@ -339,6 +342,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
 
           function handleFormSubmit(e) {
             e.preventDefault();
+            emitter.emit(emitter.events.showProgressBar);
             var formValues = extractFormValues();
             var errors = validateFormValues(formValues);
 
@@ -560,6 +564,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   m.ctxMenus = m.ctxMenus || {
     register: function register() {
       emitter.on(emitter.events.newPostAdded, function(data) {
+        emitter.emit(emitter.events.hideProgressBar);
         const el = data.el.querySelectorAll("[data-ctx-menu-trigger]");
         setupListeners(el);
       });
@@ -723,6 +728,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       });
 
       function deleteProduct() {
+        emitter.emit(emitter.events.showProgressBar);
         productDelFormEl.submit();
       }
     },
@@ -996,6 +1002,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         emitter.events.productToolAdded,
         function handleProductToolAdded(tool) {
           addProductToolElement(tool);
+          emitter.emit(emitter.events.hideProgressBar);
         }
       );
 
@@ -1264,4 +1271,35 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     success: "success",
     error: "error",
   };
+
+  // progress bar ------------------------------------------------------------
+  m.progressBar =
+    m.progressBar ||
+    (function() {
+      var aEls = document.querySelectorAll("a");
+      var formEls = document.querySelectorAll("form");
+      var progressBarEl = document.querySelector("[data-progress-bar]");
+      if (!progressBarEl) {
+        console.warn("No progress bar element found on the page.");
+        return;
+      }
+
+      emitter.on(emitter.events.showProgressBar, showProgressBar);
+      emitter.on(emitter.events.hideProgressBar, hideProgressBar);
+
+      function showProgressBar() {
+        progressBarEl.classList.remove("hidden");
+      }
+
+      function hideProgressBar() {
+        progressBarEl.classList.add("hidden");
+      }
+
+      aEls.forEach(function registerProgressBar(aEl) {
+        aEl.addEventListener("click", showProgressBar);
+      });
+      formEls.forEach(function registerProgressBar(formEl) {
+        formEl.addEventListener("submit", showProgressBar);
+      });
+    })();
 });
