@@ -64,7 +64,6 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(user, done) {
-  app.locals.user = user;
   done(null, user);
 });
 
@@ -99,7 +98,6 @@ passport.use(
                   .table("users")
                   .first()
                   .then((result) => {
-                    app.locals.user = result;
                     done(null, result);
                   })
                   .catch((err) => done(err, null));
@@ -107,7 +105,6 @@ passport.use(
               .catch((err) => done(err, null));
           } else {
             // return the user
-            app.locals.user = result;
             done(null, result);
           }
         })
@@ -149,6 +146,10 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
 app.use(flash({ sessionKeyName: SID }));
 
 // helpers / middlewares
@@ -221,6 +222,7 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
           title: "Dashboard | Haptic",
           og: { title: "Dashboard | Haptic" },
         },
+        showFeedbackBtn: true,
         products: result,
         flash,
       });
@@ -667,7 +669,6 @@ app.get(
 
 app.get("/logout", (req, res) => {
   req.logout();
-  app.locals.user = null;
   req.session.destroy(function(err) {
     res.redirect("/");
   });

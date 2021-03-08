@@ -14,6 +14,6 @@ block content
         div(class="pb-8")
           label
             div(class="label pb-1 pl-1") Bio
-            textarea(class="textarea w-full" placeholder="..." name="bio" id="bio")= user.bio
+            textarea(class="textarea w-full" placeholder="..." name="bio" id="bio" disabled)= user.bio
           span(class="text-sm text-gray-500") Be brief. Max: 280 symbols.
-        button(type="submit" class="btn btn-primary") Save
+        button(type="submit" class="btn btn-primary" disabled) Update (soon)

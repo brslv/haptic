@@ -131,6 +131,8 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     addToast: "addToast",
     showProgressBar: "showProgressBar",
     hideProgressBar: "hideProgressBar",
+    modalOpen: "modalOpen",
+    modalClose: "modalClose",
   };
 
   // - updateTypeButtons ------------------------------------------------------------
@@ -749,27 +751,15 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   m.createProduct = m.createProduct || {
     register: function register() {
       var createBtn = document.getElementById("create-product-btn");
-      var modal = document.querySelector(
-        '[data-modal-name="create-product-modal"]'
-      );
-      var close = document.querySelector(
-        '[data-modal-name="create-product-modal"] [data-modal-close]'
-      );
       var form = document.getElementById("create-product-form");
       var productNameEl = document.getElementById("product-name");
 
-      if (createBtn && modal) {
-        createBtn.addEventListener("click", function onCreate() {
-          modal.classList.remove("hidden");
+      emitter.on(emitter.events.modalOpen, function handleModalOpen(data) {
+        var name = data.name;
+        if (name === "new-product") {
           if (productNameEl) productNameEl.focus();
-        });
-      }
-
-      if (close && modal) {
-        close.addEventListener("click", function onClose() {
-          modal.classList.add("hidden");
-        });
-      }
+        }
+      });
 
       if (form) {
         (function() {
@@ -1150,16 +1140,17 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       emitter.on(emitter.events.collectionItemRemoved, handleRemove);
 
       function handleRemove() {
+        emitter.emit(emitter.events.addToast, {
+          content: "Product removed from your collection",
+          type: m.toast.types.success,
+        });
+
         if (listEl) {
           if (!listEl.firstChild) {
             var noItemsMsgEl = document.querySelector(
               "[data-collections-no-items-msg]"
             );
             noItemsMsgEl.classList.remove("hidden");
-            emitter.emit(emitter.events.addToast, {
-              content: "Product removed from your collection",
-              type: m.toast.types.success,
-            });
           }
         }
       }
@@ -1310,6 +1301,47 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       });
       formEls.forEach(function registerProgressBar(formEl) {
         formEl.addEventListener("submit", showProgressBar);
+      });
+    })();
+
+  // - modal ------------------------------------------------------------
+
+  m.modal =
+    m.modal ||
+    (function() {
+      var modals = document.querySelectorAll("[data-modal-name]");
+      if (!modals.length) return;
+      modals.forEach(function registerModal(modal) {
+        var name = modal.dataset.modalName;
+        var triggers = document.querySelectorAll(
+          '[data-modal-trigger="' + name + '"]'
+        );
+        if (!triggers.length) {
+          console.warn("Modal " + name + " has no registered triggers.");
+          return;
+        }
+
+        triggers.forEach(function registerModalTrigger(trigger) {
+          trigger.addEventListener("click", function handleTriggerClick(e) {
+            modal.classList.remove("hidden");
+            emitter.emit(emitter.events.modalOpen, { name: name });
+          });
+        });
+
+        var closeTriggers = modal.querySelectorAll("[data-modal-close]");
+        if (closeTriggers.length) {
+          closeTriggers.forEach(function registerModalCloseTrigger(
+            closeTrigger
+          ) {
+            closeTrigger.addEventListener(
+              "click",
+              function handleCloseTriggerClick(e) {
+                modal.classList.add("hidden");
+                emitter.emit(emitter.events.modalClose, { name: name });
+              }
+            );
+          });
+        }
       });
     })();
 });
