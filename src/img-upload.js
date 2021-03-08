@@ -24,8 +24,10 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+const maxSize = 500 * 1000; // 500kb in bytes
 const upload = multer({
   fileFilter,
+  limits: { fileSize: maxSize },
   storage: multerS3({
     acl: "public-read",
     s3,

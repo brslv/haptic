@@ -409,6 +409,16 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
               ok: function ok(data) {
                 emitter.emit(emitter.events.imageUploaded, data);
               },
+              fail: function fail(err) {
+                emitter.emit(emitter.events.addToast, {
+                  content: err.response.data.err,
+                  type: "error",
+                });
+                if (imgUploadLoaderEl)
+                  imgUploadLoaderEl.classList.add("hidden");
+                if (submitBtnEl) submitBtnEl.removeAttribute("disabled");
+                uploadImgBtnEl.removeAttribute("disabled");
+              },
             });
           }
 

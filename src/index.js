@@ -980,6 +980,15 @@ app.delete("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
 
 app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
   singleUpload(req, res, function handleUpload(err) {
+    if (err && err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        ok: 0,
+        err:
+          "Files greater than 500kb in size are not allowed. Please, optimize your image.",
+        details: { max: "500kb" },
+      });
+    }
+
     if (err) {
       next(err);
       return;
