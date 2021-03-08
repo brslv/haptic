@@ -139,7 +139,6 @@ function actions({ db, user }) {
           .leftJoin("images", "images.post_id", "posts.id")
           .where({ "posts.product_id": productId })
           .orderBy("posts.created_at", "DESC")
-          .debug()
           .then((result) => {
             trx.commit().then(() => res(result));
           })

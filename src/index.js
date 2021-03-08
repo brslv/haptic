@@ -187,7 +187,6 @@ const loadNotifications = (req, res, next) => {
   notificationsActions
     .getAll()
     .then((notificationsResult) => {
-      console.log(notificationsResult);
       app.locals.notifications = notificationsResult;
       next();
     })
@@ -1050,7 +1049,6 @@ app.delete("/product/:slug/tool/:id", authOnly, ajaxOnly, (req, res, next) => {
       db("product_tools")
         .where({ id })
         .del()
-        .debug()
         .then((productToolsResult) => {
           res.json({
             ok: 1,
