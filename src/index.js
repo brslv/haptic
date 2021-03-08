@@ -17,6 +17,7 @@ const { flash } = require("express-flash-message");
 const day = require("dayjs");
 const posts = require("./posts");
 const boosts = require("./boosts");
+const products = require("./products");
 const upload = require("./img-upload");
 const singleUpload = upload.single("image");
 const showdown = require("showdown");
@@ -209,10 +210,10 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
   const flash = {
     success: await req.consumeFlash("success"),
   };
+  const productsActions = products.actions({ db, user: req.user });
 
-  db("products")
-    .select()
-    .where({ user_id: req.user.id })
+  productsActions
+    .getMyProducts()
     .then((result) => {
       res.render("dashboard", {
         meta: {
@@ -254,10 +255,9 @@ app.get("/dashboard/product/:slug", authOnly, (req, res) => {
 
 app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
   const slug = req.params.slug;
-  db.select()
-    .table("products")
-    .where({ slug })
-    .first()
+  const productsActions = products.actions({ db, user: req.user });
+  productsActions
+    .getProductBySlug({ slug })
     .then((productResult) => {
       if (!productResult) {
         return res.status(404).render("404", {
@@ -317,11 +317,10 @@ app.get(
       success: await req.consumeFlash("success"),
       error: await req.consumeFlash("error"),
     };
+    const productsActions = products.actions({ db, user: req.user });
 
-    db.select()
-      .table("products")
-      .where({ slug })
-      .first()
+    productsActions
+      .getProductBySlug({ slug })
       .then((result) => {
         if (!result) {
           return res.status(404).render("404", {

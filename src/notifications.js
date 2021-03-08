@@ -1,4 +1,5 @@
 const day = require("dayjs");
+const { cache, cacheKeys, ttl } = require("./cache");
 
 const POST_BOOSTS_TYPE = "post_boosts";
 const PRODUCT_COLLECTIONS_TYPE = "product_collections";
@@ -163,6 +164,10 @@ function actions({ db, user }) {
 
   function getAll() {
     return new Promise((res, rej) => {
+      const cached = cache.get(cacheKeys.notifications(user.id));
+      if (cached) {
+        return res(cached);
+      }
       return (
         db
           .select(
@@ -253,6 +258,7 @@ function actions({ db, user }) {
               { read: [], unread: [] }
             );
 
+            cache.set(cacheKeys.notifications(user.id), notifications, ttl[1]);
             res(notifications);
           })
           .catch((err) => {
@@ -268,6 +274,7 @@ function actions({ db, user }) {
         .where({ user_id: user.id, is_read: false })
         .update({ is_read: true })
         .then((result) => {
+          cache.del(cacheKeys.notifications(user.id));
           res(result);
         })
         .catch((err) => {

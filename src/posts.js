@@ -1,3 +1,5 @@
+const { cache, cacheKeys, ttl } = require("./cache");
+
 const TEXT_TYPE = "text";
 
 const types = [TEXT_TYPE];
@@ -114,6 +116,10 @@ function actions({ db, user }) {
 
   function getAllPosts(productId) {
     return new Promise((res, rej) => {
+      const cachedPosts = cache.get(cacheKeys.productPosts(productId));
+      if (cachedPosts) {
+        return res(cachedPosts);
+      }
       db.transaction().then((trx) => {
         db.transacting(trx)
           .select(
@@ -140,7 +146,10 @@ function actions({ db, user }) {
           .where({ "posts.product_id": productId })
           .orderBy("posts.created_at", "DESC")
           .then((result) => {
-            trx.commit().then(() => res(result));
+            trx.commit().then(() => {
+              cache.set(cacheKeys.productPosts(productId), result, ttl[5]);
+              res(result);
+            });
           })
           .catch((err) => {
             trx.rollback().then(() => rej(err));
@@ -150,6 +159,7 @@ function actions({ db, user }) {
   }
 
   function publish(type, product, reqBody) {
+    cache.del(cacheKeys.productPosts(product.id));
     switch (type) {
       case "text": {
         return _publishText(product, reqBody.text, reqBody.image);
