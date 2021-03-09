@@ -7,7 +7,7 @@ mixin feedbackBtn
     style:"min-width: 400px;"
   })
     h2(class="font-medium text-gray-600 dark:text-gray-200 text-xs uppercase") Feedback
-    form(action="/create-product" method="POST" id="create-product-form")
+    form(data-feedback-form)
       div(class="pt-8")
         div(class="pb-4")
           label
@@ -15,9 +15,9 @@ mixin feedbackBtn
             div(class="text-xs text-gray-500 pl-1 pb-1") In order to get back to you for details, if needed.
             input(
               class="input"
-              type="text"
-              id="name"
-              name="name"
+              type="email"
+              id="email"
+              name="email"
               autocomplete="off"
             )
         div(class="pb-4")
@@ -34,6 +34,6 @@ mixin feedbackBtn
         div(class="pb-4")
           label
             div(class="label pb-1 pl-1") Message
-            textarea(name="text" rows="4" class="textarea w-full" placeholder="..." data-text)
+            textarea(name="text" rows="4" class="textarea w-full" placeholder="...")
         div(class="hidden mb-4 error-container" data-form-error)
       button(class="btn btn-primary w-full" type="submit" disabled="disabled") Send

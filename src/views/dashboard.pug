@@ -4,6 +4,7 @@ include partials/top-bar.pug
 include partials/modal.pug
 include partials/page-title.pug
 include partials/flash-msg.pug
+include partials/feedbackBtn.pug
 
 block content
   +top-bar
@@ -28,6 +29,7 @@ block content
                 +icon("plus-circle")
 
 block modals
+  +feedbackBtn
   +modal("new-product", { style: "width: 300px;" })
     h2(class="font-medium text-gray-600 dark:text-gray-200 text-xs uppercase") Create product
     form(action="/create-product" method="POST" id="create-product-form")

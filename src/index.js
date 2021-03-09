@@ -222,7 +222,6 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
           title: "Dashboard | Haptic",
           og: { title: "Dashboard | Haptic" },
         },
-        showFeedbackBtn: true,
         products: result,
         flash,
       });
@@ -1074,18 +1073,19 @@ app.delete("/product/:slug/tool/:id", authOnly, ajaxOnly, (req, res, next) => {
     });
 });
 
-app.post("/feedback", authOnly, ajaxOnly, (req, res, next) => {
+app.post("/feedback", authOnly, ajaxOnly, express.json(), (req, res, next) => {
   const user = req.user;
   const data = req.body;
   db("feedback")
     .insert({
       user_id: user.id,
+      email: data.email,
       type: data.type,
       text: data.text,
     })
+    .returning("id")
     .then((result) => {
-      console.log(result);
-      res.json({ ok: 1, err: null, details: result });
+      res.json({ ok: 1, err: null, details: { id: result[0] } });
     })
     .catch((err) => {
       next(err);

@@ -131,8 +131,9 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     addToast: "addToast",
     showProgressBar: "showProgressBar",
     hideProgressBar: "hideProgressBar",
-    modalOpen: "modalOpen",
-    modalClose: "modalClose",
+    closeModal: "closeModal",
+    modalOpened: "modalOpened",
+    modalClosed: "modalClosed",
   };
 
   // - updateTypeButtons ------------------------------------------------------------
@@ -754,7 +755,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       var form = document.getElementById("create-product-form");
       var productNameEl = document.getElementById("product-name");
 
-      emitter.on(emitter.events.modalOpen, function handleModalOpen(data) {
+      emitter.on(emitter.events.modalOpened, function handleModalOpen(data) {
         var name = data.name;
         if (name === "new-product") {
           if (productNameEl) productNameEl.focus();
@@ -1094,7 +1095,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // collect ------------------------------------------------------------
+  // - collect ------------------------------------------------------------
 
   m.collect = m.collect || {
     register: function register() {
@@ -1131,7 +1132,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // collection list ------------------------------------------------------------
+  // - collection list ------------------------------------------------------------
 
   m.collectionList = m.collectionList || {
     register: function register() {
@@ -1157,7 +1158,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // collection item ------------------------------------------------------------
+  // - collection item ------------------------------------------------------------
 
   m.collectionItemActions = m.collectionItemActions || {
     register: function register() {
@@ -1205,7 +1206,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     },
   };
 
-  // toast ------------------------------------------------------------
+  // - toast ------------------------------------------------------------
 
   m.toast =
     m.toast ||
@@ -1273,7 +1274,8 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     error: "error",
   };
 
-  // progress bar ------------------------------------------------------------
+  // - progress bar ------------------------------------------------------------
+
   m.progressBar =
     m.progressBar ||
     (function() {
@@ -1309,6 +1311,13 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   m.modal =
     m.modal ||
     (function() {
+      emitter.on(emitter.events.closeModal, function handleCloseModal(data) {
+        var name = data.name;
+        var modal = document.querySelector('[data-modal-name="' + name + '"]');
+        modal.classList.add("hidden");
+        emitter.emit(emitter.events.modalClosed, { name: name });
+      });
+
       var modals = document.querySelectorAll("[data-modal-name]");
       if (!modals.length) return;
       modals.forEach(function registerModal(modal) {
@@ -1324,7 +1333,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         triggers.forEach(function registerModalTrigger(trigger) {
           trigger.addEventListener("click", function handleTriggerClick(e) {
             modal.classList.remove("hidden");
-            emitter.emit(emitter.events.modalOpen, { name: name });
+            emitter.emit(emitter.events.modalOpened, { name: name });
           });
         });
 
@@ -1337,11 +1346,71 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
               "click",
               function handleCloseTriggerClick(e) {
                 modal.classList.add("hidden");
-                emitter.emit(emitter.events.modalClose, { name: name });
+                emitter.emit(emitter.events.modalClosed, { name: name });
               }
             );
           });
         }
       });
     })();
+
+  // - feedback ------------------------------------------------------------
+
+  m.feedback = m.feedback || {
+    register: function register() {
+      console.log("register feedback");
+      var formEl = document.querySelector("[data-feedback-form]");
+      if (!formEl) {
+        console.warn("No feedback form element");
+        return;
+      }
+
+      var emailEl = formEl.querySelector('[name="email"]');
+      var typeEl = formEl.querySelector('[name="type"]');
+      var textEl = formEl.querySelector('[name="text"]');
+      var submitBtnEl = formEl.querySelector('button[type="submit"]');
+
+      textEl.addEventListener("input", function handleTextInput(e) {
+        if (e.target.value === "") {
+          submitBtnEl.setAttribute("disabled", "disabled");
+          submitBtnEl.classList.add("disabled");
+        } else {
+          submitBtnEl.removeAttribute("disabled");
+          submitBtnEl.classList.remove("disabled");
+        }
+      });
+
+      formEl.addEventListener("submit", function handleFeedbackFormSubmit(e) {
+        e.preventDefault();
+        utils.req(
+          "/feedback",
+          {
+            email: emailEl.value,
+            type: typeEl.value,
+            text: textEl.value,
+          },
+          {
+            method: "post",
+            ok: function ok(response) {
+              if (response.data.ok) {
+                emitter.emit(emitter.events.addToast, {
+                  type: "success",
+                  content: "Thank you for your feedback!",
+                });
+
+                emitter.emit(emitter.events.closeModal, { name: "feedback" });
+                emitter.emit(emitter.events.hideProgressBar);
+              }
+            },
+            fail: function fail(err) {
+              emitter.emit(emitter.events.addToast, {
+                type: "error",
+                content: "Oops, something went wrong. Please, try again.",
+              });
+            },
+          }
+        );
+      });
+    },
+  };
 });
