@@ -1074,6 +1074,24 @@ app.delete("/product/:slug/tool/:id", authOnly, ajaxOnly, (req, res, next) => {
     });
 });
 
+app.post("/feedback", authOnly, ajaxOnly, (req, res, next) => {
+  const user = req.user;
+  const data = req.body;
+  db("feedback")
+    .insert({
+      user_id: user.id,
+      type: data.type,
+      text: data.text,
+    })
+    .then((result) => {
+      console.log(result);
+      res.json({ ok: 1, err: null, details: result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
 // error handler
 app.use((err, req, res, next) => {
   console.log("An error occurred.", err);
