@@ -15,9 +15,9 @@ mixin top-bar()
           li
             a(href="/faq" class="mr-4 hover:underline") FAQ
           if user
-            a(href="/dashboard" class="btn btn-icon mr-4" data-tippy-content="Profile settings")
-                li
-                    img(class="rounded-full w-8 h-8" src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
+            a(href="/dashboard" class="btn btn-icon mr-4" data-tippy-content="Dashboard")
+              li
+                +icon('box')
           else
             li
               a(href="/login" class="btn btn-primary") Login with Twitter

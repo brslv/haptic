@@ -7,11 +7,13 @@ block content
     div(class="mb-32")
       +top-bar
     div(class="container p-4 mx-auto")
+
+      // - hero
       div(class="text-center relative mx-auto")
         h1(class="text-3xl pb-10 font-bold")
           span(class="relative")
             span Humanize 
-            img(src="/static/images/underline.svg" class="absolute top-10 left-4 select-none")
+            img(src="/static/images/landing/underline.svg" class="absolute top-10 left-4 select-none")
           span your product
 
         h2(class="text-2xl text-gray-600 mx-auto pb-10" style="width: 28ch") You have a story. Your product, too. Share it with the world.
@@ -20,6 +22,29 @@ block content
           button(class="btn btn-primary text-center mb-1 text-lg") Start building in public
           span(class="text-xs text-gray-600") FREE, no credit cards required!
 
-        div(class="flex flex-col items-center")
-          img(src="/static/images/smiling-face.svg" class="-mb-6")
-          img(src="/static/images/product-image.png" class="z-10 -mb-64")
+        div(class="flex flex-col items-center lg:-mx-10")
+          img(src="/static/images/landing/smiling-face.svg" class="-mb-6")
+          img(src="/static/images/landing/product-image.png" class="z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200")
+
+  // - features
+  main(class="mt-32 lg:mt-64")
+    div(class="container p-4 mx-auto")
+      div(class="my-24 px-16")
+        div(class="md:grid md:grid-cols-10 gap-10 mb-16 md:mb-24")
+          img(src="/static/images/landing/sun.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
+          div(class="md:mb-0 md:col-span-4")
+            h3(class="text-2xl font-semibold mb-4") Ideas meet reality on Haptic
+          p(class="col-span-5").
+            Building in isolation is a lonely experience. More importantly, it's disconnected from reality, which makes it counterproductive. Join Haptic and reconnect by engaging with your audience and future customers.
+        div(class="md:grid md:grid-cols-10 gap-4 mb-16 md:mb-24")
+          img(src="/static/images/landing/leaf.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
+          div(class="md:mb-0 md:col-span-4")
+            h3(class="text-2xl font-semibold mb-4") Good stories always catch people's attention
+          p(class="col-span-5").
+            Social media is not meant for building a narative because of it's ephemeral nature. That's where haptic shines. We give you a clean, simple and neatly-organized place to grow your idea from the seed in your consciousness to the story of your life.
+        div(class="md:grid md:grid-cols-10 gap-4 mb-16 md:mb-24")
+          img(src="/static/images/landing/product-lifecycle.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
+          div(class="md:mb-0 md:col-span-4")
+            h3(class="text-2xl font-semibold mb-4") Build better products
+          p(class="col-span-5").
+            Building great products is a non-linear process. You have to validate, ship and iterate. Haptic helps you get the valueable feedback needed for your next move on every step of the process.
