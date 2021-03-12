@@ -38,7 +38,7 @@ mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitt
                     +icon("trash-2", { stroke: "white", width: '18', height: '18' })
                   span Delete
 
-    div(class="__md my-8")
+    div(class="prose prose-yellow my-8")
       div(class={"hidden":!img_url, "border rounded-md p-1.5 bg-white border-gray-300 w-full mb-4": true})
         img(data-image data-zoomable src=img_url class={"hidden": !img_url, "mx-auto cursor-pointer rounded-md": true})
       div(data-content="data-content")

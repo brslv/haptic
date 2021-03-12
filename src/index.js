@@ -204,7 +204,7 @@ const dateFmt = (dateStr) => {
 
 // setup routes
 app.get("/", (req, res) => {
-  res.render("index", { meta: defaultMetas });
+  res.render("index", { meta: defaultMetas, isHomepage: true });
 });
 
 app.get("/dashboard", authOnly, async (req, res, next) => {
