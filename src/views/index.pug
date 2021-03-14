@@ -10,21 +10,23 @@ block content
 
       // - hero
       div(class="text-center relative mx-auto")
-        h1(class="text-3xl pb-10 font-bold")
+        h1(class="text-3xl md:text-5xl pb-12 font-bold")
           span(class="relative")
             span Humanize 
-            img(src="/static/images/landing/underline.svg" class="absolute top-10 left-4 select-none")
+            img(src="/static/images/landing/underline.svg" class="absolute top-10 left-2 md:top-14 md:left-6 select-none" style="width: 180px")
           span your product
 
         h2(class="text-2xl text-gray-600 mx-auto pb-10" style="width: 28ch") You have a story. Your product, too. Share it with the world.
 
         div(class="flex items-center justify-center flex-col mb-10")
-          button(class="btn btn-primary text-center mb-1 text-lg") Start building in public
+          div(class="relative")
+            img(src="/static/images/landing/arrow.svg" class="absolute -top-4 -left-24 select-none")
+            button(class="btn btn-primary text-center mb-1 text-lg") Start building in public
           span(class="text-xs text-gray-600") FREE, no credit cards required!
 
         div(class="flex flex-col items-center lg:-mx-10")
-          img(src="/static/images/landing/smiling-face.svg" class="-mb-6")
-          img(src="/static/images/landing/product-image.png" class="z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200")
+          img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none")
+          img(src="/static/images/landing/product-image-hq.png" class="z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none")
 
   // - features
   main(class="mt-32 lg:mt-64")
@@ -41,10 +43,48 @@ block content
           div(class="md:mb-0 md:col-span-4")
             h3(class="text-2xl font-semibold mb-4") Good stories always catch people's attention
           p(class="col-span-5").
-            Social media is not meant for building a narative because of it's ephemeral nature. That's where haptic shines. We give you a clean, simple and neatly-organized place to grow your idea from the seed in your consciousness to the story of your life.
+            Social media is not meant for building a narative because of it's ephemeral nature. That's where haptic shines. We give you the playgroind and the tools to grow your idea from the seed in your consciousness to the story of your life.
         div(class="md:grid md:grid-cols-10 gap-4 mb-16 md:mb-24")
           img(src="/static/images/landing/product-lifecycle.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
           div(class="md:mb-0 md:col-span-4")
             h3(class="text-2xl font-semibold mb-4") Build better products
           p(class="col-span-5").
             Building great products is a non-linear process. You have to validate, ship and iterate. Haptic helps you get the valueable feedback needed for your next move on every step of the process.
+      div
+        h3(class="font-medium text-center mx-auto text-4xl mb-28 sm:mb-16") Here's how it works
+
+        div(class="flex relative bg-yellow-50 sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row items-start mb-20")
+          div(class="absolute top-10 left-10 sm:hidden")
+            img(src="/static/images/landing/pattern.svg" class="w-48 h-48")
+          div(class="text-center sm:text-left bg-yellow-50 p-8 rounded-xl mr-10 max-w-lg")
+            span(class="block text-xs font-medium text-gray-600 uppercase") Step 1
+            h4(class="text-2xl font-semibold mb-4") Create your product page
+            p(class="mb-4") It takes 5 seconds.
+            p You'll get a unique slug for your product page on #[strong haptic.so/p/{your-slug}].
+          div(class="mx-auto max-w-xl sm:max-w-3xl relative")
+            img(src="/static/images/landing/create-product.svg" class="block sm:hidden w-full -mt-8 sm:mt-0 h-64" style="min-width: 150px;")
+            img(src="/static/images/landing/create-product.svg" class="hidden sm:block w-full" style="min-width: 300px; max-width: 350px;")
+
+        div(class="flex relative bg-yellow-50 sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row-reverse items-start mb-20")
+          div(class="absolute -top-10 right-4 sm:hidden")
+            img(src="/static/images/landing/pattern.svg" class="w-48 h-48")
+          div(class="text-center sm:text-left bg-yellow-50 p-8 rounded-xl ml-10 max-w-lg")
+            span(class="block text-xs font-medium text-gray-600 uppercase") Step 2
+            h4(class="text-2xl font-semibold mb-4") Build rich narratives
+            p(class="mb-4") You have various tools at your disposal to share your jorney with the crowd.
+            p Quick update posts, long-form articles, feedback surveys, milestone celebrations, roadmaps and more.
+          div(class="mx-auto max-w-xl sm:max-w-3xl relative")
+            img(src="/static/images/landing/icons.svg" class="block sm:hidden w-full -mt-8 sm:mt-0 h-44" style="min-width: 150px;")
+            img(src="/static/images/landing/icons.svg" class="hidden sm:block w-full" style="min-width: 300px; max-width: 350px;")
+
+        div(class="flex relative bg-yellow-50 sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row items-start mb-20")
+          div(class="absolute -top-16 left-10 sm:hidden")
+            img(src="/static/images/landing/pattern.svg" class="w-48 h-48")
+          div(class="text-center sm:text-left bg-yellow-50 p-8 rounded-xl mr-10 max-w-lg")
+            span(class="block text-xs font-medium text-gray-600 uppercase") Step 3
+            h4(class="text-2xl font-semibold mb-4") Collect products, show some ❤️
+            p(class="mb-4") Make a collection of products that you love, built by fellow makers on haptic.
+            p Boost your most favorite ones to show it's creators that you care.
+          div(class="mx-auto max-w-xl sm:max-w-3xl relative")
+            img(src="/static/images/landing/boost-collect.svg" class="block sm:hidden w-full -mt-8 sm:mt-0 h-36" style="min-width: 150px;")
+            img(src="/static/images/landing/boost-collect.svg" class="hidden sm:block w-full" style="min-width: 300px; max-width: 350px;")
