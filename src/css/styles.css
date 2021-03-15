@@ -85,12 +85,8 @@
   }
 
   .input {
-    @apply px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 w-full dark:bg-transparent;
+    @apply focus:ring-2 focus:ring-yellow-300 px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 w-full dark:bg-transparent focus:border-transparent;
     outline: none !important;
-  }
-
-  .input:focus {
-    @apply border-yellow-300;
   }
 
   .input[disabled] {
@@ -102,12 +98,8 @@
   }
 
   .textarea {
-    @apply bg-white border border-gray-300 rounded-xl p-4 resize-none;
+    @apply bg-white border border-gray-300 focus:border-transparent focus:ring-2 focus:ring-yellow-300 rounded-xl p-4 resize-none;
     outline: none !important;
-  }
-
-  .textarea:focus {
-    @apply border-yellow-300;
   }
 
   .textarea[disabled] {
