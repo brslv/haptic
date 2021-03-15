@@ -42,7 +42,7 @@ block content
           +page-title(class="bg-gray-200 px-4 py-1 rounded-full mr-4") Unread
           if notifications && notifications.unread && notifications.unread.length
             form(action="/mark-notifications-read" method="POST")
-              button(type="submit" class="btn btn-primary btn-small") Mark as read
+              button(type="submit" class="btn btn-primary btn-small click-scale") Mark as read
         if notifications && notifications.unread && notifications.unread.length
           each notif in notifications.unread
             +notif({notif})

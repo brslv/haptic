@@ -85,7 +85,11 @@
   }
 
   .click-scale {
-    @apply transform transition duration-150 active:scale-95;
+    @apply transform transition duration-150 active:scale-98;
+  }
+
+  .click-scale-2 {
+    @apply transform transition duration-150 active:scale-90;
   }
 
   .product-btn {

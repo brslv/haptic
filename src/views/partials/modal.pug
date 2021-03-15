@@ -2,7 +2,7 @@ mixin modal(name, attr = {})
   div(data-modal-name=name class="hidden z-20 fixed top-0 left-0 w-screen h-screen flex items-center justify-center w-screen h-screen")
     div(class="absolute top-0 left-0 w-full h-full bg-white opacity-90")
     div(class="relative")&attributes(attr)
-      div(class="btn btn-default absolute -top-14 left-0" data-modal-close) Close
+      div(class="btn btn-default absolute -top-14 left-0 click-scale" data-modal-close) Close
       div(class="p-4 rounded-xl bg-white shadow-xl border border-gray-100 overflow-y-auto" style="min-width: 250px; max-height: 80vh;")
         if block
           block

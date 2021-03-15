@@ -9,11 +9,13 @@ include ../../partials/icon.pug
 
 mixin post-type-btn({bind, icon, disabled}, attr = {})
   div(
+    tabindex="0"
+    role="button"
     data-bind=bind
     data-disabled=disabled
     class={
-      "relative flex items-center py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700": true,
-      "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700": !disabled,
+      "relative flex items-center py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700 outline-none": true,
+      "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 click-scale": !disabled,
       "text-gray-300": disabled
     }
   )&attributes(attr)
@@ -50,9 +52,9 @@ block content
                 textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." data-text)
                 p(class="hidden text-red-500" data-error)
               div(class="flex flex-row-reverse items-center justify-between")
-                button(type="submit" class="btn btn-primary") Publish
+                button(type="submit" class="btn btn-primary click-scale") Publish
                 div(class="flex items-center")
-                  button(type="button" class="mr-4 btn btn-default flex items-center" data-upload-image-btn)
+                  button(type="button" class="mr-4 btn btn-default flex items-center click-scale" data-upload-image-btn)
                     span(class="mr-2")
                       +icon('image', { width: '18', height: '18' })
                     span Attach image

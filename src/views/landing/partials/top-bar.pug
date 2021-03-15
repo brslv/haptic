@@ -15,9 +15,9 @@ mixin top-bar()
           li
             a(href="/faq" class="mr-4 hover:underline") FAQ
           if user
-            a(href="/dashboard" class="btn btn-icon mr-4" data-tippy-content="Dashboard")
+            a(href="/dashboard" class="btn btn-icon mr-4 click-scale" data-tippy-content="Dashboard")
               li
                 +icon('box')
           else
             li
-              a(href="/login" class="btn btn-primary") Login with Twitter
+              a(href="/login" class="btn btn-primary click-scale") Login with Twitter

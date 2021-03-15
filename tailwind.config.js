@@ -13,6 +13,10 @@ module.exports = {
       },
     },
     extend: {
+      scale: {
+        "98": "0.98",
+        ...defaultTheme.scale,
+      },
       fontFamily: {
         sans: ["Montserrat", ...defaultTheme.fontFamily.sans],
       },
