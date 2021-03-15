@@ -600,6 +600,16 @@ app.get("/p/:slug/:postId", (req, res, next) => {
       return postsActions
         .getPost("text", { postId })
         .then((result) => {
+          if (!result) {
+            return res.status(404).render("404", {
+              meta: {
+                ...defaultMetas,
+                title: "Page not found | Haptic",
+                og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+              },
+            });
+          }
+
           const title =
             result.text.length > 100
               ? result.text.slice(0, 100) + "..."

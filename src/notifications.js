@@ -247,6 +247,10 @@ function actions({ db, user }) {
           .then((result) => {
             const notifications = result.reduce(
               (acc, notif) => {
+                if (!notif.product_slug) {
+                  return acc;
+                }
+
                 notif.created_at_formatted = dateFmt(notif.created_at);
                 if (notif.is_read) {
                   acc.read.push(notif);

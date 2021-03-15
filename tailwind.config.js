@@ -24,7 +24,9 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      scale: ["focus", "active"],
+    },
   },
   plugins: [require("@tailwindcss/typography")],
 };

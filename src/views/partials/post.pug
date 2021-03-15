@@ -46,11 +46,13 @@ mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitt
 
     div(class="flex items-center justify-between")
       div(
+        tabindex="0"
+        role="button"
         title=`Boost ${product.name} to show it's creator that you care about it. This also helps the product get better haptic rank.`
         class={
-          "text-xs select-none block px-2 py-1 mr-4 rounded-xl border border-gray-300 hover:border-transparent dark:border-gray-600": true,
-          "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600": !disable_boost_btn,
-          "text-gray-500 hover:border-gray-300 hover:bg-transparent dark:hover:bg-transparent": disable_boost_btn
+          "product-btn product-btn-small text-xs": true,
+          "cursor-pointer click-scale": !disable_boost_btn,
+          "cursor-auto focus:ring-0 text-gray-500 hover:border-gray-300 hover:bg-transparent dark:hover:bg-transparent": disable_boost_btn
         }
         data-post-boost-btn
         data-post-id=post_id

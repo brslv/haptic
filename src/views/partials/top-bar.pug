@@ -11,28 +11,28 @@ mixin top-bar()
                 nav
                     ul(class="flex items-center -mr-4")
                         if user
-                            a(href="/dashboard" class="btn btn-icon mr-4" data-tippy-content="Dashboard")
+                            a(href="/dashboard" class="btn btn-icon mr-4 click-scale" data-tippy-content="Dashboard")
                                 li
                                     +icon('box')
 
-                            a(href="/collections" class="btn btn-icon mr-4" data-tippy-content="Collections")
+                            a(href="/collections" class="btn btn-icon mr-4 click-scale" data-tippy-content="Collections")
                                 li
                                     +icon('bookmark')
 
-                            a(href="/notifications" class="btn btn-icon mr-4" data-tippy-content=`Notifications (${notifications && notifications.unread && notifications.unread.length || 0})`)
+                            a(href="/notifications" class="btn btn-icon mr-4 click-scale" data-tippy-content=`Notifications (${notifications && notifications.unread && notifications.unread.length || 0})`)
                                 li(class="relative")
                                     +icon('mail')
                                     if notifications && notifications.unread && notifications.unread.length > 0
                                         span(class="absolute -top-3 -right-3 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notifications.unread.length
 
-                            a(href="/dashboard/profile" class="btn btn-icon mr-4" data-tippy-content="Profile settings")
+                            a(href="/dashboard/profile" class="btn btn-icon mr-4 click-scale" data-tippy-content="Profile settings")
                                 li
                                     img(class="rounded-full w-8 h-8" src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
 
-                            a(href="/logout" class="btn btn-icon mr-4" data-tippy-content="Log out")
+                            a(href="/logout" class="btn btn-icon mr-4 click-scale" data-tippy-content="Log out")
                                 li
                                     +icon('log-out')
                         else
-                            a(href="/login" class="btn btn-icon" data-tippy-content="Log in")
+                            a(href="/login" class="btn btn-icon click-scale" data-tippy-content="Log in")
                                 li
                                     +icon('log-in')
