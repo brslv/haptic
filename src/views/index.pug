@@ -7,42 +7,53 @@ mixin use-case(title, icon, shapeSrc)
   div(class="relative  p-8 rounded-xl")
     img(src=`/static/images/landing/shapes/${shapeSrc}.svg` class="absolute -top-2 left-4" style="width: 100px; height: 100px;")
     div(class="relative z-10")
-      +icon(icon, { width: 32, height: 32, stroke: "muted" })(class="mb-8")
+      +icon(icon, { width: 32, height: 32 })(class="mb-8")
       h2(class="font-bold text-2xl mb-4")= title
       if block
         p
           block
 
+mixin step(nr, title, imageSrc, mobileImgHeight)
+  div(class="flex relative sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row items-start mb-32 sm:mb-20")
+    div(class="text-center sm:text-left rounded-xl sm:mr-10 max-w-lg")
+      span(class="block text-xs font-medium text-gray-600 uppercase mb-4") Step #{nr}
+      h4(class="text-2xl font-bold mb-8 bg-yellow-100 p-1 inline-block transform -rotate-1")= title
+      if block
+        block
+    div(class="mx-auto max-w-xl sm:max-w-3xl relative")
+      img(src=`/static/images/landing/${imageSrc}.svg` class=`block sm:hidden w-full -mt-8 sm:mt-0 h-${mobileImgHeight || 64}` style="min-width: 150px;")
+      img(src=`/static/images/landing/${imageSrc}.svg` class="hidden sm:block w-full transition transform hover:scale-105" style="min-width: 300px; max-width: 350px;")
+
 block content
   div(class="bg-yellow-50")
     div(class="mb-32")
       +top-bar
-    div(class="container p-4 mx-auto")
 
       // - hero
-      div(class="text-center relative mx-auto")
-        h1(class="text-3xl md:text-5xl pb-12 font-black")
-          span(class="relative")
-            span Humanize 
-            img(src="/static/images/landing/underline.svg" class="absolute top-10 left-2 md:top-14 md:left-6 select-none" style="width: 180px")
-          span your product
+      div(class="container p-4 mx-auto mt-32")
+        div(class="text-center relative mx-auto")
+          h1(class="text-3xl md:text-5xl pb-12 font-black")
+            span(class="relative")
+              span Humanize 
+              img(src="/static/images/landing/underline.svg" class="absolute top-10 left-2 md:top-14 md:left-6 select-none" style="width: 180px")
+            span your product
 
-        h2(class="text-2xl text-gray-600 mx-auto pb-10" style="width: 28ch") You have a story. Your product, too. Share it with the world.
+          h2(class="text-2xl text-gray-600 mx-auto pb-10" style="width: 28ch") You have a story. Your product, too. Share it with the world.
 
-        div(class="flex items-center justify-center flex-col mb-10")
-          div(class="relative")
-            img(src="/static/images/landing/arrow.svg" class="absolute -top-4 -left-24 select-none")
-            button(class="btn btn-primary text-center mb-1 text-lg click-scale") Start building in public
-          span(class="text-xs text-gray-600") FREE, no credit cards required!
+          div(class="flex items-center justify-center flex-col mb-10")
+            div(class="relative")
+              img(src="/static/images/landing/arrow.svg" class="absolute -top-4 -left-24 select-none")
+              button(class="btn btn-primary text-center mb-1 text-lg click-scale") Start building in public
+            span(class="text-xs text-gray-600") FREE, no credit cards required!
 
-        div(class="flex flex-col items-center lg:-mx-10")
-          img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none")
-          img(src="/static/images/landing/product-image-hq.png" class="z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none")
+          div(class="flex flex-col items-center lg:-mx-10")
+            img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none")
+            img(src="/static/images/landing/product-image-hq.png" class="z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none transition transform hover:scale-105")
 
   // - features
   main(class="mt-32 lg:mt-64")
     div(class="container p-4 mx-auto")
-      div(class="my-24 px-16")
+      div(class="mb-32 mt-32 px-16")
         div(class="md:grid md:grid-cols-10 gap-10 mb-16 md:mb-24")
           +icon("anchor", { width: 42, height: 42 })
           //- img(src="/static/images/landing/sun.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
@@ -64,46 +75,25 @@ block content
             h3(class="text-2xl font-bold mb-4") Build better products
           p(class="col-span-5").
             Building great products is a non-linear process. You have to validate, ship and iterate. Haptic helps you get the valueable feedback needed for your next move on every step of the process.
-      div
+
+    div(class="relative mb-32 bg-gray-50")
+      div(class="container mx-auto p-8 pt-32 pb-12")
         span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Here's how Haptic works
         h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") The essence
 
-        div(class="flex relative bg-yellow-50 sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row items-start mb-20")
-          div(class="absolute top-10 left-10 sm:hidden")
-            img(src="/static/images/landing/pattern.svg" class="w-48 h-48")
-          div(class="text-center sm:text-left bg-yellow-50 p-8 rounded-xl mr-10 max-w-lg")
-            span(class="block text-xs font-medium text-gray-600 uppercase") Step 1
-            h4(class="text-2xl font-bold mb-4") Create your product page
-            p(class="mb-4") It takes 5 seconds.
-            p You'll get a unique slug for your product page on #[strong haptic.so/p/{your-slug}].
-          div(class="mx-auto max-w-xl sm:max-w-3xl relative")
-            img(src="/static/images/landing/create-product.svg" class="block sm:hidden w-full -mt-8 sm:mt-0 h-64" style="min-width: 150px;")
-            img(src="/static/images/landing/create-product.svg" class="hidden sm:block w-full" style="min-width: 300px; max-width: 350px;")
+        +step(1, "Create your product page", "create-product")
+          p(class="mb-4") It takes 5 seconds.
+          p(class="mb-4") You'll get a unique slug for your product page on #[strong haptic.so/p/{your-slug}].
+          p This is your public url.
+        +step(2, "Build rich narratives", "icons", 44)
+          p(class="mb-4") You have various tools at your disposal to share your jorney with the crowd.
+          p Quick update posts, long-form articles, feedback surveys, milestone celebrations, roadmaps and more.
+        +step(3, "Collect products, show some ❤️", "boost-collect", 44)
+          p(class="mb-4") Make a collection of products that you love, built by fellow makers on haptic.
+          p Boost your most favorite ones to show it's creators that you care.
 
-        div(class="flex relative bg-yellow-50 sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row-reverse items-start mb-20")
-          div(class="absolute -top-10 right-4 sm:hidden")
-            img(src="/static/images/landing/pattern.svg" class="w-48 h-48")
-          div(class="text-center sm:text-left bg-yellow-50 p-8 rounded-xl ml-10 max-w-lg")
-            span(class="block text-xs font-medium text-gray-600 uppercase") Step 2
-            h4(class="text-2xl font-bold mb-4") Build rich narratives
-            p(class="mb-4") You have various tools at your disposal to share your jorney with the crowd.
-            p Quick update posts, long-form articles, feedback surveys, milestone celebrations, roadmaps and more.
-          div(class="mx-auto max-w-xl sm:max-w-3xl relative")
-            img(src="/static/images/landing/icons.svg" class="block sm:hidden w-full -mt-8 sm:mt-0 h-44" style="min-width: 150px;")
-            img(src="/static/images/landing/icons.svg" class="hidden sm:block w-full" style="min-width: 300px; max-width: 350px;")
-
-        div(class="flex relative bg-yellow-50 sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row items-start mb-20")
-          div(class="absolute -top-16 left-10 sm:hidden")
-            img(src="/static/images/landing/pattern.svg" class="w-48 h-48")
-          div(class="text-center sm:text-left bg-yellow-50 p-8 rounded-xl mr-10 max-w-lg")
-            span(class="block text-xs font-medium text-gray-600 uppercase") Step 3
-            h4(class="text-2xl font-bold mb-4") Collect products, show some ❤️
-            p(class="mb-4") Make a collection of products that you love, built by fellow makers on haptic.
-            p Boost your most favorite ones to show it's creators that you care.
-          div(class="mx-auto max-w-xl sm:max-w-3xl relative")
-            img(src="/static/images/landing/boost-collect.svg" class="block sm:hidden w-full -mt-8 sm:mt-0 h-36" style="min-width: 150px;")
-            img(src="/static/images/landing/boost-collect.svg" class="hidden sm:block w-full" style="min-width: 300px; max-width: 350px;")
-      div
+    div(class="mb-32")
+      div(class="container mx-auto p-8")
         span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Popular usecases
         h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Who is Haptic built for
 
