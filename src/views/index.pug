@@ -4,7 +4,7 @@ include landing/partials/top-bar.pug
 include partials/icon.pug
 
 mixin use-case(title, icon, shapeSrc)
-  div(class="relative  p-8 rounded-xl")
+  div(class="relative p-8 rounded-xl")
     img(src=`/static/images/landing/shapes/${shapeSrc}.svg` class="absolute -top-2 left-4" style="width: 100px; height: 100px;")
     div(class="relative z-10")
       +icon(icon, { width: 32, height: 32 })(class="mb-8")
@@ -23,6 +23,12 @@ mixin step(nr, title, imageSrc, mobileImgHeight)
     div(class="mx-auto max-w-xl sm:max-w-3xl relative")
       img(src=`/static/images/landing/${imageSrc}.svg` class=`block sm:hidden w-full -mt-8 sm:mt-0 h-${mobileImgHeight || 64}` style="min-width: 150px;")
       img(src=`/static/images/landing/${imageSrc}.svg` class="hidden sm:block w-full transition transform hover:scale-105" style="min-width: 300px; max-width: 350px;")
+
+mixin detail(title)
+  li(class="p-8 border border-red-100 hover:bg-red-50 transition rounded-xl")
+    h2(class="font-bold text-2xl mb-4")= title
+    if block
+      block
 
 block content
   div(class="bg-yellow-50")
@@ -87,10 +93,47 @@ block content
           p This is your public url.
         +step(2, "Build rich narratives", "icons", 44)
           p(class="mb-4") You have various tools at your disposal to share your jorney with the crowd.
-          p Quick update posts, long-form articles, feedback surveys, milestone celebrations, roadmaps and more.
+          // - p Quick update posts, long-form articles, feedback surveys, milestone celebrations, roadmaps and more.
         +step(3, "Collect products, show some ❤️", "boost-collect", 44)
           p(class="mb-4") Make a collection of products that you love, built by fellow makers on haptic.
           p Boost your most favorite ones to show it's creators that you care.
+
+    div(class="relative mb-32")
+      div(class="container mx-auto p-8")
+        span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") There's more
+        h3(class="font-bold text-center mx-auto text-4xl mb-4") The details
+
+        div(class="text-xl text-gray-600 font-medium text-center mb-28 sm:mb-16 mx-auto" style="max-width: 24ch;")
+          p Haptic aims to streamline your #BuildInPublic experience.
+          p Here's how:
+
+        ul(class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-8")
+          +detail("Get inspired")
+            p Browse products built publicly on Haptic. Find amazing stories. Get inspired.
+          +detail("Make collections")
+            p Found a story worth following? Add it to your collection.
+          +detail("Build in the open")
+            p Be the inspiration for the fellow makers.
+          +detail("Quick updates")
+            p Just share your thoughts. No stress.
+          +detail("Long-form content")
+            p Dive into the details.
+          +detail("(Haptic) Feedback")
+            p You're not sure about your logo? You need to decide on the next feature? Just ask your crowd!
+          +detail("Celebrations")
+            p Share your milestones.
+          +detail("Roadmaps")
+            p Get specific on how your ideas will come to reality.
+          +detail("Tools")
+            p Brag about your stack!
+          +detail("Markdown support")
+            p Because WYSIWYG is not always what you get.
+          +detail("Streaks")
+            p Let the compounding effect do it's magic. You just have to show up.
+          +detail("Boosts")
+            p Show some love - boost your favorite products.
+          +detail("Rankings")
+            p Let's play the game. 🚀
 
     div(class="mb-32")
       div(class="container mx-auto p-8")
