@@ -13,26 +13,31 @@ mixin use-case(title, icon, shapeSrc)
         p
           block
 
-mixin step(nr, title, imageSrc, mobileImgHeight)
+mixin step(nr, title, imageSrc, mobileImgHeight, blobSrc, imageAttrs, blobWidth)
   div(class="flex relative sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row items-start mb-32 sm:mb-20")
-    div(class="text-center sm:text-left rounded-xl sm:mr-10 max-w-lg")
-      span(class="block text-xs font-medium text-gray-600 uppercase mb-4") Step #{nr}
-      h4(class="text-2xl font-bold mb-8 bg-yellow-100 p-1 inline-block transform -rotate-1")= title
-      if block
-        block
-    div(class="mx-auto max-w-xl sm:max-w-3xl relative")
+    div(class="absolute")&attributes(imageAttrs)
+      img(src=`/static/images/landing/shapes/${blobSrc}.svg` style=`width: ${blobWidth}px;`)
+    div(class="relative z-10 border border-gray-100 bg-white hover:shadow transition p-8 text-center sm:text-left rounded-xl sm:mr-10 max-w-lg")
+      div(class="relative")
+        span(class="block text-xs font-medium text-gray-600 uppercase mb-4 mt-10 sm:mt-0") Step #{nr}
+        h4(class="text-2xl font-bold mb-8 bg-yellow-100 p-1 inline-block transform -rotate-1")= title
+        if block
+          block
+    div(class="mx-auto max-w-xl sm:max-w-3xl relative -mb-16 sm:mb-0 z-20")
       img(src=`/static/images/landing/${imageSrc}.svg` class=`block sm:hidden w-full -mt-8 sm:mt-0 h-${mobileImgHeight || 64}` style="min-width: 150px;")
       img(src=`/static/images/landing/${imageSrc}.svg` class="hidden sm:block w-full transition transform hover:scale-105" style="min-width: 300px; max-width: 350px;")
 
-mixin detail(title)
-  li(class="p-8 border border-red-100 hover:bg-red-50 transition rounded-xl")
+mixin detail(title, isSoon = false)
+  li(class={"relative p-8 transition rounded-xl": true, "bg-red-50 hover:bg-red-100": isSoon, "bg-yellow-50 hover:bg-yellow-100": !isSoon})
+    if isSoon
+      span(class="bg-red-200 absolute -top-2 -right-2 uppercase font-medium text-xs px-2 py-1.5 rounded-md") Soon
     h2(class="font-bold text-2xl mb-4")= title
     if block
       block
 
 block content
   div(class="bg-yellow-50")
-    div(class="mb-32")
+    div(class="mb-8 sm:mb-32")
       +top-bar
 
       // - hero
@@ -57,94 +62,102 @@ block content
             img(src="/static/images/landing/product-image-hq.png" class="z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none transition transform hover:scale-105")
 
   // - features
-  main(class="mt-32 lg:mt-64")
-    div(class="container p-4 mx-auto")
-      div(class="mb-32 mt-32 px-16")
-        div(class="md:grid md:grid-cols-10 gap-10 mb-16 md:mb-24")
-          +icon("anchor", { width: 42, height: 42 })
-          //- img(src="/static/images/landing/sun.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
-          div(class="md:mb-0 md:col-span-4")
-            h3(class="text-2xl font-bold mb-4") Ideas meet reality on Haptic
-          p(class="col-span-5").
-            Building in isolation is a lonely experience. More importantly, it's disconnected from reality, which makes it counterproductive. Join Haptic and reconnect by engaging with your audience and future customers.
-        div(class="md:grid md:grid-cols-10 gap-4 mb-16 md:mb-24")
-          +icon("message-circle", { width: 42, height: 42 })
-          //- img(src="/static/images/landing/leaf.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
-          div(class="md:mb-0 md:col-span-4")
-            h3(class="text-2xl font-bold mb-4") Good stories always catch people's attention
-          p(class="col-span-5").
-            Social media is not meant for building a narative because of it's ephemeral nature. That's where haptic shines. We give you the playgroind and the tools to grow your idea from the seed in your consciousness to the story of your life.
-        div(class="md:grid md:grid-cols-10 gap-4 mb-16 md:mb-24")
-          +icon("package", { width: 42, height: 42 })
-          //- img(src="/static/images/landing/product-lifecycle.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
-          div(class="md:mb-0 md:col-span-4")
-            h3(class="text-2xl font-bold mb-4") Build better products
-          p(class="col-span-5").
-            Building great products is a non-linear process. You have to validate, ship and iterate. Haptic helps you get the valueable feedback needed for your next move on every step of the process.
+  div(class="relative overflow-x-hidden")
+    img(src="/static/images/landing/shapes/lines-1.svg" class="absolute mt-32 left-1/2" style="min-width: 2300px; min-height: 2300px; transform: translateX(-50%)")
+    main(class="relative mt-32 lg:mt-64 overflow-x-hidden")
+      div(class="container p-4 mx-auto")
+        div(class="z-10 mb-32 mt-32")
+          div(class="relative z-10")
+            div(class="md:grid md:grid-cols-10 gap-4 mb-16 bg-white border border-gray-100 hover:bg-white hover:shadow p-8 rounded-xl transition")
+              +icon("anchor", { width: 42, height: 42 })(class="mb-8 sm:mb-0")
+              //- img(src="/static/images/landing/sun.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
+              div(class="md:mb-0 md:col-span-4")
+                h3(class="text-2xl font-bold mb-4") Ideas meet reality on Haptic
+              p(class="col-span-5").
+                Building in isolation is a lonely experience. More importantly, it's disconnected from reality, which makes it counterproductive. Join Haptic and reconnect by engaging with your audience and future customers.
+            div(class="md:grid md:grid-cols-10 gap-4 mb-16 border border-gray-100 bg-white hover:bg-white hover:shadow p-8 rounded-xl transition")
+              +icon("message-circle", { width: 42, height: 42 })(class="mb-8 sm:mb-0")
+              //- img(src="/static/images/landing/leaf.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
+              div(class="md:mb-0 md:col-span-4")
+                h3(class="text-2xl font-bold mb-4") Good stories always catch people's attention
+              p(class="col-span-5").
+                Social media is not meant for building a narative because of it's ephemeral nature. That's where haptic shines. We give you the playgroind and the tools to grow your idea from the seed in your consciousness to the story of your life.
+            div(class="md:grid md:grid-cols-10 gap-4 mb-16 border border-gray-100 bg-white hover:bg-white hover:shadow p-8 rounded-xl transition")
+              +icon("package", { width: 42, height: 42 })(class="mb-8 sm:mb-0")
+              //- img(src="/static/images/landing/product-lifecycle.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
+              div(class="md:mb-0 md:col-span-4")
+                h3(class="text-2xl font-bold mb-4") Build better products
+              p(class="col-span-5").
+                Building great products is a non-linear process. You have to validate, ship and iterate. Haptic helps you get the valueable feedback needed for your next move on every step of the process.
 
-    div(class="relative mb-32 bg-gray-50")
-      div(class="container mx-auto p-8 pt-32 pb-12")
-        span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Here's how Haptic works
-        h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") The essence
+      div(class="relative")
+        div(class="container mx-auto p-4")
+          span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Here's how Haptic works
+          h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") The essence
 
-        +step(1, "Create your product page", "create-product")
-          p(class="mb-4") It takes 5 seconds.
-          p(class="mb-4") You'll get a unique slug for your product page on #[strong haptic.so/p/{your-slug}].
-          p This is your public url.
-        +step(2, "Build rich narratives", "icons", 44)
-          p(class="mb-4") You have various tools at your disposal to share your jorney with the crowd.
-          // - p Quick update posts, long-form articles, feedback surveys, milestone celebrations, roadmaps and more.
-        +step(3, "Collect products, show some ❤️", "boost-collect", 44)
-          p(class="mb-4") Make a collection of products that you love, built by fellow makers on haptic.
-          p Boost your most favorite ones to show it's creators that you care.
+          +step(1, "Create your product page", "create-product", 64, "blob-1", { class: "-top-4 -left-10 opacity-40" }, 300)
+            div(class="relative z-10")
+              p(class="mb-4") It takes 5 seconds.
+              p(class="mb-4") You'll get a unique slug for your product page on #[strong haptic.so/p/{your-slug}].
+              p This is your public url.
+          +step(2, "Build rich narratives", "icons", 44, "blob-2", { class: "-top-24 -right-10 opacity-30" }, 400)
+            p(class="mb-4") You have various tools at your disposal to share your jorney with the crowd.
+            // - p Quick update posts, long-form articles, feedback surveys, milestone celebrations, roadmaps and more.
+          +step(3, "Collect products, show some ❤️", "boost-collect", 44, "blob-3", { class: "top-10 left-10 opacity-60" }, 350)
+            p(class="mb-4") Make a collection of products that you love, built by fellow makers on haptic.
+            p Boost your most favorite ones to show it's creators that you care.
 
-    div(class="relative mb-32")
-      div(class="container mx-auto p-8")
-        span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") There's more
-        h3(class="font-bold text-center mx-auto text-4xl mb-4") The details
+      div(class="relative mb-32")
+        div(class="container mx-auto p-4")
+          span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") There's more
+          h3(class="font-bold text-center mx-auto text-4xl mb-4") The details
 
-        div(class="text-xl text-gray-600 font-medium text-center mb-28 sm:mb-16 mx-auto" style="max-width: 24ch;")
-          p Haptic aims to streamline your #BuildInPublic experience.
-          p Here's how:
+          div(class="text-xl text-gray-600 font-medium text-center mb-28 sm:mb-16 mx-auto" style="max-width: 24ch;")
+            p Haptic aims to streamline your #BuildInPublic experience.
+            p Here's how:
 
-        ul(class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-8")
-          +detail("Get inspired")
-            p Browse products built publicly on Haptic. Find amazing stories. Get inspired.
-          +detail("Make collections")
-            p Found a story worth following? Add it to your collection.
-          +detail("Build in the open")
-            p Be the inspiration for the fellow makers.
-          +detail("Quick updates")
-            p Just share your thoughts. No stress.
-          +detail("Long-form content")
-            p Dive into the details.
-          +detail("(Haptic) Feedback")
-            p You're not sure about your logo? You need to decide on the next feature? Just ask your crowd!
-          +detail("Celebrations")
-            p Share your milestones.
-          +detail("Roadmaps")
-            p Get specific on how your ideas will come to reality.
-          +detail("Tools")
-            p Brag about your stack!
-          +detail("Markdown support")
-            p Because WYSIWYG is not always what you get.
-          +detail("Streaks")
-            p Let the compounding effect do it's magic. You just have to show up.
-          +detail("Boosts")
-            p Show some love - boost your favorite products.
-          +detail("Rankings")
-            p Let's play the game. 🚀
+          ul(class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8")
+            +detail("Build in the open")
+              p Be the inspiration for the fellow makers.
+            +detail("Make collections")
+              p Found a story worth following? Add it to your collection.
+            +detail("Boosts")
+              p Show some love - boost your favorite products.
+            +detail("Quick updates")
+              p Just share your thoughts. No stress.
+            +detail("Tools")
+              p Brag about your stack!
+            +detail("Markdown support")
+              p Because WYSIWYG is not always what you get.
+            +detail("Long-form content", true)
+              p Dive into the details.
+            +detail("(Haptic) Feedback", true)
+              p You're not sure about your logo? You need to decide on the next feature? Just ask your crowd!
+            +detail("Celebrations", true)
+              p Share your milestones.
+            +detail("Roadmaps", true)
+              p Get specific on how your ideas will come to reality.
+            +detail("Browse products", true)
+              p Browse products built publicly on Haptic. Find amazing stories. Get inspired.
+            +detail("Streaks", true)
+              p Let the compounding effect do it's magic. You just have to show up.
+            +detail("Rankings", true)
+              p Let's play the game. 🚀
 
-    div(class="mb-32")
-      div(class="container mx-auto p-8")
-        span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Popular usecases
-        h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Who is Haptic built for
+      div(class="mb-32")
+        div(class="container mx-auto p-4")
+          span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Popular usecases
+          h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Who is Haptic built for
 
-        div(class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-8")
-          +use-case("Makers", "hexagon", "shape-1") For the problem-solvers, who create reusable solutions.
-          +use-case("Writers", "edit-2", "shape-2") For those, who tame the words for us.
-          +use-case("Learners", "book-open", "shape-3") For all of us, who master the chaos of knowledge.
-          +use-case("Designers", "pen-tool", "shape-4") For the people, who deliver elegant usability.
-          +use-case("Artists", "circle", "shape-5") For the creative ones, who can deeply touch our souls.
-          +use-case("You", "heart", "shape-6") For You and your story. Whoever you are. Whatever your story.
+          div(class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-16")
+            +use-case("Makers", "hexagon", "shape-1") For the problem-solvers, who create reusable solutions.
+            +use-case("Writers", "edit-2", "shape-2") For those, who tame the words for us.
+            +use-case("Learners", "book-open", "shape-3") For all of us, who master the chaos of knowledge.
+            +use-case("Designers", "pen-tool", "shape-4") For the people, who deliver elegant usability.
+            +use-case("Artists", "circle", "shape-5") For the creative ones, who can deeply touch our souls.
+            +use-case("You", "heart", "shape-6") For You and your story. Whoever you are. Whatever your story.
+
+          div(class="flex flex-col items-center justify-center")
+            a(class="btn btn-primary text-xl px-6 py-4 inline-block click-scale mb-2" href="/login") Start sharing your story
+            span(class="text-sm text-gray-600") FREE, no credit cards required!
 
