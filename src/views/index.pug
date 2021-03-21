@@ -53,9 +53,9 @@ block content
 
           div(class="flex items-center justify-center flex-col mb-10")
             div(class="relative")
-              img(src="/static/images/landing/arrow.svg" class="absolute -top-4 -left-24 select-none")
-              button(class="btn btn-primary text-center mb-1 text-lg click-scale") Start building in public
-            span(class="text-xs text-gray-600") FREE, no credit cards required!
+              img(src="/static/images/landing/arrow.svg" class="absolute -top-2 -left-28 select-none")
+              button(class="btn btn-primary text-center mb-1 text-xl px-6 py-4 click-scale") Start building in public
+            span(class="text-sm text-gray-600") FREE, no credit cards required!
 
           div(class="flex flex-col items-center lg:-mx-10")
             img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none")
@@ -161,3 +161,58 @@ block content
             a(class="btn btn-primary text-xl px-6 py-4 inline-block click-scale mb-2" href="/login") Start sharing your story
             span(class="text-sm text-gray-600") FREE, no credit cards required!
 
+      div(class="mb-32" id="pricing")
+        div(class="container mx-auto p-4")
+          span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Transparent, fair
+          h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Pricing
+
+          div(class="flex items-start")
+            div(class="flex-1 bg-white border border-gray-100 rounded-xl p-8 mr-8 hover:shadow-md transition")
+              div(class="text-4xl font-black mb-4 text-yellow-300") FREE
+              h2(class="text-2xl font-bold") Observer
+              p(class="text-xl text-gray-600 mb-8") For the inspiration seekers.
+              ul
+                li(class="p-4 border-b") Collect products
+                li(class="p-4 border-b") Boost products
+                li(class="p-4 border-b") Boost posts
+                li(class="p-4 border-b") Vote in surveys
+                li(class="p-4 pb-0") Post comments
+              div(class="mt-8")
+                a(href="/login" class="btn btn-primary text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as observer
+            div(class="flex-1 bg-white shadow-lg border border-gray-100 rounded-xl p-8 hover:shadow-xl transition")
+              div(class="text-4xl font-black mb-4 text-yellow-300") 10$
+              h2(class="text-2xl font-bold") Creator
+              p(class="text-xl text-gray-600 mb-8") For the doers.
+              ul
+                li(class="flex items-center p-4 border-b font-bold")
+                  +icon("arrow-left")(class="mr-2")
+                  span All from Observer
+                li(class="p-4 border-b") Create product pages
+                li(class="p-4 pb-0") All of Haptic's content creation tools
+              div(class="mt-8")
+                a(href="/login" class="btn btn-primary text-xl text-center py-3") Join as creator
+
+      div(class="mb-32")
+        div(class="container mx-auto p-4")
+          div(class="relative max-w-lg mx-auto")
+            img(src="/static/images/landing/shapes/blob-1.svg" class="absolute -top-2 -left-24 opacity-50")
+
+            div(class="relative z-10")
+              span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") From creator, for creators
+              h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Who built this?
+
+              div(class="relative bg-white border border-gray-100 rounded-xl mt-32 shadow")
+                img(src="/static/images/landing/me-bw-optimized.jpg" class="absolute -top-20 left-1/2 rounded-full w-40 h-40 shadow-2xl border-4 border-gray-500" style="transform: translateX(-50%);" alt="Borislav Grigorov")
+                div(class="mt-12 p-8")
+                  p(class="mb-8") Hey, there! 👋
+                  p I'm Borislav &mdash; full-stack developer, part time indie maker. I love building digital utilities. I'm also an avid reader. I truly believe that reading is the ultimate learning experience. Big fan of Ayn Rand and everything Objectivism.
+                  hr(class="my-8")
+                  p I built Haptic to solve a problem I had on my own. I wanted to streamline my own #BuildInPublic process. It was all over the place - twitter, my blog, other platforms. I was unable to create tractable, coherent story around the product I was building. That's how the idea to build Haptic was born.
+                  div(class="bg-gray-100 mt-8 -mx-8 -mb-8 px-8 py-4 rounded-bl-xl rounded-br-xl flex items-center")
+                    a(href="https://twitter.com/Brslv" class="inline-block" title="Let's connect on Twitter" data-tippy-content="Let's connect on Twitter")
+                      +icon("twitter", { fill: "default" })
+
+      div(class="mb-32")
+        div(class="container mx-auto p-4")
+          div(class="max-w-lg mx-auto")
+            h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Join now

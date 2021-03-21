@@ -1299,6 +1299,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       }
 
       aEls.forEach(function registerProgressBar(aEl) {
+        if (aEl.dataset.skipProgress) return;
         aEl.addEventListener("click", showProgressBar);
       });
       formEls.forEach(function registerProgressBar(formEl) {
