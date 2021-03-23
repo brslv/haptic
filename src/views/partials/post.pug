@@ -40,7 +40,7 @@ mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitt
 
     div(class="prose prose-yellow my-8")
       div(class={"hidden":!img_url, "border rounded-md p-1.5 bg-white border-gray-300 w-full mb-4": true})
-        img(data-image data-zoomable src=img_url class={"hidden": !img_url, "mx-auto cursor-pointer rounded-md": true})
+        img(data-image data-zoomable src=img_url class={"hidden": !img_url, "mx-auto cursor-pointer rounded-md": true} style="margin-top: 0; margin-bottom: 0;")
       div(data-content="data-content")
         block
 

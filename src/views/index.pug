@@ -8,7 +8,7 @@ mixin use-case(title, icon, shapeSrc)
     img(src=`/static/images/landing/shapes/${shapeSrc}.svg` class="absolute -top-2 left-4" style="width: 100px; height: 100px;")
     div(class="relative z-10")
       +icon(icon, { width: 32, height: 32 })(class="mb-8")
-      h2(class="font-bold text-2xl mb-4")= title
+      h2(class="font-bold text-xl md:text-2xl mb-4")= title
       if block
         p
           block
@@ -17,10 +17,10 @@ mixin step(nr, title, imageSrc, mobileImgHeight, blobSrc, imageAttrs, blobWidth)
   div(class="flex relative sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row items-start mb-32 sm:mb-20")
     div(class="absolute")&attributes(imageAttrs)
       img(src=`/static/images/landing/shapes/${blobSrc}.svg` style=`width: ${blobWidth}px;`)
-    div(class="relative z-10 border border-gray-100 bg-white hover:shadow transition p-8 text-center sm:text-left rounded-xl sm:mr-10 max-w-lg")
+    div(class="relative z-10 border border-gray-100 bg-white shadow hover:shadow-lg transition p-4 md:p-8 text-center sm:text-left rounded-xl sm:mr-10 sm:max-w-lg")
       div(class="relative")
         span(class="block text-xs font-medium text-gray-600 uppercase mb-4 mt-10 sm:mt-0") Step #{nr}
-        h4(class="text-2xl font-bold mb-8 bg-yellow-100 p-1 inline-block transform -rotate-1")= title
+        h4(class="text-xl md:text-2xl font-bold mb-8 bg-yellow-100 p-1 inline-block transform -rotate-1")= title
         if block
           block
     div(class="mx-auto max-w-xl sm:max-w-3xl relative -mb-16 sm:mb-0 z-20")
@@ -28,10 +28,10 @@ mixin step(nr, title, imageSrc, mobileImgHeight, blobSrc, imageAttrs, blobWidth)
       img(src=`/static/images/landing/${imageSrc}.svg` class="hidden sm:block w-full transition transform hover:scale-105" style="min-width: 300px; max-width: 350px;")
 
 mixin detail(title, isSoon = false)
-  li(class={"relative p-8 transition rounded-xl": true, "bg-red-50 hover:bg-red-100": isSoon, "bg-yellow-50 hover:bg-yellow-100": !isSoon})
+  li(class={"relative p-4 md:p-8 transition rounded-xl": true, "bg-red-50 hover:bg-red-100": isSoon, "bg-yellow-50 hover:bg-yellow-100": !isSoon})
     if isSoon
       span(class="bg-red-200 absolute -top-2 -right-2 uppercase font-medium text-xs px-2 py-1.5 rounded-md") Soon
-    h2(class="font-bold text-2xl mb-4")= title
+    h2(class="font-bold text-xl md:text-2xl mb-4")= title
     if block
       block
 
@@ -54,17 +54,17 @@ block content
           div(class="flex items-center justify-center flex-col mb-10")
             div(class="relative")
               img(src="/static/images/landing/arrow.svg" class="absolute -top-2 -left-28 select-none")
-              a(class="btn btn-primary text-xl px-6 py-4 mb-1 click-scale" href="/login") Start sharing your story
+              a(class="btn btn-primary text-lg md:text-xl px-6 py-4 mb-1 click-scale" href="/login") Start sharing your story
             span(class="text-sm text-gray-600") FREE, no credit cards required!
 
-          div(class="flex flex-col items-center lg:-mx-10")
-            img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none")
-            img(src="/static/images/landing/product-image-hq.png" class="z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none transition transform hover:scale-105")
+      div(class="flex flex-col items-center")
+        img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none hidden md:block")
+        img(src="/static/images/landing/product-image-hq.png" class="z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none transition transform " style="max-width: 1320px; width: 90%;")
 
   // - features
   div(class="relative overflow-x-hidden")
     img(src="/static/images/landing/shapes/lines-1.svg" class="absolute mt-32 left-1/2" style="min-width: 2300px; min-height: 2300px; transform: translateX(-50%)")
-    main(class="relative mt-32 lg:mt-64 overflow-x-hidden")
+    main(class="relative mt-48 lg:mt-64 overflow-x-hidden")
       div(class="mb-32")
         div(class="container mx-auto p-4")
           div(class="relative mx-auto")
@@ -72,29 +72,29 @@ block content
 
             div(class="relative z-10")
               span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1 mx-auto" style="max-width: 22ch;") Why I built Haptic?
-              h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") The idea is simple
+              h3(class="font-bold text-center mx-auto text-3xl lg:text-4xl mb-28 sm:mb-16") The idea is simple
 
               div(class="grid grid-cols-1 md:grid-cols-8 gap-8 mt-32")
                 div(class="col-span-8 md:col-span-4 lg:col-span-3")
                   div(class="relative bg-white border border-gray-100 rounded-xl transition shadow")
                     img(src="/static/images/landing/me-bw-optimized.jpg" class="absolute -top-20 left-1/2 rounded-full w-36 h-36 shadow-2xl border-4 border-gray-500" style="transform: translateX(-50%);" alt="Borislav Grigorov")
-                    div(class="mt-12 p-8")
-                      p(class="mb-8") Hey, there! 👋
-                      p(class="mb-8") I'm Borislav &mdash; full-stack developer, part time indie maker.
+                    div(class="mt-12 p-4 md:p-8")
+                      p(class="mb-4 md:mb-8") Hey, there! 👋
+                      p(class="mb-4 md:mb-8") I'm Borislav &mdash; full-stack developer, part time indie maker.
                       p Let me tell you about Haptic 👉
-                      hr(class="my-8 hidden")
+                      hr(class="mb-4 md:my-8 hidden")
                 div(class="col-span-8 md:col-span-4 lg:col-span-5")
-                  div(class="bg-white border border-gray-100 rounded-xl shadow p-8 mb-8 relative")
+                  div(class="bg-white border border-gray-100 rounded-xl shadow p-4 pt-6 md:p-8 md:pt-8 mb-8 relative")
                     span(class="text-xs uppercase text-gray-600 font-medium bg-yellow-100 px-2 py-1 rounded mb-2 absolute -top-4 left-8 shadow border border-yellow-300") The problem
-                    p(class="mb-8") When I started to #BuildInPublic, I quickly realized that the general process is a mess.                
-                    p(class="mb-8") I was using countless platforms to share my wins, struggles and learnings. The content creation tools were limited and sometimes constraining.
-                    p(class="mb-8") On top of that my posts were living in context of other personal sharings, unrelated to my #BuildInPublic journey.
+                    p(class="mb-4 md:mb-8") When I started to #BuildInPublic, I quickly realized that the general process is a mess.                
+                    p(class="mb-4 md:mb-8") I was using countless platforms to share my ups, downs and learnings. The content creation tools were limited and sometimes constraining.
+                    p(class="mb-4 md:mb-8") On top of that my posts were living in context of other personal sharings, unrelated to my #BuildInPublic journey.
                     p(class="lg:absolute lg:-bottom-18 lg:-right-4 lg:bg-white lg:rounded-xl lg:shadow-lg lg:border lg:border-gray-100 lg:max-w-lg lg:p-4") I was unable to create tractable, coherent story around the product itself. Everything was swallowed in feeds and lost in the void.
 
-                  div(class="flex-1 bg-white border border-gray-100 rounded-xl shadow p-8 relative lg:mt-32")
+                  div(class="flex-1 bg-white border border-gray-100 rounded-xl shadow p-4 pt-6 md:p-8 md:pt-8 relative lg:mt-32")
                     span(class="text-xs uppercase text-gray-600 font-medium bg-yellow-100 px-2 py-1 rounded mb-2 absolute -top-4 left-8 shadow border border-yellow-300") The solution
-                    p(class="mb-8") Haptic aims to streamline the process. It provides a set of content creation tools which help you create a coherent story.
-                    p(class="mb-8") Think of Haptic as your product's public diary.
+                    p(class="mb-4 md:mb-8") Haptic aims to streamline the process. It provides a set of content creation tools which help you narrate a coherent story.
+                    p(class="mb-4 md:mb-8") Think of Haptic as your product's public diary.
                     p Having it all in one place makes it easier for your audience to engage and enjoy the ride with you.
 
       // - div(class="container p-4 mx-auto")
@@ -125,14 +125,14 @@ block content
       div(class="relative")
         div(class="container mx-auto p-4")
           span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") The essence 
-          h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") How it works
+          h3(class="font-bold text-center mx-auto text-3xl lg:text-4xl mb-28 sm:mb-16") How it works
 
-          +step(1, "Create your product page", "create-product", 64, "blob-1", { class: "-top-4 -left-10 opacity-40" }, 300)
+          +step(1, "Create your product page", "create-product", 72, "blob-1", { class: "-top-4 -left-10 opacity-40" }, 300)
             div(class="relative z-10")
               p(class="mb-4") It takes 5 seconds.
               p(class="mb-4") You'll get a unique slug for your product page on #[strong haptic.so/p/{your-slug}].
               p This is your public url.
-          +step(2, "Build rich narratives", "icons", 44, "blob-2", { class: "-top-24 -right-10 opacity-30" }, 400)
+          +step(2, "Build rich narratives", "icons", 48, "blob-2", { class: "-top-24 -right-10 opacity-30" }, 400)
             p(class="mb-4") You have various tools at your disposal to share your jorney with the crowd.
             // - p Quick update posts, long-form articles, feedback surveys, milestone celebrations, roadmaps and more.
           +step(3, "Collect products, show some ❤️", "boost-collect", 44, "blob-3", { class: "top-10 left-10 opacity-60" }, 350)
@@ -142,13 +142,13 @@ block content
       div(class="relative mb-32")
         div(class="container mx-auto p-4")
           span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") There's more
-          h3(class="font-bold text-center mx-auto text-4xl mb-4") The details
+          h3(class="font-bold text-center mx-auto text-3xl lg:text-4xl mb-4") The details
 
-          div(class="text-xl text-gray-600 font-medium text-center mb-28 sm:mb-16 mx-auto" style="max-width: 24ch;")
+          div(class="text-lg lg:text-xl text-gray-600 font-medium text-center mb-28 sm:mb-16 mx-auto" style="max-width: 24ch;")
             p Haptic aims to streamline your #BuildInPublic experience.
             p Here's how:
 
-          ul(class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8")
+          ul(class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-8")
             +detail("Build in the open")
               p Be the inspiration for the fellow makers.
             +detail("Make collections")
@@ -179,7 +179,7 @@ block content
       div(class="mb-32")
         div(class="container mx-auto p-4")
           span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Popular usecases
-          h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Who is Haptic built for
+          h3(class="font-bold text-center mx-auto text-3xl lg:text-4xl mb-28 sm:mb-16") Who is Haptic built for
 
           div(class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-16")
             +use-case("Makers", "hexagon", "shape-1") For the problem-solvers, who create reusable solutions.
@@ -190,7 +190,7 @@ block content
             +use-case("You", "heart", "shape-6") For You and your story. Whoever you are. Whatever your story.
 
           div(class="flex flex-col items-center justify-center")
-            a(class="btn btn-primary text-xl px-6 py-4 inline-block click-scale mb-2" href="/login") Start sharing your story
+            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href="/login") Start sharing your story
             span(class="text-sm text-gray-600") FREE, no credit cards required!
 
       div(class="mb-32" id="pricing")
@@ -199,10 +199,10 @@ block content
           h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Pricing
 
           div(class="flex flex-col md:flex-row items-start")
-            div(class="flex-1 w-full bg-white border border-gray-100 rounded-xl p-8 mb-8 md:mb-0 md:mr-8 hover:shadow-md transition")
-              div(class="text-4xl font-black mb-4 text-yellow-300") FREE
-              h2(class="text-2xl font-bold") Observer
-              p(class="text-xl text-gray-600 mb-8") For the inspiration seekers.
+            div(class="flex-1 w-full bg-white border border-gray-100 rounded-xl p-4 md:p-8 mb-8 md:mb-0 md:mr-8 hover:shadow-md transition")
+              div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") FREE
+              h2(class="text-xl md:text-2xl font-bold") Creator
+              p(class="text-lg lg:text-xl text-gray-600 mb-4 md:mb-8") For the inspiration seekers.
               ul
                 li(class="p-4 border-b") Collect products
                 li(class="p-4 border-b") Boost products
@@ -214,10 +214,10 @@ block content
                   span Post comments
                   span(class="uppercase ml-2 bg-yellow-50 rounded px-2 py-1.5 text-xs") Soon
               div(class="mt-8")
-                a(href="/login" class="btn btn-primary text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as observer
-            div(class="flex-1 w-full bg-white shadow-lg border border-gray-100 rounded-xl p-8 hover:shadow-xl transition")
-              div(class="text-4xl font-black mb-4 text-yellow-300") 10$
-              h2(class="text-2xl font-bold") Creator
+                a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as observer
+            div(class="flex-1 w-full bg-white shadow-lg border border-gray-100 rounded-xl p-4 md:p-8 hover:shadow-xl transition")
+              div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") 10$ / month
+              h2(class="text-xl md:text-2xl font-bold") Creator
               p(class="text-xl text-gray-600 mb-8") For the doers.
               ul
                 li(class="flex items-center p-4 border-b font-bold")
@@ -226,7 +226,7 @@ block content
                 li(class="p-4 border-b") Create product pages
                 li(class="p-4 pb-0") All of Haptic's content creation tools
               div(class="mt-8")
-                a(href="/login" class="btn btn-primary text-xl text-center py-3") Join as creator
+                a(href="/login" class="btn btn-primary lg:text-xl text-center py-3") Join as creator
 
       // - div(class="mb-48 mt-16")
       // -   div(class="container mx-auto p-4")
