@@ -47,19 +47,28 @@ block content
             span(class="relative")
               span Humanize 
               img(src="/static/images/landing/underline.svg" class="absolute top-10 left-2 md:top-14 md:left-6 select-none" style="width: 180px")
-            span your product
+            span(class="relative z-10") your product
 
           h2(class="text-2xl text-gray-600 mx-auto pb-10" style="width: 28ch") You have a story. Your product, too. Share it with the world.
 
-          div(class="flex items-center justify-center flex-col mb-10")
+          div(class="flex items-center justify-center flex-col mb-24")
             div(class="relative")
               img(src="/static/images/landing/arrow.svg" class="absolute -top-2 -left-28 select-none")
               a(class="btn btn-primary text-lg md:text-xl px-6 py-4 mb-1 click-scale" href="/login") Start sharing your story
             span(class="text-sm text-gray-600") FREE, no credit cards required!
 
       div(class="flex flex-col items-center")
-        img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none hidden md:block")
-        img(src="/static/images/landing/product-image-hq.png" class="z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none transition transform " style="max-width: 1320px; width: 90%;")
+        // img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none hidden md:block")
+        div(class="relative overflow-hidden bg-gray-50 z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none transition transform" style="max-width: 90%")
+          div(class="flex items-center bg-gray-100 w-full h-12 px-4 border-b border-gray-200")
+            div(class="flex items-center mr-4")
+              div(class="w-4 h-4 rounded-full bg-red-500 mr-2")
+              div(class="w-4 h-4 rounded-full bg-yellow-400 mr-2")
+              div(class="w-4 h-4 rounded-full bg-green-500 mr-2")
+            div(class="flex-1 flex items-center px-4 bg-white rounded-lg w-32 h-8 border border-gray-200")
+              span(class="text-sm font-medium") haptic.so/p/#[span(class="font-bold") your-product]
+          div(class="relative overflow-y-scroll" style="min-height: 450px; max-height: 600px; width: 100%;")
+            img(src="/static/images/landing/product-image-hq.png" class="w-full" style="max-width: 1200px;")
 
   // - features
   div(class="relative overflow-x-hidden")
