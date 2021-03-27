@@ -17,6 +17,7 @@
     "@tailwindcss/typography": "^0.4.0",
     "autoprefixer": "^10.2.4",
     "aws-sdk": "^2.848.0",
+    "body-parser": "^1.19.0",
     "connect-session-knex": "^2.0.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -39,6 +40,7 @@
     "rollbar": "^2.20.0",
     "showdown": "^1.9.1",
     "slugify": "^1.4.6",
+    "stripe": "^8.139.0",
     "tailwindcss": "^2.0.3"
   },
   "devDependencies": {

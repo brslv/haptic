@@ -22,6 +22,8 @@ const upload = require("./img-upload");
 const singleUpload = upload.single("image");
 const showdown = require("showdown");
 const notifications = require("./notifications");
+const { webhook, createCustomer } = require("./payments");
+const bodyParser = require("body-parser");
 
 // constants
 const HOUR_IN_MS = 3600000;
@@ -1101,6 +1103,26 @@ app.post("/feedback", authOnly, ajaxOnly, express.json(), (req, res, next) => {
       next(err);
     });
 });
+
+// payments
+app.get("/checkout", (req, res) => {
+  // TODO: the checkout page should check if the user has an email.
+  // user.email v -> show the plan selector
+  // user.email x -> show the email field -> create customer
+  res.render("checkout", { meta: defaultMetas, flash });
+});
+app.post("/create-customer", async (req, res) => {
+  const { email } = req.body;
+  const user = req.user;
+  try {
+    const customer = await createCustomer({ email, user });
+    // save the customer id to the user's entity
+    // add email to the user
+  } catch (err) {
+    return next(err);
+  }
+});
+app.post("/stripe-wh", bodyParser.raw({ type: "application/json" }), webhook);
 
 // error handler
 app.use((err, req, res, next) => {
