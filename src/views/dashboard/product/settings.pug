@@ -3,6 +3,10 @@ extends ../../layouts/base.layout.pug
 include ../../partials/top-bar.pug
 include ../../partials/product-header.pug
 include ../../partials/flash-msg.pug
+include ../../partials/require-module.pug
+
+block append scripts
+  +require-module('settings')
 
 block content
   +top-bar
@@ -52,6 +56,3 @@ block content
               span(class="text-gray-500 text-xs pt-1") Cannot be undone!
             
             button(type="submit" class="btn btn-primary") Save
-
-block append scripts
-  script(src="/static/js/settings.js")

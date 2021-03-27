@@ -3,6 +3,10 @@ extends layouts/base.layout.pug
 include partials/top-bar.pug
 include partials/post.pug
 include partials/icon.pug
+include partials/require-module.pug
+
+block append scripts
+  +require-module('product')
 
 block content
   +top-bar
@@ -91,5 +95,3 @@ block content
               each tool of tools
                 div(class="px-2 py-1 border border-gray-300 rounded-full")= tool.text
 
-block append scripts
-  script(src="/static/js/product.js")

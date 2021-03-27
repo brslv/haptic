@@ -173,7 +173,7 @@ function actions({ db, user }) {
       db.transaction().then((trx) => {
         db.transacting(trx)
           .table("posts")
-          .select("user_id")
+          .select("user_id", "product_id")
           .where({ id: postId })
           .first()
           .then((postResult) => {
@@ -184,6 +184,7 @@ function actions({ db, user }) {
             if (user.id !== postResult.user_id) {
               throw new Error("Wrong post owner.");
             }
+            cache.del(cacheKeys.productPosts(postResult.product_id));
 
             return true;
           })

@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
+document.addEventListener("turbo:load", function handleDomLoaded() {
   window._hpt = window._hpt || {};
   var m = (window._hpt.modules = window._hpt.modules || {});
 
@@ -79,7 +79,11 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     window._hpt.emitter ||
     (function emitter() {
       var handlers = {};
+
       function _registerEvent(eventName, handler) {
+        if (handlers[eventName] && handlers[eventName].indexOf(handler) !== -1)
+          return;
+
         if (handlers[eventName] && handlers[eventName].length) {
           handlers[eventName].push(handler);
         } else {
@@ -129,8 +133,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     productCollected: "productCollected",
     collectionItemRemoved: "collectionItemRemoved",
     addToast: "addToast",
-    showProgressBar: "showProgressBar",
-    hideProgressBar: "hideProgressBar",
     closeModal: "closeModal",
     modalOpened: "modalOpened",
     modalClosed: "modalClosed",
@@ -219,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   // - updateTypes ------------------------------------------------------------
   m.updateTypes = m.updateTypes || {
     textAndImage: {
-      register: function register() {
+      register: function register(registered) {
         var rootEl = document.querySelector('[data-show="text"]');
         var formEl = rootEl.querySelector("form");
         var submitBtnEl = rootEl.querySelector('button[type="submit"]');
@@ -245,21 +247,23 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
 
         // - Register text ------------------------------------------------------------
         function registerText() {
-          emitter.on(emitter.events.newPostAdded, function handleNewPostAdded(
-            data
-          ) {
-            textEl.value = "";
-            var imgContainer = document.getElementById("img-container");
-            if (imgContainer) imgContainer.remove();
-            uploadedImageEl.value = "";
-          });
-
-          emitter.on(emitter.events.newPostAdded, function() {
-            emitter.emit(emitter.events.addToast, {
-              content: "Your new post is live! 🎉",
-              type: m.toast.types.success,
+          if (!registered)
+            emitter.on(emitter.events.newPostAdded, function handleNewPostAdded(
+              data
+            ) {
+              textEl.value = "";
+              var imgContainer = document.getElementById("img-container");
+              if (imgContainer) imgContainer.remove();
+              uploadedImageEl.value = "";
             });
-          });
+
+          if (!registered)
+            emitter.on(emitter.events.newPostAdded, function() {
+              emitter.emit(emitter.events.addToast, {
+                content: "Your new post is live! 🎉",
+                type: m.toast.types.success,
+              });
+            });
 
           function extractFormValues() {
             var text = textEl.value;
@@ -291,7 +295,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
               textEl.classList.add("error-field");
               textErrorEl.innerHTML = errors.text;
               textErrorEl.classList.remove("hidden");
-              emitter.emit(emitter.events.hideProgressBar);
             }
           }
 
@@ -345,7 +348,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
 
           function handleFormSubmit(e) {
             e.preventDefault();
-            emitter.emit(emitter.events.showProgressBar);
             var formValues = extractFormValues();
             var errors = validateFormValues(formValues);
 
@@ -366,6 +368,10 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
           }
 
           formEl.addEventListener("submit", handleFormSubmit);
+
+          document.addEventListener("turbo:before-cache", function() {
+            formEl.removeEventListener("submit", handleFormSubmit);
+          });
         }
 
         // - Register image ------------------------------------------------------------
@@ -575,9 +581,8 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   // - ctxMenus ------------------------------------------------------------
 
   m.ctxMenus = m.ctxMenus || {
-    register: function register() {
+    register: function register(registered) {
       emitter.on(emitter.events.newPostAdded, function(data) {
-        emitter.emit(emitter.events.hideProgressBar);
         const el = data.el.querySelectorAll("[data-ctx-menu-trigger]");
         setupListeners(el);
       });
@@ -659,7 +664,7 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   // - posts actions ------------------------------------------------------------
 
   m.postActions = m.postActions || {
-    register: function register() {
+    register: function register(registered) {
       function deletePost(postId) {
         utils.req("/post/" + postId, {
           method: "delete",
@@ -685,19 +690,19 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         });
       }
 
-      emitter.on(emitter.events.ctxMenuItemClicked, function(data) {
-        console.log(data);
-        if (data.action) {
-          switch (data.action) {
-            case "delete":
-              var ok = window.confirm(
-                "Deleting a post is irreversible. Delete post anyway?"
-              );
-              if (ok) deletePost(data.clickedEl.dataset.postId);
-              break;
+      if (!registered)
+        emitter.on(emitter.events.ctxMenuItemClicked, function(data) {
+          if (data.action) {
+            switch (data.action) {
+              case "delete-post":
+                var ok = window.confirm(
+                  "Deleting a post is irreversible. Delete post anyway?"
+                );
+                if (ok) deletePost(data.clickedEl.dataset.postId);
+                break;
+            }
           }
-        }
-      });
+        });
     },
   };
 
@@ -741,7 +746,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       });
 
       function deleteProduct() {
-        emitter.emit(emitter.events.showProgressBar);
         productDelFormEl.submit();
       }
     },
@@ -1003,7 +1007,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
         emitter.events.productToolAdded,
         function handleProductToolAdded(tool) {
           addProductToolElement(tool);
-          emitter.emit(emitter.events.hideProgressBar);
         }
       );
 
@@ -1135,10 +1138,11 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   // - collection list ------------------------------------------------------------
 
   m.collectionList = m.collectionList || {
-    register: function register() {
+    register: function register(registered) {
       var listEl = document.querySelector("[data-collections-list]");
 
-      emitter.on(emitter.events.collectionItemRemoved, handleRemove);
+      if (!registered)
+        emitter.on(emitter.events.collectionItemRemoved, handleRemove);
 
       function handleRemove() {
         emitter.emit(emitter.events.addToast, {
@@ -1161,12 +1165,13 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
   // - collection item ------------------------------------------------------------
 
   m.collectionItemActions = m.collectionItemActions || {
-    register: function register() {
-      emitter.on(emitter.events.ctxMenuItemClicked, handleCtxMenuItemClicked);
+    register: function register(registered) {
+      if (!registered)
+        emitter.on(emitter.events.ctxMenuItemClicked, handleCtxMenuItemClicked);
 
       function handleCtxMenuItemClicked(data) {
         switch (data.action) {
-          case "delete": {
+          case "delete-collected-item": {
             deleteCollectionItem(data);
             break;
           }
@@ -1274,39 +1279,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
     error: "error",
   };
 
-  // - progress bar ------------------------------------------------------------
-
-  m.progressBar =
-    m.progressBar ||
-    (function() {
-      var aEls = document.querySelectorAll("a");
-      var formEls = document.querySelectorAll("form");
-      var progressBarEl = document.querySelector("[data-progress-bar]");
-      if (!progressBarEl) {
-        console.warn("No progress bar element found on the page.");
-        return;
-      }
-
-      emitter.on(emitter.events.showProgressBar, showProgressBar);
-      emitter.on(emitter.events.hideProgressBar, hideProgressBar);
-
-      function showProgressBar() {
-        progressBarEl.classList.remove("hidden");
-      }
-
-      function hideProgressBar() {
-        progressBarEl.classList.add("hidden");
-      }
-
-      aEls.forEach(function registerProgressBar(aEl) {
-        if (aEl.dataset.skipProgress) return;
-        aEl.addEventListener("click", showProgressBar);
-      });
-      formEls.forEach(function registerProgressBar(formEl) {
-        formEl.addEventListener("submit", showProgressBar);
-      });
-    })();
-
   // - modal ------------------------------------------------------------
 
   m.modal =
@@ -1359,7 +1331,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
 
   m.feedback = m.feedback || {
     register: function register() {
-      console.log("register feedback");
       var formEl = document.querySelector("[data-feedback-form]");
       if (!formEl) {
         console.warn("No feedback form element");
@@ -1400,7 +1371,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
                 });
 
                 emitter.emit(emitter.events.closeModal, { name: "feedback" });
-                emitter.emit(emitter.events.hideProgressBar);
               }
             },
             fail: function fail(err) {
@@ -1414,4 +1384,6 @@ document.addEventListener("DOMContentLoaded", function handleDomLoaded() {
       });
     },
   };
+
+  __modulesLoaded__ = true;
 });

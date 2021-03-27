@@ -2,7 +2,10 @@ extends layouts/base.layout.pug
 
 include partials/top-bar.pug
 include partials/post.pug
+include partials/require-module.pug
 
+block append scripts
+  +require-module('post')
 
 block content
   - var post_text = post.text;
@@ -22,6 +25,3 @@ block content
         show_view_btn: false,
         boosts_count: post.boosts_count
       }) !{post_text}
-
-block append scripts
-  script(src="/static/js/post.js")

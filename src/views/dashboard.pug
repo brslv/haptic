@@ -5,6 +5,10 @@ include partials/modal.pug
 include partials/page-title.pug
 include partials/flash-msg.pug
 include partials/feedbackBtn.pug
+include partials/require-module.pug
+
+block append scripts
+  +require-module('dashboard')
 
 block content
   +top-bar
@@ -62,5 +66,3 @@ block modals
         div(class="hidden mb-4 error-container" data-form-error)
       button(class="btn btn-primary w-full click-scale" type="submit" disabled="disabled") Create
 
-block append scripts
-  script(src="/static/js/dashboard.js")

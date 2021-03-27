@@ -6,6 +6,7 @@ include ../../partials/page-title.pug
 include ../../partials/modal.pug
 include ../../partials/post.pug
 include ../../partials/icon.pug
+include ../../partials/require-module.pug
 
 mixin post-type-btn({bind, icon, disabled}, attr = {})
   div(
@@ -27,6 +28,9 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
       span(class="text-xs px-2 py-1 ml-4 bg-yellow-100 dark:bg-gray-700 rounded-full text-gray-500") Soon!
     span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
       +icon("x", { width: 14, height: 14 })
+
+block append scripts
+  +require-module('posts')
 
 block content
   +top-bar
@@ -128,6 +132,3 @@ block content
     div(class="px-2 py-1 border border-gray-300 rounded-full flex items-center justify-between" data-product-tool-id="-1")
       span(class="pr-2" data-text-container)
       +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale" data-product-tools-remove-btn)
-
-block append scripts
-  script(src="/static/js/posts.js")
