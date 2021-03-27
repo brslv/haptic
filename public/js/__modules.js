@@ -340,9 +340,15 @@ document.addEventListener("turbo:load", function handleDomLoaded() {
               imageEl.parentElement.classList.remove("hidden");
             }
 
+            var tempId = Math.random().toString();
+            clone.content.firstChild.dataset.id = tempId;
             postsContainerEl.prepend(clone.content);
+
+            var el = postsContainerEl.querySelector(
+              '[data-id="' + tempId + '"]'
+            );
             emitter.emit(emitter.events.newPostAdded, {
-              el: clone.content,
+              el: el,
             });
           }
 
@@ -583,6 +589,11 @@ document.addEventListener("turbo:load", function handleDomLoaded() {
   m.ctxMenus = m.ctxMenus || {
     register: function register(registered) {
       emitter.on(emitter.events.newPostAdded, function(data) {
+        console.log(
+          "ctxMenu register newly created post",
+          data.el,
+          data.el.querySelectorAll("[data-ctx-menu-trigger]")
+        );
         const el = data.el.querySelectorAll("[data-ctx-menu-trigger]");
         setupListeners(el);
       });
@@ -709,19 +720,20 @@ document.addEventListener("turbo:load", function handleDomLoaded() {
   // - posts wall ------------------------------------------------------------
 
   m.postsWall = m.postsWall || {
-    register: function register() {
+    register: function register(registered) {
       var postsContainerEl = document.querySelector("[data-posts-container]");
       var noPostsMsgEl = document.querySelector("[data-no-posts-msg]");
 
-      emitter.on(emitter.events.postRemoved, function(data) {
-        if (!postsContainerEl.childNodes.length) {
-          noPostsMsgEl.classList.remove("hidden");
-        }
-        emitter.emit(emitter.events.addToast, {
-          content: "Post removed",
-          type: m.toast.types.success,
+      if (!registered)
+        emitter.on(emitter.events.postRemoved, function(data) {
+          if (!postsContainerEl.childNodes.length) {
+            noPostsMsgEl.classList.remove("hidden");
+          }
+          emitter.emit(emitter.events.addToast, {
+            content: "Post removed",
+            type: m.toast.types.success,
+          });
         });
-      });
 
       emitter.on(emitter.events.newPostAdded, function(data) {
         noPostsMsgEl.classList.add("hidden");
