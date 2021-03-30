@@ -67,7 +67,7 @@ export default function createProduct() {
         ok: (result) => {
           const slug = result.data.details.slug;
           const redirectTo = `/dashboard/product/${slug}/settings`;
-          Turbo.visit(redirectTo);
+          turbo.actions.visit(redirectTo);
         },
       }
     );

@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hotwired/turbo": "^7.0.0-beta.4",
     "@tailwindcss/typography": "^0.4.0",
     "autoprefixer": "^10.2.4",
     "aws-sdk": "^2.848.0",

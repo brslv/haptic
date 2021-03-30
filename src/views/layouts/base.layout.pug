@@ -61,22 +61,10 @@ html(lang="en" id="html" class="")
     script(src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous")
     script(src="https://unpkg.com/@popperjs/core@2")
     script(src="https://unpkg.com/tippy.js@6")
-    script(src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous")
     script(src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js")
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/dayjs.min.js" integrity="sha512-0fcCRl828lBlrSCa8QJY51mtNqTcHxabaXVLPgw/jPA5Nutujh6CbTdDgRzl9aSPYW/uuE7c4SffFUQFBAy6lg==" crossorigin="anonymous")
-    script(
-      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
-      integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
-      crossorigin="anonymous"
-    )
-
-    //- script(src="/static/js/__modules.js")
+    script(src="https://unpkg.com/axios/dist/axios.min.js")
 
     script(src="/static/js/bundle.js")
-    block head_scripts
-      //- script(src="/static/js/index.js")
-
-    script(type="text/javascript" src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.0.0-beta.4/dist/turbo.es5-umd.js")
 
     block head
     body(class={"dark:bg-gray-800": true, "bg-white": isHomepage, "bg-gray-50": !isHomepage} id="body")

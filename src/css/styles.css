@@ -4,8 +4,8 @@
 
 @layer components {
   .turbo-progress-bar {
-    @apply bg-yellow-300;
-    height: 3px;
+    @apply bg-yellow-400;
+    height: 5px;
   }
 
   .link {

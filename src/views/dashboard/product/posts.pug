@@ -8,14 +8,14 @@ include ../../partials/post.pug
 include ../../partials/icon.pug
 include ../../partials/require-module.pug
 
-mixin post-type-btn({bind, icon, disabled}, attr = {})
+mixin post-type-btn({trigger, icon, disabled}, attr = {})
   div(
     tabindex="0"
     role="button"
-    data-bind=bind
+    data-post-type-trigger=trigger
     data-disabled=disabled
     class={
-      "relative flex items-center py-2 px-4 rounded-full border border-gray-300 dark:border-gray-700 outline-none": true,
+      "relative flex items-center py-2 px-4 rounded-full border border-gray-300 outline-none select-none": true,
       "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 click-scale": !disabled,
       "text-gray-300": disabled
     }
@@ -26,7 +26,7 @@ mixin post-type-btn({bind, icon, disabled}, attr = {})
       block
     if disabled
       span(class="text-xs px-2 py-1 ml-4 bg-yellow-100 dark:bg-gray-700 rounded-full text-gray-500") Soon!
-    span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=bind)
+    span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=trigger)
       +icon("x", { width: 14, height: 14 })
 
 block append scripts
@@ -41,21 +41,22 @@ block content
         +page-title(class="mb-4") Publish new
         div(class="bg-white p-4 mb-4 rounded-xl shadow-sm border border-gray-100")
           div(class="gap-2 flex flex-wrap")
-            +post-type-btn({ bind: "text", icon: "file-text", disabled: false }) Short update
-            +post-type-btn({ bind: "youtube", icon: "youtube", disabled: true }) YouTube
-            +post-type-btn({ bind: "survey", icon: "check-circle", disabled: true }) Survey
-            +post-type-btn({ bind: "milestone", icon: "smile", disabled: true }) Milestone
-            +post-type-btn({ bind: "roadmap", icon: "map", disabled: true }) Roadmap
+            +post-type-btn({ trigger: "short-update", icon: "file-text", disabled: false }) Short update
+            +post-type-btn({ trigger: "youtube", icon: "youtube", disabled: true }) YouTube
+            +post-type-btn({ trigger: "survey", icon: "check-circle", disabled: true }) Survey
+            +post-type-btn({ trigger: "milestone", icon: "smile", disabled: true }) Milestone
+            +post-type-btn({ trigger: "roadmap", icon: "map", disabled: true }) Roadmap
 
-          div(data-show="text" class="hidden pt-2")
+          div(data-post-type="short-update" class="hidden mt-4")
             form
               input(type="file" id="image-upload" data-upload-file class="hidden")
               input(type="hidden" name="uploaded_image" value="" data-uploaded)
               input(type="hidden" name="id" value=product.id)
+              div(class="border border-gray-300 p-1.5 rounded-xl relative mb-2" style="display: none;" data-upload-image-preview)
               label
                 textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." data-text)
                 p(class="hidden text-red-500" data-error)
-              div(class="flex flex-row-reverse items-center justify-between")
+              div(class="flex flex-row-reverse items-center justify-between mt-4")
                 button(type="submit" class="btn btn-primary click-scale") Publish
                 div(class="flex items-center")
                   button(type="button" class="mr-4 btn btn-default flex items-center click-scale" data-upload-image-btn)
@@ -65,7 +66,6 @@ block content
                   span(data-image-upload-loader class="hidden mr-2")
                     span(class="animate-spin icon-container opacity-75 my-0 block relative")
                       +icon("refresh-cw")
-                  span(data-upload-image-preview)
 
       
         div

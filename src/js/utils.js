@@ -1,11 +1,19 @@
 import $ from "cash-dom";
 
 const turbo = {
+  actions: {
+    visit(...data) {
+      window.Turbo.visit(...data);
+    },
+  },
   load(fn) {
     document.addEventListener("turbo:load", fn);
   },
   beforeCache(fn) {
     document.addEventListener("turbo:before-cache", fn);
+  },
+  beforeVisit(fn) {
+    document.addEventListener("turbo:before-visit", fn);
   },
 };
 
