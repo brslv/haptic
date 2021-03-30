@@ -36,7 +36,7 @@ block modals
   +feedbackBtn
   +modal("new-product", { style: "width: 300px;" })
     h2(class="font-medium text-gray-600 dark:text-gray-200 text-xs uppercase") Create product
-    form(action="/create-product" method="POST" id="create-product-form")
+    form(action="/create-product" method="POST" data-create-product-form)
       div(class="pt-8")
         div(class="pb-4")
           label
@@ -44,10 +44,10 @@ block modals
             input(
               class="input"
               type="text"
-              id="product-name"
               name="name"
               placeholder="Your product name"
               autocomplete="off"
+              data-product-name-input
             )
         div(class="pb-4")
           label
@@ -57,12 +57,12 @@ block modals
               input(
                   class="input mr-2 pl-6"
                   type="text"
-                  id="product-slug"
                   name="slug"
                   placeholder="your-product-slug"
                   disabled="disabled"
+                  data-product-slug-input
                 )
-              button(class="btn btn-default click-scale" type="button" data-form-gen-slug-btn disabled="disabled" data-tippy-content="Let us generate a safe slug for you. Note: If you see some gibberish after your product's slug name, that's because the name is taken and we've added some symbols in order your slug to be unique.") Generate
+              button(class="btn btn-default click-scale" type="button" data-product-slug-btn disabled="disabled" data-tippy-content="Let us generate a safe slug for you. Note: If you see some gibberish after your product's slug name, that's because the name is taken and we've added some symbols in order your slug to be unique.") Generate
         div(class="hidden mb-4 error-container" data-form-error)
       button(class="btn btn-primary w-full click-scale" type="submit" disabled="disabled") Create
 
