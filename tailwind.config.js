@@ -1,7 +1,10 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
-  purge: ["./src/views/**/*.pug", "./public/js/**/*.js"],
+  purge: {
+    content: ["./src/views/**/*.pug", "./src/js/**/*.js"],
+    options: { safelist: ["turbo-progress-bar"] },
+  },
   darkMode: "class",
   theme: {
     container: {
