@@ -6,6 +6,7 @@ export default function modal() {
   function openModal($modal, modalName) {
     $modal.removeClass("hidden");
     $(document).trigger("haptic:modal-open", { $modal, modalName });
+    $(document).one("haptic:close-modals", closeAllModals);
   }
 
   function closeModal($modal, modalName) {
@@ -33,10 +34,12 @@ export default function modal() {
     $(window).on("keyup", onKeyUp.bind(null, trigger));
   }
 
-  function closeAllModals($triggerEl) {
-    const trigger = $triggerEl.data("modal-trigger");
-    const $modal = $(`[data-modal-name="${trigger}"]`);
-    closeModal($modal, trigger);
+  function closeAllModals() {
+    const $modals = $(`[data-modal-name]`);
+    $modals.each((i, modal) => {
+      const $modal = $(modal);
+      closeModal($modal, $modal.data("modal-name"));
+    });
   }
 
   turbo.load(() => {
@@ -47,8 +50,6 @@ export default function modal() {
 
   turbo.beforeCache(() => {
     // before turbo caches the page, close the modals.
-    $(triggerSelector).each(function() {
-      closeAllModals($(this));
-    });
+    closeAllModals();
   });
 }

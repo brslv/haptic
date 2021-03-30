@@ -85,8 +85,9 @@ export default function createProduct() {
 
   let $els = {};
   turbo.load(() => {
+    const $form = $("[data-create-product-form]");
     $els = {
-      $form: $("[data-create-product-form]"),
+      $form,
       $name: $("[data-product-name-input]", $form),
       $slug: $("[data-product-slug-input]", $form),
       $slugBtn: $("[data-product-slug-btn]", $form),
