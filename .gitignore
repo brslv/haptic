@@ -2,6 +2,7 @@ node_modules
 .idea
 .env
 .env.dev
+public/js
 notes.md
 
 #built by npm run css
