@@ -1,9 +1,10 @@
+import * as Turbo from "@hotwired/turbo";
 import $ from "cash-dom";
 
 const turbo = {
   actions: {
     visit(...data) {
-      window.Turbo.visit(...data);
+      Turbo.visit(...data);
     },
   },
   load(fn) {

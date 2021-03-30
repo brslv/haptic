@@ -9,7 +9,6 @@ import textareaAutoresize from "./widgets/textarea-autoresize";
 import imageZoom from "./widgets/image-zoom";
 
 turbo.load(() => {
-  window.Turbo = Turbo;
   Turbo.setProgressBarDelay(0);
 });
 modal();
