@@ -36,22 +36,20 @@ export default function feedback() {
         method: "post",
         ok: (result) => {
           if (result.data.ok) {
-            // emitter.emit(emitter.events.addToast, {
-            //   type: "success",
-            //   content: "Thank you for your feedback!",
-            // });
-
-            // emitter.emit(emitter.events.closeModal, { name: "feedback" });
             clearForm($els);
             $(document).trigger("haptic:close-modals");
+            $(document).trigger("haptic:add-toast", {
+              content: "Thank you for the feedback!",
+              type: "success",
+            });
           }
         },
         fail: function fail(err) {
           console.log("fail", err);
-          // emitter.emit(emitter.events.addToast, {
-          //   type: "error",
-          //   content: "Oops, something went wrong. Please, try again.",
-          // });
+          $(document).trigger("haptic:add-toast", {
+            content: "Something went wrong. Please, try again.",
+            type: "error",
+          });
         },
       }
     );
