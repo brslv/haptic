@@ -5,7 +5,7 @@ export default function createProduct() {
     function validate() {
       const name = $els.$name.val();
       const slug = $els.$slug.val();
-      if (name.length && slug.length) $submit.removeAttr("disabled");
+      if (name.length && slug.length) $els.$submit.removeAttr("disabled");
       else $els.$submit.attr("disabled", "disabled");
 
       if (name.length) {
