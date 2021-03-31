@@ -1,4 +1,6 @@
 import * as Turbo from "@hotwired/turbo";
+import tippy from "tippy.js";
+import "tippy.js/dist/tippy.css";
 import { $, turbo } from "./utils";
 import modal from "./widgets/modal";
 import toasts from "./widgets/toasts";
@@ -11,6 +13,15 @@ import contextMenu from "./widgets/context-menu";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
+
+  tippy("[data-tippy-content]", {
+    arrow: false,
+    animation: "fade",
+    delay: [150, 0],
+    inlinePositioning: true,
+    placement: "bottom",
+    theme: "haptic",
+  });
 });
 modal();
 toasts();
