@@ -1,5 +1,5 @@
 mixin product-header(product, links, activePage)
-  div(class="container mx-auto px-4")
+  div(class="container mx-auto")
     div(class="flex items-center bg-white h-16 px-4 rounded-xl shadow-sm border border-gray-100 relative")
       h1(class="pr-4 text-2xl font-bold mr-4")= product.name
       a(href=`${links.posts}` class={"h-full flex items-center px-4 hover:bg-gray-50": true, "border-b-4 border-yellow-300": activePage === 'posts'} data-tippy-content="Notifications")

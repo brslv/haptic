@@ -10,49 +10,56 @@ block append scripts
 
 block content
   +top-bar
-  div(class="container mx-auto")
-    div(class="md:w-2/3 mx-auto")
-      +product-header(product, links, 'settings')
-      div(class="container mx-auto px-4 pt-4")
-        +flash-msg(flash)
+  div(class="container mx-auto px-4")
+    +product-header(product, links, 'settings')
+    div(class="container mx-auto pt-4")
+      +flash-msg(flash)
+    form(action=`${form.delete.action}` method="POST" id="product-delete-form" class="hidden")
+    form(action=`${form.action}` method="POST" id="product-settings-form")
+      div(class="flex items-start md:flex-row flex-col")
 
-        div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
-          form(action=`${form.delete.action}` method="POST" id="product-delete-form" class="hidden")
+        // -- left
+        div(class="w-full md:w-2/3 md:mr-4")
+          div(class="container mx-auto")
+            div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
+              div(class="pb-8")
+                label
+                  div(class="label pb-1 pl-1") Name
+                  input(class="input w-full" name="name" id="product-name" value=product.name)
 
-          form(action=`${form.action}` method="POST" id="product-settings-form")
-            div(class="pb-8")
-              label
-                div(class="label pb-1 pl-1") Name
-                input(class="input w-full" name="name" id="product-name" value=product.name)
+              div(class="pb-8")
+                label
+                  div(class="label pb-1 pl-1") Description
+                  textarea(class="textarea w-full" placeholder="E.g. Haptic.so helps entrepreneurs build their products in public by setting up their on #BuildInPublic space" name="description" id="product-description")= product.description
+                span(class="text-sm text-gray-500") Briefly describe your product
 
-            div(class="pb-8")
-              label
-                div(class="label pb-1 pl-1") Description
-                textarea(class="textarea w-full" placeholder="E.g. Haptic.so helps entrepreneurs build their products in public by setting up their on #BuildInPublic space" name="description" id="product-description")= product.description
-              span(class="text-sm text-gray-500") Briefly describe your product
+              div(class="pb-8")
+                label
+                  div(class="label pb-1 pl-1") Website/URL
+                  input(class="input w-full" name="website" id="product-website" value=product.website) 
 
-            div(class="pb-8")
-              label
-                div(class="label pb-1 pl-1") Website/URL
-                input(class="input w-full" name="website" id="product-website" value=product.website)
+          div(class="container mx-auto")
+            div(class="p-4 bg-white rounded-xl shadow-sm border-4 border-red-100 mb-4 relative")
+              div(class="px-2 py-1 bg-red-300 rounded-full text-xs absolute -top-4 left-4") Danger zone
+              div(class="relative rounded-xl pt-2")
+                button(type="button" class="btn btn-danger click-scale" data-delete-product-btn) Delete product
+                span(class="text-gray-500 text-xs pt-1") Cannot be undone!
 
-            div(class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 mb-8")
+        // -- right
+        div(class="flex-1 container mx-auto")
+          div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
+            div
               div(class="pb-8")
                 label(class="flex items-center")
-                  input(type="checkbox" class="mr-2" name="is_public" id="is-public" checked=(product.is_public ? 'checked' : false))
-                  span(class="label") Public
+                  input(type="checkbox" class="mr-2 cursor-pointer" name="is_public" id="is-public" checked=(product.is_public ? 'checked' : false))
+                  span(class="label cursor-pointer") Public
                 span(class="text-sm text-gray-500") Turn this off, if you want to hide your product page from the public
 
               div
                 label(class="flex items-center")
-                  input(type="checkbox" class="mr-2" name="is_listed" id="is-listed" checked=(product.is_listed ? 'checked' : false))
-                  span(class="label") List on Haptic
+                  input(type="checkbox" class="mr-2 cursor-pointer" name="is_listed" id="is-listed" checked=(product.is_listed ? 'checked' : false))
+                  span(class="label cursor-pointer") List on Haptic
                 span(class="text-sm text-gray-500") By having this on, you agree that we can list your product on our homepage
 
-            div(class="relative border border-red-300 rounded-xl p-4 mb-8")
-              div(class="px-2 py-1 bg-red-300 rounded-full absolute -top-4 right-4 text-xs") Danger zone
-
-              button(type="button" class="btn btn-danger click-scale" data-delete-product-btn) Delete product
-              span(class="text-gray-500 text-xs pt-1") Cannot be undone!
-            
-            button(type="submit" class="btn btn-primary") Save
+          div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
+            button(type="submit" class="btn btn-primary w-full") Save

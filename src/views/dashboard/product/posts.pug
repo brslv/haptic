@@ -8,21 +8,23 @@ include ../../partials/post.pug
 include ../../partials/icon.pug
 include ../../partials/require-module.pug
 
-mixin post-type-btn({trigger, icon, disabled, tooltip}, attr = {})
+mixin post-type-btn({trigger, icon, disabled, tooltip, text}, attr = {})
   div(
     tabindex="0"
     role="button"
     data-post-type-trigger=trigger
     data-disabled=disabled
     class={
-      "relative flex items-center p-3 rounded-full outline-none select-none": true,
+      "relative flex flex-col items-center p-3 rounded-xl outline-none select-none text-center": true,
       "cursor-pointer bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 click-scale": !disabled,
       "text-gray-300": disabled
     }
     data-tippy-content= tooltip
   )&attributes(attr)
-    span
+    span(class="mb-1")
       +icon(icon, { width: '18', height: '18', stroke: disabled ? "disabled" : "default" })
+
+    span(class="text-xs text-gray-500")= text
     //- if block
     //-   block
     if disabled
@@ -34,38 +36,41 @@ block append scripts
 
 block content
   +top-bar
-  +product-header(product, links, 'posts')
-  div(class="container mx-auto px-4 pt-4")
-    div(class="flex flex-col md:flex-row items-start")
-      div(class="md:w-4/6 md:mr-4 mb-16")
+  div(class="container mx-auto px-4")
+    +product-header(product, links, 'posts')
+    div(class="flex flex-col md:flex-row items-start pt-4")
+      div(class="w-full md:w-4/6 md:mr-4 mb-4")
         +page-title(class="mb-4") Publish new
-        div(class="bg-white p-4 mb-4 rounded-xl shadow-sm border border-gray-100")
-          div(class="gap-2 flex flex-wrap")
-            +post-type-btn({ trigger: "short-update", icon: "file-text", disabled: false, tooltip: "Short Update" })
-            +post-type-btn({ trigger: "youtube", icon: "youtube", disabled: true, tooltip: "YouTube (Soon)" }) 
-            +post-type-btn({ trigger: "survey", icon: "check-circle", disabled: true, tooltip: "Survey (Soon)" }) 
-            +post-type-btn({ trigger: "milestone", icon: "smile", disabled: true, tooltip: "Milestone (Soon)" }) 
-            +post-type-btn({ trigger: "roadmap", icon: "map", disabled: true, tooltip: "Roadmap (Soon)" }) 
+        div(class="bg-white p-2 mb-4 rounded-xl shadow-sm border border-gray-100" data-post-types-container)
+          div(class="gap-2 flex overflow-y-auto")
+            +post-type-btn({ trigger: "short-update", icon: "file-text", disabled: false, text: "Quick Update" })
+            +post-type-btn({ trigger: "youtube", icon: "youtube", disabled: true, tooltip: "Soon!", text: "YouTube video" }) 
+            +post-type-btn({ trigger: "survey", icon: "check-circle", disabled: true, tooltip: "Soon!", text: "Survey" }) 
+            +post-type-btn({ trigger: "milestone", icon: "smile", disabled: true, tooltip: "Soon!", text: "Milestone" }) 
+            +post-type-btn({ trigger: "roadmap", icon: "map", disabled: true, tooltip: "Soon!", text: "Roadmap" }) 
 
-          div(data-post-type="short-update" class="hidden mt-4")
+          div(data-post-type="short-update" class="hidden")
             form
               input(type="file" id="image-upload" data-upload-file class="hidden")
               input(type="hidden" name="uploaded_image" value="" data-uploaded)
               input(type="hidden" name="id" value=product.id)
               div(class="border border-gray-300 p-1.5 rounded-xl relative mb-2" style="display: none;" data-upload-image-preview)
               label
-                textarea(data-autoresize="2" class="textarea w-full" placeholder="Share something great about your product..." data-text)
+                textarea(data-autoresize="3" rows="3" class="textarea w-full" placeholder="Share something great about your product..." data-text)
                 p(class="hidden text-red-500" data-error)
-              div(class="flex flex-row-reverse items-center items-end")
-                button(type="submit" class="btn btn-primary click-scale") Publish
-                div(class="flex items-center")
-                  span(data-image-upload-loader class="hidden mr-2")
-                    span(class="animate-spin icon-container opacity-75 my-0 block relative")
-                      +icon("refresh-cw")
-                  button(type="button" class="mr-2 btn btn-default flex items-center click-scale" data-upload-image-btn)
+              div(class="flex flex-row-reverse items-center justify-between")
+                div(class="flex flex-row-reverse items-center")
+                  button(type="submit" class="btn btn-primary click-scale") Publish
+                  button(type="button" class="mr-2 btn btn-text flex items-center click-scale" data-upload-image-btn)
                     span(class="mr-2")
                       +icon('image', { width: '18', height: '18' })
                     span Attach image
+                  span(data-image-upload-loader class="hidden mr-2")
+                    span(class="animate-spin icon-container opacity-75 my-0 block relative")
+                      +icon("refresh-cw")
+                button(data-post-type-cancel type="button" class="btn bg-gray-100 rounded-xl px-2 py-1.5 text-xs flex items-center click-scale")
+                  span Quick update
+                  +icon("x", { width: 18, height: 18 })(class="ml-2 bg-gray-200 rounded-full p-1")
 
       
         div
@@ -91,7 +96,7 @@ block content
                   boosts_count: post.boosts_count,
                 }) !{post_text}
 
-      div(class="md:w-2/6 mb-4")
+      div(class="w-full md:w-2/6 mb-4")
         +page-title(class="mb-4") Product details
         // - div(class="relative p-4 bg-yellow-50 rounded-xl mb-4 border border-yellow-300")
         // -   +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-4 cursor-pointer")
@@ -100,13 +105,14 @@ block content
         div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl")
           span(class="font-medium text-sm mb-4 block") Tools
           div(data-product-tools-root data-product-tools-product-slug=product.slug)
-            div(class="flex flex-wrap gap-2 mb-2" data-product-tools-container)
+            div(class={"flex flex-wrap gap-2":true, "mb-2": tools.length} data-product-tools-container)
               each tool of tools
-                div(class="px-2 py-1 border border-gray-300 rounded-full flex items-center justify-between" data-product-tool-id=tool.id)
+                div(class="px-2 py-1 border border-gray-300 rounded-lg flex items-center justify-between" data-product-tool-id=tool.id)
                   span(class="pr-2")= tool.text
                   +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale" data-product-tools-remove-btn)
-            button(class="btn btn-primary rounded-full click-scale" data-product-tools-add-btn)
-              +icon("plus", { width: 18, height: 18 })
+            button(class="flex items-center btn btn-primary click-scale" data-product-tools-add-btn)
+              +icon("plus", { width: 18, height: 18 })(class="mr-2")
+              span Add new
             form(data-product-tools-form class="hidden relative mt-4 -mx-4 -mb-4 p-4 bg-transparent border-t border-gray-100")
               +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-2 cursor-pointer" data-product-tools-close-btn)
               label(class="label" for="tools-input")

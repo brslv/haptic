@@ -1,18 +1,44 @@
 import { $, turbo, req } from "../utils";
 
 export default function shortUpdate() {
-  let isSubmitReload = false;
   function activate($els) {
-    toggle($els);
+    open($els);
+    registerCancel($els);
   }
 
-  function toggle($els) {
-    if ($els.$root.hasClass("hidden")) open($els);
-    else close($els);
+  function open($els) {
+    $els.$postTypesContainer.removeClass("p-2").addClass("p-4");
+    $els.$root.removeClass("hidden");
+    $els.$text.trigger("focus");
+    $els.$allTriggers.each(function(i, btn) {
+      const $btn = $(btn);
+      $btn.addClass("hidden");
+    });
+
+    $els.$form.on("submit", function(e) {
+      e.preventDefault();
+      onFormSubmit($els);
+    });
+    $els.$uploadImgBtn.on("click", function(e) {
+      onUploadImageBtnClick($els);
+    });
+    $els.$fileUpload.on("change", onFileSelected);
+    $(document).on(
+      "haptic:short-update-img-uploaded",
+      onImageUploaded.bind(null, $els)
+    );
+  }
+
+  function registerCancel($els) {
+    $els.$cancelBtn.on("click", function() {
+      close($els);
+      $(this).off("click");
+    });
   }
 
   function close($els) {
     // el hidden
+    $els.$postTypesContainer.removeClass("p-4").addClass("p-2");
     $els.$trigger.removeClass("bg-gray-100");
     $els.$allTriggers.removeClass("hidden");
     $els.$root.addClass("hidden");
@@ -36,32 +62,6 @@ export default function shortUpdate() {
     }
     $els.$uploadedImg.val("");
     $els.$uploadImgBtn.removeAttr("disabled");
-  }
-
-  function open($els) {
-    // el visible
-    $els.$root.removeClass("hidden");
-    $els.$trigger.addClass("bg-gray-100");
-    $els.$text.trigger("focus");
-    $els.$allTriggers.each(function(i, btn) {
-      const $btn = $(btn);
-      if ($btn.data("post-type-trigger") === $els.$root.data("post-type"))
-        return;
-      $btn.addClass("hidden");
-    });
-
-    $els.$form.on("submit", function(e) {
-      e.preventDefault();
-      onFormSubmit($els);
-    });
-    $els.$uploadImgBtn.on("click", function(e) {
-      onUploadImageBtnClick($els);
-    });
-    $els.$fileUpload.on("change", onFileSelected);
-    $(document).on(
-      "haptic:short-update-img-uploaded",
-      onImageUploaded.bind(null, $els)
-    );
   }
 
   function onImageUploaded($els, e, data) {
@@ -96,8 +96,8 @@ export default function shortUpdate() {
         const details = data.details;
         if (data.ok) {
           const post = details.post;
-          // renderNewPost(post);
-          isSubmitReload = true;
+          // we use this flag to preserve the open state of the short update form
+          // after the turbo visit reload of the page.
           window._keepShortUpdateOpen = true;
           $(document).trigger("haptic:add-toast", {
             content: "Post published successfully 🎉",
@@ -225,13 +225,16 @@ export default function shortUpdate() {
     const $allTriggers = $("[data-post-type-trigger]");
     const $root = $(`[data-post-type="short-update"]`);
     const $trigger = $(`[data-post-type-trigger="short-update"]`);
+    const $postTypesContainer = $("[data-post-types-container]");
     $els = {
       $root,
       $trigger,
       $allTriggers,
+      $postTypesContainer,
       $form: $root.find("form"),
       $submit: $root.find(`button[type="submit"]`),
       $uploadImgBtn: $root.find(`[data-upload-image-btn]`),
+      $cancelBtn: $root.find(`[data-post-type-cancel]`),
       $text: $root.find("[data-text]"),
       $textError: $root.find("[data-error]"),
       $uploadedImg: $root.find("[data-uploaded]"),
