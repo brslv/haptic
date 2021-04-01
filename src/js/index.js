@@ -12,6 +12,7 @@ import textareaAutoresize from "./widgets/textarea-autoresize";
 import imageZoom from "./widgets/image-zoom";
 import contextMenu, { postContextMenu } from "./widgets/context-menu";
 import tools from "./widgets/tools";
+import deleteProduct from "./widgets/delete-product";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -27,3 +28,4 @@ imageZoom();
 contextMenu();
 postContextMenu();
 tools();
+deleteProduct();

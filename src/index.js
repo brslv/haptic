@@ -422,7 +422,7 @@ app.post("/dashboard/product/:slug/delete", authOnly, (req, res, next) => {
     .then((result) => {
       if (result) {
         req.flash("success", "Product deleted ✅").then(() => {
-          res.redirect("/dashboard");
+          res.set("Location", "/dashboard").sendStatus(303);
         });
       }
     })

@@ -14,7 +14,7 @@ block content
     +product-header(product, links, 'settings')
     div(class="container mx-auto pt-4")
       +flash-msg(flash)
-    form(action=`${form.delete.action}` method="POST" id="product-delete-form" class="hidden")
+    form(action=`${form.delete.action}` method="POST" data-delete-product-form class="hidden")
     form(action=`${form.action}` method="POST" id="product-settings-form")
       div(class="flex items-start md:flex-row flex-col")
 
