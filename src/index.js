@@ -397,7 +397,7 @@ app.post(
               req.flash("success", "Settings updated 🎉").then(() => {
                 res
                   .set(`Location`, `/dashboard/product/${slug}/settings`)
-                  .send(303);
+                  .sendStatus(303);
               });
             } else {
               req
