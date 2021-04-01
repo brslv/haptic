@@ -712,7 +712,8 @@ app.post(
   express.json(),
   (req, res, next) => {
     let slug = nanoid(6).toLowerCase();
-    if (req.body.name) slug = slugify(req.body.name, { lower: true });
+    if (req.body.name)
+      slug = slugify(req.body.name, { lower: true, remove: /[\.]+/g });
 
     db("products")
       .where({ slug })
@@ -737,7 +738,7 @@ app.post("/product", ajaxOnly, authOnly, express.json(), (req, res, next) => {
     .insert({
       user_id: req.user.id,
       name: req.body.name,
-      slug: req.body.slug.toLowerCase(),
+      slug: req.body.slug.replace(/[\.]+/g, "-").toLowerCase(),
     })
     .returning(["id", "slug"])
     .then((result) => {

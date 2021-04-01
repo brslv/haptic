@@ -69,6 +69,14 @@ export default function createProduct() {
           const redirectTo = `/dashboard/product/${slug}/settings`;
           turbo.actions.visit(redirectTo);
         },
+        fail: (err) => {
+          if (err.response.data && err.response.data.err) {
+            $(document).trigger("haptic:add-toast", {
+              content: err.response.data.err,
+              type: "error",
+            });
+          }
+        },
       }
     );
   }

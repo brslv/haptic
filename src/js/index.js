@@ -11,6 +11,7 @@ import shortUpdate from "./widgets/short-update";
 import textareaAutoresize from "./widgets/textarea-autoresize";
 import imageZoom from "./widgets/image-zoom";
 import contextMenu, { postContextMenu } from "./widgets/context-menu";
+import tools from "./widgets/tools";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -25,3 +26,4 @@ textareaAutoresize();
 imageZoom();
 contextMenu();
 postContextMenu();
+tools();
