@@ -19,6 +19,25 @@ function actions({ db, user }) {
     });
   }
 
+  function updateProduct({ slug, input }) {
+    return new Promise((res, rej) => {
+      db("products")
+        .where({ slug, user_id: user.id })
+        .update({
+          name: input.name,
+          description: input.description,
+          website: input.website,
+          is_public: input.is_public === "on",
+          is_listed: input.is_listed === "on",
+        })
+        .then((result) => {
+          cache.del(cacheKeys.product(slug));
+          res(result);
+        })
+        .catch((err) => rej(err));
+    });
+  }
+
   function getMyProducts() {
     return new Promise((res) => {
       return db("products")
@@ -30,7 +49,7 @@ function actions({ db, user }) {
     });
   }
 
-  return { getProductBySlug, getMyProducts };
+  return { getProductBySlug, getMyProducts, updateProduct };
 }
 
 module.exports = {

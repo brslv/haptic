@@ -370,6 +370,7 @@ app.post(
   authOnly,
   (req, res, next) => {
     const slug = req.params.slug;
+    const productsActions = products.actions({ db, user: req.user });
     // check if the user owns the product
     db("products")
       .select()
@@ -389,19 +390,14 @@ app.post(
         }
 
         var input = req.body;
-        db("products")
-          .where({ slug, user_id: req.user.id })
-          .update({
-            name: input.name,
-            description: input.description,
-            website: input.website,
-            is_public: input.is_public === "on",
-            is_listed: input.is_listed === "on",
-          })
+        productsActions
+          .updateProduct({ slug, input })
           .then((result) => {
             if (result) {
               req.flash("success", "Settings updated 🎉").then(() => {
-                res.redirect(`/dashboard/product/${slug}/settings`);
+                res
+                  .set(`Location`, `/dashboard/product/${slug}/settings`)
+                  .send(303);
               });
             } else {
               req

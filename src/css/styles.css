@@ -180,13 +180,6 @@
     animation: fadeOut 0.3s;
   }
 
-  .post .under-cover {
-    @apply opacity-50;
-  }
-  .post:hover .under-cover {
-    @apply opacity-100;
-  }
-
   @keyframes fadeIn {
     from {
       /*margin-top: -5px;*/

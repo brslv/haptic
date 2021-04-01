@@ -7,11 +7,14 @@ export default function shortUpdate() {
   }
 
   function open($els) {
-    $els.$postTypesContainer.removeClass("p-2").addClass("p-4");
+    $els.$postTypesContainer
+      .removeClass("p-2 border-yellow-300")
+      .addClass("p-4 border-gray-100 shadow-lg");
     $els.$root.removeClass("hidden");
     $els.$text.trigger("focus");
     $els.$allTriggers.each(function(i, btn) {
       const $btn = $(btn);
+      if ($btn.data("post-type-trigger-no-hide") !== undefined) return;
       $btn.addClass("hidden");
     });
 
@@ -38,7 +41,9 @@ export default function shortUpdate() {
 
   function close($els) {
     // el hidden
-    $els.$postTypesContainer.removeClass("p-4").addClass("p-2");
+    $els.$postTypesContainer
+      .removeClass("p-4 border-gray-100 shadow-lg")
+      .addClass("p-2 border-yellow-300");
     $els.$trigger.removeClass("bg-gray-100");
     $els.$allTriggers.removeClass("hidden");
     $els.$root.addClass("hidden");
@@ -136,7 +141,7 @@ export default function shortUpdate() {
   function validateFormValues(formValues) {
     var errors = {};
     if (formValues.text.length < 2) {
-      errors.text = "Text is too short. You can do much better! 🤓";
+      errors.text = "OK, but what's the meaning, tho 🤔";
     }
     if (formValues.text.length > 300) {
       errors.text = "Text is too long. Maximum symbols allowed: 300";
@@ -250,7 +255,7 @@ export default function shortUpdate() {
     $trigger.on("click", activate.bind(null, $els));
     if (window._keepShortUpdateOpen) {
       window._keepShortUpdateOpen = false;
-      open($els);
+      activate($els);
     }
   });
 
