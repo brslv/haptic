@@ -13,6 +13,7 @@ import imageZoom from "./widgets/image-zoom";
 import contextMenu, { postContextMenu } from "./widgets/context-menu";
 import tools from "./widgets/tools";
 import deleteProduct from "./widgets/delete-product";
+import flashMessages from "./widgets/flash-messages";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -29,3 +30,4 @@ contextMenu();
 postContextMenu();
 tools();
 deleteProduct();
+flashMessages();
