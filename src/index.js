@@ -415,10 +415,9 @@ app.post(
 app.post("/dashboard/product/:slug/delete", authOnly, (req, res, next) => {
   const slug = req.params.slug;
   const user = req.user;
-  db("products")
-    .select()
-    .where({ slug, user_id: user.id })
-    .del()
+  const productsActions = products.actions({ db, user: req.user });
+  productsActions
+    .delProduct({ slug })
     .then((result) => {
       if (result) {
         req.flash("success", "Product deleted ✅").then(() => {

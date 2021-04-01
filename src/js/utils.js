@@ -6,6 +6,9 @@ const turbo = {
     visit(...data) {
       Turbo.visit(...data);
     },
+    clearCache() {
+      Turbo.clearCache();
+    },
   },
   load(fn) {
     document.addEventListener("turbo:load", fn);

@@ -19,6 +19,22 @@ function actions({ db, user }) {
     });
   }
 
+  function delProduct({ slug }) {
+    return new Promise((res, rej) => {
+      db("products")
+        .select()
+        .where({ slug, user_id: user.id })
+        .del()
+        .then((result) => {
+          cache.del(cacheKeys.product(slug));
+          res(result);
+        })
+        .catch((err) => {
+          rej(err);
+        });
+    });
+  }
+
   function updateProduct({ slug, input }) {
     return new Promise((res, rej) => {
       db("products")
@@ -49,7 +65,7 @@ function actions({ db, user }) {
     });
   }
 
-  return { getProductBySlug, getMyProducts, updateProduct };
+  return { getProductBySlug, getMyProducts, updateProduct, delProduct };
 }
 
 module.exports = {

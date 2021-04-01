@@ -15,6 +15,7 @@ export default function deleteProduct() {
     });
 
     function deleteProduct() {
+      turbo.actions.clearCache();
       $delForm.trigger("submit");
     }
   }
