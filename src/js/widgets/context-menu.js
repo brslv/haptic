@@ -28,7 +28,10 @@ export default function contextMenu() {
       // that might hide the menu
       $("[data-ctx-menu-container]").removeClass("relative z-10");
 
-      openedMenus.forEach(($menu) => $menu.addClass("hidden"));
+      openedMenus.forEach(($menu) => {
+        $menu.addClass("hidden");
+        clear();
+      });
       e.preventDefault();
       e.stopPropagation();
       const $this = $(this);
@@ -54,7 +57,9 @@ export default function contextMenu() {
   }
 
   function clear() {
-    if ($actions) $actions.off("click", onCtxActionClick);
+    if ($actions && $actions.length) {
+      $actions.off("click", onCtxActionClick);
+    }
     openedMenus.forEach(($menu) => $menu.addClass("hidden"));
   }
 
