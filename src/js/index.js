@@ -14,6 +14,7 @@ import contextMenu, { postContextMenu } from "./widgets/context-menu";
 import tools from "./widgets/tools";
 import deleteProduct from "./widgets/delete-product";
 import flashMessages from "./widgets/flash-messages";
+import boost from "./widgets/boost";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -31,3 +32,4 @@ postContextMenu();
 tools();
 deleteProduct();
 flashMessages();
+boost();
