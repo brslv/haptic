@@ -5,6 +5,7 @@ exports.up = function(knex) {
     if (!exists) {
       return knex.schema.createTable("users", function(t) {
         t.increments("id").primary();
+        t.string("email", 400).nullable();
         t.string("bio", 400).nullable();
         t.bigInteger("twitter_id")
           .index()
@@ -19,6 +20,7 @@ exports.up = function(knex) {
           .notNullable()
           .defaultTo(knex.fn.now());
         t.timestamp("updated_at").nullable();
+        t.string("stripe_customer_id", 100).nullable();
       });
     }
   });

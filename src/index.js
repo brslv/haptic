@@ -934,8 +934,6 @@ app.post("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
               product_id: productResult.id,
             })
             .then((notificationResult) => {
-              console.log("collectionResult", collectionResult);
-              console.log("notificationResult", notificationResult);
               res.json({
                 ok: 1,
                 err: null,
@@ -1013,7 +1011,6 @@ app.post(
   (req, res, next) => {
     const data = req.body;
     const slug = req.params.slug;
-    console.log("input", data);
     db("products")
       .select("id")
       .where({ user_id: req.user.id, slug })
@@ -1101,23 +1098,49 @@ app.post("/feedback", authOnly, ajaxOnly, express.json(), (req, res, next) => {
 });
 
 // payments
-app.get("/checkout", (req, res) => {
+app.get("/checkout", authOnly, (req, res) => {
   // TODO: the checkout page should check if the user has an email.
   // user.email v -> show the plan selector
   // user.email x -> show the email field -> create customer
   res.render("checkout", { meta: defaultMetas, flash });
 });
-app.post("/create-customer", async (req, res) => {
-  const { email } = req.body;
-  const user = req.user;
-  try {
-    const customer = await createCustomer({ email, user });
-    // save the customer id to the user's entity
-    // add email to the user
-  } catch (err) {
-    return next(err);
+
+app.post(
+  "/create-customer",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  async (req, res) => {
+    const { email } = req.body;
+    const user = req.user;
+
+    try {
+      const customer = await createCustomer({ email, user });
+      // save the customer id to the user's entity
+
+      db("users")
+        .where("id", user.id)
+        .update({ email, stripe_customer_id: customer.id })
+        .returning("email")
+        .then(async ([email]) => {
+          req.logIn({ ...user, email }, async function(reloginErr) {
+            if (reloginErr) {
+              return res.json({
+                ok: 0,
+                err: "We couldn't update your email, please try again.",
+                details: null,
+              });
+            } else {
+              return res.json({ ok: 1, err: null, details: { customer } });
+            }
+          });
+        });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
+
 app.post("/stripe-wh", bodyParser.raw({ type: "application/json" }), webhook);
 
 // error handler

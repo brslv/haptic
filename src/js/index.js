@@ -19,6 +19,7 @@ import deleteProduct from "./widgets/delete-product";
 import flashMessages from "./widgets/flash-messages";
 import boost from "./widgets/boost";
 import collect from "./widgets/collect";
+import payments from "./widgets/payments";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -39,3 +40,4 @@ flashMessages();
 boost();
 collect();
 collectionContextMenu();
+payments();
