@@ -1,11 +1,7 @@
 import { $, turbo, req } from "../utils";
 
 export default function payments() {
-  function load($els) {
-    createCustomerForm($els);
-  }
-
-  function createCustomerForm($els) {
+  function loadCreateCustomerForm($els) {
     $els.$createCustomerForm.on(
       "submit",
       onCreateCustomerFormSubmit.bind(null, $els)
@@ -37,15 +33,55 @@ export default function payments() {
     );
   }
 
-  const $els = {};
-  turbo.load(() => {
-    const $createCustomerForm = $("[data-create-customer-form]"),
-      $els = {
-        $createCustomerForm,
-        $email: $createCustomerForm.find("[data-create-customer-email]"),
-        $submit: $createCustomerForm.find('button[type="submit"]'),
-      };
+  function loadPaymentForm($els) {
+    if (!window.___spk___) {
+      $(document).trigger("haptic:add-toast", {
+        content: "Invalid/missing spk.",
+        type: "error",
+      });
+      console.error("Invalid/missing spk.");
+      return;
+    }
 
-    load($els);
+    function updateErrors($els, e) {
+      $els.$errorsContainer.text(e.error ? e.error.message : "");
+    }
+
+    // create the stripe elements
+    let stripe = window.Stripe(window.___spk___);
+    let elements = stripe.elements();
+    let card = elements.create("card", {
+      classes: { base: "input px-4 py-4" },
+      style: {
+        base: { fontSize: `16px` },
+      },
+    });
+
+    card.on("change", updateErrors.bind(null, $els));
+    card.mount("#card-element");
+  }
+
+  // setup ---------------------------------------------------------------------
+
+  let $createCustomerFormEls = {};
+  let $paymentFormEls = {};
+  turbo.load(() => {
+    if (window.location.pathname !== "/checkout") return;
+
+    const $createCustomerForm = $("[data-create-customer-form]");
+    $createCustomerFormEls = {
+      $createCustomerForm,
+      $email: $createCustomerForm.find("[data-create-customer-email]"),
+      $submit: $createCustomerForm.find('button[type="submit"]'),
+    };
+
+    loadCreateCustomerForm($createCustomerFormEls);
+
+    if (!$createCustomerForm.length) {
+      $paymentFormEls = {
+        $errorsContainer: $("#card-element-errors"),
+      };
+      loadPaymentForm($paymentFormEls);
+    }
   });
 }

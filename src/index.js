@@ -1102,7 +1102,11 @@ app.get("/checkout", authOnly, (req, res) => {
   // TODO: the checkout page should check if the user has an email.
   // user.email v -> show the plan selector
   // user.email x -> show the email field -> create customer
-  res.render("checkout", { meta: defaultMetas, flash });
+  res.render("checkout", {
+    meta: defaultMetas,
+    flash,
+    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+  });
 });
 
 app.post(
