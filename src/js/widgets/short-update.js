@@ -2,8 +2,10 @@ import { $, turbo, req } from "../utils";
 
 export default function shortUpdate() {
   function activate($els) {
-    open($els);
-    registerCancel($els);
+    if ($els.$root.hasClass("hidden")) {
+      open($els);
+      registerCancel($els);
+    }
   }
 
   function open($els) {
