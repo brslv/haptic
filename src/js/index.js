@@ -10,11 +10,15 @@ import feedback from "./widgets/feedback";
 import shortUpdate from "./widgets/short-update";
 import textareaAutoresize from "./widgets/textarea-autoresize";
 import imageZoom from "./widgets/image-zoom";
-import contextMenu, { postContextMenu } from "./widgets/context-menu";
+import contextMenu, {
+  postContextMenu,
+  collectionContextMenu,
+} from "./widgets/context-menu";
 import tools from "./widgets/tools";
 import deleteProduct from "./widgets/delete-product";
 import flashMessages from "./widgets/flash-messages";
 import boost from "./widgets/boost";
+import collect from "./widgets/collect";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -33,3 +37,5 @@ tools();
 deleteProduct();
 flashMessages();
 boost();
+collect();
+collectionContextMenu();

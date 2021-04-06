@@ -8,6 +8,8 @@ export default function contextMenu() {
   function detectOutsideClick($menu, $trigger, e) {
     if (!$menu[0].contains(e.target) && !$trigger[0].contains(e.target)) {
       clear();
+    } else {
+      e.preventDefault();
     }
   }
 
@@ -114,6 +116,49 @@ export function postContextMenu() {
 
   function clear() {
     $(document).off("haptic:context-menu-action", onOpen);
+  }
+
+  turbo.load(() => {
+    load();
+  });
+
+  turbo.beforeCache(clear);
+}
+
+export function collectionContextMenu() {
+  function onOk($el) {
+    const $parents = $el.parents("[data-collected-product-root]");
+    $parents.remove();
+    $(document).trigger("haptic:collected-item-removed");
+    turbo.actions.visit(window.location.href);
+  }
+
+  function onFail(err) {
+    console.error(err);
+  }
+
+  function deleteCollectedItem($el) {
+    const slug = $el.data("product-slug");
+
+    req(`/p/${slug}/collect`, {
+      method: "delete",
+      ok: onOk.bind(null, $el),
+      fail: onFail,
+    });
+  }
+
+  function onAction(e, data) {
+    if (data.name === "delete-collected-item") {
+      deleteCollectedItem(data.$el);
+    }
+  }
+
+  function load() {
+    $(document).on("haptic:context-menu-action", onAction);
+  }
+
+  function clear() {
+    $(document).off("haptic:context-menu-action", onAction);
   }
 
   turbo.load(() => {
