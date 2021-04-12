@@ -40,11 +40,10 @@ const dbErrCodes = {
   DUP_CODE: "23505",
 };
 const defaultMetas = {
-  title: "Haptic - The #BuildInPublic toolkit for your next big thing",
-  description:
-    "Build, test and learn in public. Get feedback for your product from your audience and grow beyond their expectations.",
+  title: "Haptic - Humanize your product",
+  description: "You have a story. Your product, too. Share it with the world.",
   og: {
-    title: "Haptic - The #BuildInPublic toolkit for your next big thing",
+    title: "Haptic - Humanize your product",
     image: "https://haptic.so/static/images/landing/social-img.png",
   },
   twitter: {
