@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "NODE_ENV=production node ./src/index.js",
-    "stage": "NODE_ENV=stage node ./src/index.js",
+    "stage": "NODE_ENV=stage node ./src/index.js --trace-warnings",
     "dev": "NODE_ENV=development nodemon ./src/index.js",
     "css:dev": "postcss ./src/css/styles.css -o ./public/css/styles.css",
     "css:stage": "postcss ./src/css/styles.css -o ./public/css/styles.css",
