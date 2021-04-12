@@ -71,12 +71,7 @@ const rollbar = new Rollbar({
 });
 
 // setup db
-const dbConfigs = {
-  production: "production",
-  development: "development",
-  stage: "stage",
-};
-const db = knex(dbConfig[dbConfigs[process.env.NODE_ENV]]);
+const db = knex(dbConfig[process.env.NODE_ENV]);
 
 passport.serializeUser(function(user, done) {
   done(null, user);
