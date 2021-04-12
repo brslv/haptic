@@ -34,21 +34,25 @@ const HOUR_IN_MS = 3600000;
 const IS_DEV = process.env.NODE_ENV === "development";
 const IS_PROD = process.env.NODE_ENV === "production";
 const IS_STAGE = process.env.NODE_ENV === "stage";
+const ROOT_URL = IS_DEV
+  ? "http://localhost:3035"
+  : IS_STAGE
+  ? "https://haptic-stage.onrender.com"
+  : "https://haptic.so";
 
 const SID = "__sid__";
 const dbErrCodes = {
   DUP_CODE: "23505",
 };
 const defaultMetas = {
-  title: "Haptic - The #BuildInPublic toolkit for your next big thing",
-  description:
-    "Build, test and learn in public. Get feedback for your product from your audience and grow beyond their expectations.",
+  title: "Haptic - Humanize your product",
+  description: "You have a story. Your product, too. Share it with the world.",
   og: {
-    title: "Haptic - The #BuildInPublic toolkit for your next big thing",
-    image: "https://haptic.so/static/images/landing/social-img.png",
+    title: "Haptic - Humanize your product",
+    image: `${ROOT_URL}/static/images/landing/social-image.png`,
   },
   twitter: {
-    image: "https://haptic.so/static/images/landing/social-img.png",
+    image: `${ROOT_URL}/static/images/landing/social-image.png`,
     image_alt: "Haptic.so social media sharing image",
   },
 };
