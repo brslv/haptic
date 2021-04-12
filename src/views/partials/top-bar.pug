@@ -1,0 +1,67 @@
+include ./icon.pug
+
+mixin top-bar(activePage)
+    div(class="relative w-full bg-white shadow-sm border-b border-gray-100 mb-8")
+        div(class="container px-4 mx-auto")
+            div(class="flex h-16 items-center justify-between")
+                a(href="/")
+                    div(class="flex items-center")
+                        img(src="/static/images/logo/logo-main.svg" class="h-8 logo-dark")
+                        img(src="/static/images/logo/logo-main-light.svg" class="h-8 logo-light")
+                nav
+                    ul(class="flex items-center h-16 relative")
+                        if user
+                            a(
+                              href="/dashboard"
+                              class={
+                                "h-full flex items-center hover:bg-gray-50 px-4": true,
+                                "border-b-4 border-yellow-300": activePage === "dashboard"
+                              }
+                              data-tippy-content="Dashboard"
+                            )
+                                li
+                                    +icon('box')
+
+                            a(
+                              href="/collections"
+                              class={
+                                "h-full flex items-center hover:bg-gray-50 px-4": true,
+                                "border-b-4 border-yellow-300": activePage === "collections"
+                              }
+                              data-tippy-content="Collections"
+                            )
+                                li
+                                    +icon('bookmark')
+
+                            a(
+                              href="/notifications"
+                              class={
+                                "h-full flex items-center hover:bg-gray-50 px-4": true,
+                                "border-b-4 border-yellow-300": activePage === "notifications"
+                              }
+                              data-tippy-content=`Notifications (${notifications && notifications.unread && notifications.unread.length || 0})`
+                            )
+                                li(class="relative")
+                                    +icon('mail')
+                                    if notifications && notifications.unread && notifications.unread.length > 0
+                                        span(class="absolute -top-3 -right-3 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notifications.unread.length
+
+                            a(
+                              href="/dashboard/profile"
+                              class={
+                                "h-full flex items-center hover:bg-gray-50 px-4": true,
+                                "border-b-4 border-yellow-300": activePage === "profile"
+                              }
+                              data-tippy-content="Profile settings"
+                            )
+                                li
+                                    img(class="rounded-full w-8 h-8" src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
+
+                            a(href="/logout" class="h-full flex items-center hover:bg-gray-50 px-4" data-tippy-content="Log out")
+                                li
+                                    +icon('log-out')
+                        else
+                          if isDev
+                            a(href="/login" class="btn btn-icon click-scale" data-tippy-content="Log in")
+                                li
+                                    +icon('log-in')

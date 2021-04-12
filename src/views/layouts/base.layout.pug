@@ -1,5 +1,8 @@
+include ../partials/toast.pug 
+include ../partials/require-module.pug
+
 doctype html
-html(lang="en" id="html")
+html(lang="en" id="html" class="")
   head(id="head")
     meta(charset="utf-8")
     title= meta.title
@@ -37,35 +40,52 @@ html(lang="en" id="html")
 
     link(href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet")
 
-    link(rel="icon" href="/static/images/icon.ico")
+    link(rel="icon" href="/static/images/favico/favicon.ico")
+    link(rel="apple-touch-icon" sizes="180x180" href="/static/images/favico/apple-touch-icon.png")
+    link(rel="icon" type="image/png" sizes="32x32" href="/static/images/favico/favicon-32x32.png")
+    link(rel="icon" type="image/png" sizes="16x16" href="/static/images/favico/favicon-16x16.png")
+    link(rel="manifest" href="/static/images/favico/site.webmanifest")
+    link(rel="mask-icon" href="/static/images/favico/safari-pinned-tab.svg" color="#5bbad5")
 
     link(rel="stylesheet" href="/static/css/styles.css")
 
-    script(type='text/javascript' async src="https://www.googletagmanager.com/gtag/js?id=G-DD6BBRSV9W")
+    block head_scripts
+      script(type='text/javascript' async src="https://www.googletagmanager.com/gtag/js?id=G-DD6BBRSV9W")
+      script(type='text/javascript').
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-    script(type='text/javascript').
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        gtag('config', 'G-DD6BBRSV9W');
 
-      gtag('config', 'G-DD6BBRSV9W');
-  body(class="dark:bg-gray-800" id="body")
+      // script(src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha512-L03kznCrNOfVxOUovR6ESfCz9Gfny7gihUX/huVbQB9zjODtYpxaVtIaAkpetoiyV2eqWbvxMH9fiSv5enX7bw==" crossorigin="anonymous")
+      script(src="https://unpkg.com/@popperjs/core@2")
+      script(src="https://unpkg.com/tippy.js@6")
+      script(src="https://unpkg.com/axios/dist/axios.min.js")
+
+      script(src="/static/js/bundle.js")
+
+    block head
+    body(class={"dark:bg-gray-800": true, "bg-white": isHomepage, "bg-gray-50": !isHomepage} id="body")
     div(class="text-gray-800 dark:text-gray-200" id="root")
-      div(class="z-20 border border-gray-100 hidden fixed bottom-0 right-0 m-8 p-4 rounded-xl bg-white shadow-2xl text-sm" id="cookies-consent")
+      div(class="z-20 border border-gray-100 hidden fixed bottom-0 right-0 m-8 p-4 rounded-xl bg-white shadow-2xl text-sm dark:bg-gray-800 dark:border-gray-700" id="cookies-consent")
         p(class="w-60 mb-4").
-          We use cookies to provide the best user experience possible. We use them for the proper functioning of the website, for monitoring visitor traffic and marketing purposes. By continuing to browse the site, you agree to our use of cookies.
+          By using haptic.so, you agree to it's use of cookies. #[a(href="/cookie-policy" title="Cookie Policy") Learn more].
         
         // You can read more about it <a href="/privacy-policy" class="text-blue-500">here</a>.
-        button(class="w-full px-4 py-2 bg-yellow-400 rounded-full" id="cookies-consent-ok-btn").
+        button(class="btn btn-primary w-full" id="cookies-consent-ok-btn").
           OK
 
 
       block content
 
-    block scripts
-      script(
-        src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
-        integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
-        crossorigin="anonymous"
-      )
-      script(src="/static/js/cookies-consent.js")
+      //- toasts
+      div(class="z-30 fixed bottom-0 right-0 overflow-y-auto p-4" data-toasts id="toasts" data-turbo-permanent)
+      template(data-toast-tpl)
+        +toast
+      //- end toasts
+
+      block modals
+
+      block scripts
+        +require-module("")

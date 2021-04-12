@@ -1,0 +1,44 @@
+extends layouts/base.layout.pug
+
+include partials/top-bar.pug
+include partials/icon.pug
+include partials/page-title.pug
+
+block append head_scripts
+  script(src="https://js.stripe.com/v3/")
+  script.
+    window.___spk___ = "!{stripePublishableKey}";
+
+block content
+  +top-bar
+  div(class="container mx-auto p-4")
+    +page-title Checkout
+
+    if !user.email
+      div(class="my-4")
+        form(data-create-customer-form action="/create-customer" method="POST" class="bg-white p-4 rounded-xl border border-gray-100 shadow")
+          +page-title(class="mb-4") Provide an email
+          label(class="block mb-4")
+            div(class="label pb-1 pl-1") Email
+            input(data-create-customer-email type="email" class="input" name="email")
+            p(class="mt-1 ml-1 text-sm text-gray-400") We will send your invoices there.
+          button(type="submit" class="btn btn-primary") Continue
+    else
+      div(class="my-4")
+        div(class="grid grid-cols-1 md:grid-cols-7 gap-4")
+          div(class="col-span-3 bg-white p-4 rounded-xl border border-gray-100 transition shadow")
+            span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded") Chosen plan
+            div(class="p-4 border border-dashed rounded-xl border-gray-300")
+              h2(class="font-black text-2xl") Creator
+              p(class="font-black text-4xl my-4 text-yellow-300") $10
+              p(class="text-gray-600") Per month
+              p(class="text-gray-600") Billed monthly
+          div(class="col-span-4")
+            div(class="bg-white p-4 rounded-xl border border-gray-100 transition shadow-lg hover:shadow-xl")
+              span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded") Payment details
+              div
+                form(id="payment-form")
+                  div(id="card-element")
+                    span(class="animate-pulse text-lg my-4") Loading...
+                  div(id="card-element-errors" class="text-red-500 text-xs mt-2" role="alert")
+                  button(type="submit" class="btn btn-primary text-lg w-full py-3 mt-2") Subscribe

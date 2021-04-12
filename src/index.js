@@ -9,13 +9,32 @@ const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
 const Rollbar = require("rollbar");
 const passport = require("passport");
-require("./passport");
+const TwitterStrategy = require("passport-twitter").Strategy;
 const KnexSessionStore = require("connect-session-knex")(expressSession);
+const slugify = require("slugify");
+const { nanoid } = require("nanoid");
+const { flash } = require("express-flash-message");
+const day = require("dayjs");
+const posts = require("./posts");
+const boosts = require("./boosts");
+const products = require("./products");
+const upload = require("./img-upload");
+const singleUpload = upload.single("image");
+const showdown = require("showdown");
+const notifications = require("./notifications");
+const { webhook, createCustomer } = require("./payments");
+const bodyParser = require("body-parser");
+
+console.log({ env: process.env.NODE_ENV });
 
 // constants
 const HOUR_IN_MS = 3600000;
+
+// env constants
 const IS_DEV = process.env.NODE_ENV === "development";
 const IS_PROD = process.env.NODE_ENV === "production";
+const IS_STAGE = process.env.NODE_ENV === "stage";
+
 const SID = "__sid__";
 const dbErrCodes = {
   DUP_CODE: "23505",
@@ -35,7 +54,13 @@ const defaultMetas = {
 };
 
 // setup env
-const dotenvConfigPath = IS_PROD ? ".env" : ".env.dev";
+const dotEnvConfigs = {
+  production: ".env",
+  development: ".env.dev",
+  stage: ".env.stage",
+};
+const dotenvConfigPath = dotEnvConfigs[process.env.NODE_ENV];
+console.log({ dotenvConfigPath });
 dotenv.config({ path: dotenvConfigPath });
 
 // setup rollbar
@@ -46,7 +71,63 @@ const rollbar = new Rollbar({
 });
 
 // setup db
-const db = knex(IS_PROD ? dbConfig.production : dbConfig.development);
+const db = knex(dbConfig[process.env.NODE_ENV]);
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.use(
+  new TwitterStrategy(
+    {
+      consumerKey: process.env.TWITTER_API_KEY,
+      consumerSecret: process.env.TWITTER_API_SECRET,
+      callbackURL: process.env.TWITTER_API_CALLBACK_URL,
+    },
+    function(accessToken, refreshToken, profile, done) {
+      const twitterData = profile._json;
+      db.select()
+        .table("users")
+        .where({ twitter_id: twitterData.id })
+        .first()
+        .then((result) => {
+          if (!result) {
+            db("users")
+              .insert({
+                bio: twitterData.description,
+                twitter_id: twitterData.id,
+                twitter_name: twitterData.name,
+                twitter_screen_name: twitterData.screen_name,
+                twitter_location: twitterData.location,
+                twitter_description: twitterData.description,
+                twitter_url: twitterData.url,
+                twitter_profile_image_url: twitterData.profile_image_url_https,
+              })
+              .then(() => {
+                db.select()
+                  .table("users")
+                  .first()
+                  .then((result) => {
+                    done(null, result);
+                  })
+                  .catch((err) => done(err, null));
+              })
+              .catch((err) => done(err, null));
+          } else {
+            // return the user
+            done(null, result);
+          }
+        })
+        .catch((err) => {
+          return done(err, null);
+        });
+    }
+  )
+);
 
 // setup view engine
 const app = express();
@@ -60,7 +141,7 @@ app.use(
     contentSecurityPolicy: false,
   })
 );
-if (IS_PROD) app.set("trust proxy", 1);
+if (IS_PROD || IS_STAGE) app.set("trust proxy", 1);
 app.use(
   expressSession({
     name: SID,
@@ -72,25 +153,563 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: IS_PROD,
-      maxAge: HOUR_IN_MS,
+      secure: IS_PROD || IS_STAGE,
+      maxAge: HOUR_IN_MS * 24, // one day
     },
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
+app.use(flash({ sessionKeyName: SID }));
 
-// helpers
+// helpers / middlewares
+const mdConverter = new showdown.Converter({
+  noHeaderId: true,
+  simplifiedAutoLink: true,
+  tasklists: true,
+  openLinksInNewWindow: true,
+  emoji: true,
+});
 const isAjaxCall = (req) =>
   req.headers["accept"] && req.headers["accept"].includes("application/json");
 const ajaxOnly = (req, res, next) => {
   if (isAjaxCall(req)) next();
   else res.status(400).end("400 Bad Request");
 };
+const authOnly = (req, res, next) => {
+  if (req.user) {
+    next();
+  } else {
+    if (isAjaxCall(req)) {
+      return res
+        .status(401)
+        .json({ ok: 0, err: "Not authorized.", details: null });
+    }
+
+    res.status(401).redirect("/login");
+  }
+};
+const guestsOnly = (req, res, next) => {
+  if (!req.user) next();
+  else res.redirect("/dashboard");
+};
+const loadNotifications = (req, res, next) => {
+  if (!req.user) return next();
+  const notificationsActions = notifications.actions({ db, user: req.user });
+  notificationsActions
+    .getAll()
+    .then((notificationsResult) => {
+      res.locals.notifications = notificationsResult;
+      next();
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+app.use(loadNotifications);
+const injectEnv = (req, res, next) => {
+  res.locals.env = process.env.NODE_ENV;
+  res.locals.isDev = IS_DEV;
+  res.locals.isProd = IS_PROD;
+  res.locals.isStage = IS_STAGE;
+  next();
+};
+app.use(injectEnv);
+
+const dateFmt = (dateStr) => {
+  return day(dateStr).format("DD MMM, HH:mm");
+};
 
 // setup routes
 app.get("/", (req, res) => {
-  res.render("index", { meta: defaultMetas });
+  res.render("index", { meta: defaultMetas, isHomepage: true });
+});
+
+app.get("/terms-of-service", (req, res) => {
+  res.render("legal/terms-of-service.pug", { meta: defaultMetas });
+});
+
+app.get("/privacy-policy", (req, res) => {
+  res.render("legal/privacy-policy.pug", { meta: defaultMetas });
+});
+
+app.get("/cookie-policy", (req, res) => {
+  res.render("legal/cookie-policy.pug", { meta: defaultMetas });
+});
+
+app.get("/dashboard", authOnly, async (req, res, next) => {
+  const flash = {
+    success: await req.consumeFlash("success"),
+  };
+  const productsActions = products.actions({ db, user: req.user });
+
+  productsActions
+    .getMyProducts()
+    .then((result) => {
+      res.render("dashboard", {
+        meta: {
+          defaultMetas,
+          title: "Dashboard | Haptic",
+          og: { title: "Dashboard | Haptic" },
+        },
+        products: result,
+        flash,
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get("/collections", authOnly, (req, res, next) => {
+  db.select(
+    "collections.id",
+    "collections.created_at",
+    "products.name",
+    "products.description",
+    "products.slug"
+  )
+    .table("collections")
+    .innerJoin("products", "collections.product_id", "products.id")
+    .where({ "collections.user_id": req.user.id })
+    .then((result) => {
+      res.render("collections", { meta: defaultMetas, collections: result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get("/dashboard/product/:slug", authOnly, (req, res) => {
+  return res.redirect(`/dashboard/product/${req.params.slug}/settings`);
+});
+
+app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
+  const slug = req.params.slug;
+  const productsActions = products.actions({ db, user: req.user });
+  productsActions
+    .getProductBySlug({ slug })
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(404).render("404", {
+          meta: {
+            ...defaultMetas,
+            title: "Page not found | Haptic",
+            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+          },
+        });
+      }
+
+      return posts
+        .actions({ db, user: req.user })
+        .getAllPosts(productResult.id)
+        .then((postsResult) => {
+          return db("product_tools")
+            .where({ product_id: productResult.id })
+            .then((toolsResult) => {
+              res.render("dashboard/product/posts", {
+                meta: {
+                  ...defaultMetas,
+                  title: `${productResult.name} | Haptic`,
+                  og: {
+                    ...defaultMetas.og,
+                    title: `${productResult.name} | Haptic`,
+                  },
+                },
+                product: { ...productResult },
+                tools: [...toolsResult],
+                posts: [
+                  ...postsResult.map((post) => ({
+                    ...post,
+                    text: mdConverter.makeHtml(post.text),
+                    created_at_formatted: dateFmt(post.created_at),
+                  })),
+                ],
+                links: {
+                  posts: `/dashboard/product/${slug}/posts`,
+                  settings: `/dashboard/product/${slug}/settings`,
+                  url: `/p/${slug}`,
+                },
+              });
+            });
+        });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get(
+  "/dashboard/product/:slug/settings",
+  authOnly,
+  async (req, res, next) => {
+    const slug = req.params.slug;
+    const flash = {
+      success: await req.consumeFlash("success"),
+      error: await req.consumeFlash("error"),
+    };
+    const productsActions = products.actions({ db, user: req.user });
+
+    productsActions
+      .getProductBySlug({ slug })
+      .then((result) => {
+        if (!result) {
+          return res.status(404).render("404", {
+            meta: {
+              ...defaultMetas,
+              title: "Page not found | Haptic",
+              og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+            },
+          });
+        }
+
+        res.render("dashboard/product/settings", {
+          meta: {
+            ...defaultMetas,
+            title: `${result.name} | Haptic`,
+            og: {
+              ...defaultMetas.og,
+              title: `${result.name} | Haptic`,
+            },
+          },
+          product: { ...result },
+          links: {
+            posts: `/dashboard/product/${slug}/posts`,
+            settings: `/dashboard/product/${slug}/settings`,
+            url: `/p/${slug}`,
+          },
+          form: {
+            action: `/dashboard/product/${slug}/settings/update`,
+            delete: {
+              action: `/dashboard/product/${slug}/delete`,
+            },
+          },
+          flash,
+        });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
+
+app.post(
+  "/dashboard/product/:slug/settings/update",
+  authOnly,
+  (req, res, next) => {
+    const slug = req.params.slug;
+    const productsActions = products.actions({ db, user: req.user });
+    // check if the user owns the product
+    db("products")
+      .select()
+      .where({
+        slug,
+        user_id: req.user.id,
+      })
+      .then((result) => {
+        if (!result) {
+          return res.status(404).render("404", {
+            meta: {
+              ...defaultMetas,
+              title: "Page not found | Haptic",
+              og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+            },
+          });
+        }
+
+        var input = req.body;
+        productsActions
+          .updateProduct({ slug, input })
+          .then((result) => {
+            if (result) {
+              req.flash("success", "Settings updated 🎉").then(() => {
+                res
+                  .set(`Location`, `/dashboard/product/${slug}/settings`)
+                  .sendStatus(303);
+              });
+            } else {
+              req
+                .flash("error", "Settings update failed, please retry 🙏")
+                .then(() => {
+                  res.redirect(`/dashboard/product/${slug}/settings`);
+                });
+            }
+          })
+          .catch((err) => next(err));
+      });
+  }
+);
+
+app.post("/dashboard/product/:slug/delete", authOnly, (req, res, next) => {
+  const slug = req.params.slug;
+  const user = req.user;
+  const productsActions = products.actions({ db, user: req.user });
+  productsActions
+    .delProduct({ slug })
+    .then((result) => {
+      if (result) {
+        req.flash("success", "Product deleted ✅").then(() => {
+          res.set("Location", "/dashboard").sendStatus(303);
+        });
+      }
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get("/dashboard/profile", authOnly, (req, res, next) => {
+  return res.render("dashboard/profile", {
+    meta: defaultMetas,
+    form: {
+      action: "/dashboard/profile/update",
+    },
+  });
+});
+
+app.get("/p/:slug", (req, res, next) => {
+  const slug = req.params.slug;
+  const postsActions = posts.actions({ db, user: req.user });
+  const boostsActions = boosts.actions({ db });
+
+  db.select(
+    "products.id",
+    "products.name",
+    "products.slug",
+    "products.description",
+    "products.website",
+    "products.is_public",
+    "products.is_listed",
+    "products.created_at as product_created_at",
+    "products.updated_at as product_updated_at",
+    "users.id as user_id",
+    "users.bio as user_bio",
+    "users.twitter_id as user_twitter_id",
+    "users.twitter_name as user_twitter_name",
+    "users.twitter_screen_name as user_twitter_screen_name",
+    "users.twitter_location as user_twitter_location",
+    "users.twitter_url as user_twitter_url",
+    "users.twitter_profile_image_url as user_twitter_profile_image_url",
+    "users.created_at as user_created_at",
+    "users.updated_at as user_updated_at"
+  )
+    .table("products")
+    .leftJoin("users", "products.user_id", "users.id")
+    .where({ "products.slug": slug })
+    .first()
+    .then((result) => {
+      if (!result) {
+        return res.status(404).render("404", {
+          meta: {
+            ...defaultMetas,
+            title: "Page not found | Haptic",
+            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+          },
+        });
+      }
+
+      if (!result.is_public && (!req.user || req.user.id !== result.user_id)) {
+        return res.render("private-product", {
+          meta: {
+            ...defaultMetas,
+            title: "Private product | Haptic",
+            og: { ...defaultMetas.og, title: "Private product | Haptic" },
+          },
+        });
+      }
+
+      return postsActions.getAllPosts(result.id).then((postsResult) => {
+        return boostsActions
+          .getProductBoosts(result.id)
+          .then((boostsResult) => {
+            return db("product_tools")
+              .where({ product_id: result.id })
+              .then((productToolsResult) => {
+                res.render("product", {
+                  meta: {
+                    ...defaultMetas,
+                    title: `${result.name} | Haptic`,
+                    og: {
+                      ...defaultMetas.og,
+                      title: `${result.name} | Haptic`,
+                    },
+                  },
+                  product: { ...result },
+                  boosts: boostsResult,
+                  posts: [
+                    ...postsResult.map((post) => ({
+                      ...post,
+                      text: mdConverter.makeHtml(post.text),
+                      created_at_formatted: dateFmt(post.created_at),
+                    })),
+                  ],
+                  tools: productToolsResult,
+                  links: {
+                    posts: `/dashboard/product/${slug}/posts`,
+                    settings: `/dashboard/product/${slug}/settings`,
+                    url: `/p/${slug}`,
+                  },
+                });
+              });
+          });
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get("/p/:slug/:postId", (req, res, next) => {
+  const postsActions = posts.actions({ db, user: req.user });
+  const slug = req.params.slug;
+  const postId = req.params.postId;
+  if (isNaN(postId)) {
+    return res.status(404).render("404", {
+      meta: {
+        ...defaultMetas,
+        title: "Page not found | Haptic",
+        og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+      },
+    });
+  }
+
+  db.select(
+    "products.id",
+    "products.name",
+    "products.slug",
+    "products.description",
+    "products.website",
+    "products.is_public",
+    "products.is_listed",
+    "products.created_at as product_created_at",
+    "products.updated_at as product_updated_at",
+    "users.id as user_id",
+    "users.bio as user_bio",
+    "users.twitter_id as user_twitter_id",
+    "users.twitter_name as user_twitter_name",
+    "users.twitter_screen_name as user_twitter_screen_name",
+    "users.twitter_location as user_twitter_location",
+    "users.twitter_url as user_twitter_url",
+    "users.twitter_profile_image_url as user_twitter_profile_image_url",
+    "users.created_at as user_created_at",
+    "users.updated_at as user_updated_at"
+  )
+    .table("products")
+    .leftJoin("users", "products.user_id", "users.id")
+    .where({ "products.slug": slug })
+    .first()
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(404).render("404", {
+          meta: {
+            ...defaultMetas,
+            title: "Page not found | Haptic",
+            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+          },
+        });
+      }
+
+      if (
+        !productResult.is_public &&
+        (!req.user || req.user.id !== productResult.user_id)
+      ) {
+        return res.render("private-product", {
+          meta: {
+            ...defaultMetas,
+            title: "Private product | Haptic",
+            og: { ...defaultMetas.og, title: "Private product | Haptic" },
+          },
+        });
+      }
+
+      return postsActions
+        .getPost("text", { postId })
+        .then((result) => {
+          if (!result) {
+            return res.status(404).render("404", {
+              meta: {
+                ...defaultMetas,
+                title: "Page not found | Haptic",
+                og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+              },
+            });
+          }
+
+          const title =
+            result.text.length > 100
+              ? result.text.slice(0, 100) + "..."
+              : result.text;
+          return res.render("post", {
+            meta: {
+              ...defaultMetas,
+              title: `${title} | Haptic`,
+              og: { ...defaultMetas.og, title: `${title} | Haptic` },
+            },
+            product: productResult,
+            post: {
+              ...result,
+              text: mdConverter.makeHtml(result.text),
+              created_at_formatted: dateFmt(result.created_at),
+            },
+          });
+        })
+        .catch((err) => {
+          next(err);
+        });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get("/notifications", authOnly, async (req, res, next) => {
+  const flash = {
+    success: await req.consumeFlash("success"),
+  };
+  res.render("notifications", { meta: defaultMetas, flash });
+});
+
+app.post("/mark-notifications-read", authOnly, (req, res, next) => {
+  const notificationsActions = notifications.actions({ db, user: req.user });
+  notificationsActions
+    .readAll()
+    .then((result) => {
+      req.flash("success", "Notifications cleared 🎉").then(() => {
+        res.redirect(`/notifications`);
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get("/login", guestsOnly, (req, res) => {
+  res.render("login", { meta: defaultMetas });
+});
+
+app.get("/auth/error", (req, res) => res.send("Unknown Error"));
+
+app.get("/auth/twitter", passport.authenticate("twitter"));
+
+app.get(
+  "/auth/twitter/callback",
+  passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
+  function(req, res) {
+    req.session.save(function onSessionSave() {
+      res.redirect("/dashboard");
+    });
+  }
+);
+
+app.get("/logout", (req, res) => {
+  req.logout();
+  req.session.destroy(function(err) {
+    res.redirect("/");
+  });
 });
 
 // ajax routes
@@ -98,7 +717,7 @@ app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
   db("subs")
     .insert({
       email: req.body.email,
-      accepted_marketing_mails: req.body.accept_emails,
+      accepted_marketing_mails: true, // previously it was a checkbox -> req.body.accept_emails,
     })
     .then((result) => {
       res.json({
@@ -109,27 +728,462 @@ app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === dbErrCodes.DUP_CODE)
-        res
-          .status(400)
-          .json({ ok: 0, err: "Email already used. 😱", details: null });
+        return res.status(400).json({
+          ok: 0,
+          err: "Email has been already used. 😱",
+          details: null,
+        });
 
       next(err);
     });
 });
 
-app.get("/auth/error", (req, res) => res.send("Unknown Error"));
-app.get("/auth/twitter", passport.authenticate("twitter"));
-app.get(
-  "/auth/twitter/callback",
-  passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
-  function(req, res) {
-    res.redirect("/");
+app.post(
+  "/product-slug",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  (req, res, next) => {
+    let slug = nanoid(6).toLowerCase();
+    if (req.body.name)
+      slug = slugify(req.body.name, { lower: true, remove: /[\.]+/g });
+
+    db("products")
+      .where({ slug })
+      .then((result) => {
+        if (result.length) {
+          // slug is taken
+          slug = `${slug}-${nanoid(6).toLowerCase()}`;
+        }
+
+        res.json({
+          ok: 1,
+          err: null,
+          details: { slug },
+        });
+      })
+      .catch((err) => next(err));
   }
 );
-app.get("/logout", (req, res) => {
-  req.session = null;
-  req.logout();
-  res.redirect("/");
+
+app.post("/product", ajaxOnly, authOnly, express.json(), (req, res, next) => {
+  db("products")
+    .insert({
+      user_id: req.user.id,
+      name: req.body.name,
+      slug: req.body.slug.replace(/[\.]+/g, "-").toLowerCase(),
+    })
+    .returning(["id", "slug"])
+    .then((result) => {
+      res.json({ ok: 1, err: null, details: { ...result[0] } });
+    })
+    .catch((err) => {
+      if (err.code === dbErrCodes.DUP_CODE)
+        return res.status(400).json({
+          ok: 0,
+          err: "Slug already taken 😕. Please, use another slug.",
+          details: null,
+        });
+
+      next(err);
+    });
+});
+
+app.post("/post/:id/boost", ajaxOnly, authOnly, (req, res, next) => {
+  const id = req.params.id;
+  const user = req.user;
+  const notificationsActions = notifications.actions({ db, user });
+
+  db.table("post_boosts")
+    .insert({ post_id: id, user_id: user.id })
+    .then((boostResult) => {
+      return notificationsActions
+        .add(notifications.typesMap.POST_BOOSTS_TYPE, { post_id: id })
+        .then((notificationsResult) => {
+          return db("post_boosts")
+            .select("id")
+            .where({ post_id: id })
+            .then((allBoostsResult) => {
+              res.json({
+                ok: 1,
+                err: null,
+                details: { boosts: allBoostsResult },
+              });
+            });
+        });
+    })
+    .catch((err) => {
+      if (err.code === dbErrCodes.DUP_CODE)
+        return res.status(400).json({
+          ok: 0,
+          err: "You've already boosted this post. 🚀",
+          details: null,
+        });
+      next(err);
+    });
+});
+
+app.post(
+  "/post/:pid/:type",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  (req, res, next) => {
+    const types = posts.types;
+    const type = req.params.type;
+    const pid = req.params.pid;
+    const postsActions = posts.actions({ db, user: req.user });
+
+    if (!types.includes(type)) {
+      return res
+        .status(400)
+        .json({ ok: 0, err: `Invalid post type: ${type}. 🧐`, details: null });
+    }
+
+    if (isNaN(pid)) {
+      return res.status(400).json({
+        ok: 0,
+        err: `Invalid product id: ${pid}. 🧐 Should be numeric.`,
+        details: null,
+      });
+    }
+
+    if (req.body.text.length < 2) {
+      return res.status(400).json({
+        ok: 0,
+        err: `Invalid text length. Min: 2 symbols.`,
+        details: null,
+      });
+    }
+
+    db("products")
+      .select()
+      .where({ id: pid })
+      .first()
+      .then((productResult) => {
+        postsActions
+          .publish(type, productResult, req.body)
+          .then((post) => {
+            res.json({ ok: 1, err: null, details: { post } });
+          })
+          .catch((err) => next(err));
+      });
+  }
+);
+
+app.delete("/post/:id", ajaxOnly, authOnly, (req, res, next) => {
+  const id = req.params.id;
+  posts
+    .actions({ db, user: req.user })
+    .removePost(id)
+    .then((result) => {
+      if (result) {
+        return res.json({ ok: 1, err: null, details: { id } });
+      } else {
+        return res.status(400).json({
+          ok: 0,
+          err: "Post deletion failed unexpectedly. Please, try again 🙏",
+          details: null,
+        });
+      }
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.post("/p/:slug/boost", ajaxOnly, authOnly, (req, res, next) => {
+  const slug = req.params.slug;
+  const user = req.user;
+  const notificationsActions = notifications.actions({ db, user: req.user });
+
+  db("products")
+    .select("id")
+    .where({ slug })
+    .first()
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(400).json({
+          ok: 0,
+          err: `No such product (slug: ${slug}).`,
+          details: null,
+        });
+      }
+
+      return db("product_boosts")
+        .insert({ product_id: productResult.id, user_id: user.id })
+        .then((boostResult) => {
+          return notificationsActions
+            .add(notifications.typesMap.PRODUCT_BOOSTS_TYPE, {
+              product_id: productResult.id,
+            })
+            .then((notificationResult) => {
+              return db("product_boosts")
+                .select("id")
+                .where({ product_id: productResult.id })
+                .then((allBoostsResult) => {
+                  res.json({
+                    ok: 1,
+                    err: null,
+                    details: { boosts: allBoostsResult },
+                  });
+                });
+            });
+        });
+    })
+    .catch((err) => {
+      if (err.code === dbErrCodes.DUP_CODE)
+        return res.status(400).json({
+          ok: 0,
+          err: "You've already boosted this product. 🚀",
+          details: null,
+        });
+      next(err);
+    });
+});
+
+app.post("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
+  const slug = req.params.slug;
+  const user = req.user;
+  const notificationsActions = notifications.actions({ db, user: req.user });
+  db("products")
+    .select("id")
+    .where({ slug })
+    .first()
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(400).json({
+          ok: 0,
+          err: `No such product (slug: ${slug}).`,
+          details: null,
+        });
+      }
+
+      return db("collections")
+        .insert({ user_id: user.id, product_id: productResult.id })
+        .returning("id")
+        .then((collectionResult) => {
+          notificationsActions
+            .add(notifications.typesMap.PRODUCT_COLLECTIONS_TYPE, {
+              product_id: productResult.id,
+            })
+            .then((notificationResult) => {
+              res.json({
+                ok: 1,
+                err: null,
+                details: { id: collectionResult.id },
+              });
+            });
+        });
+    })
+    .catch((err) => {
+      if (err.code === dbErrCodes.DUP_CODE)
+        return res.status(400).json({
+          ok: 0,
+          err: "You've already collected this product.",
+          details: null,
+        });
+      next(err);
+    });
+});
+
+app.delete("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
+  const slug = req.params.slug;
+  const user = req.user;
+  db("products")
+    .select("id")
+    .where({ slug })
+    .first()
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(400).json({
+          ok: 0,
+          err: `No such product (slug: ${slug}).`,
+          details: null,
+        });
+      }
+
+      return db
+        .table("collections")
+        .where({ user_id: user.id, product_id: productResult.id })
+        .del()
+        .then((collectionResult) => {
+          console.log("collectionResult", collectionResult);
+          res.json({ ok: 1, err: null, details: null });
+        });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
+  singleUpload(req, res, function handleUpload(err) {
+    if (err && err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        ok: 0,
+        err:
+          "Files greater than 500kb in size are not allowed. Please, optimize your image.",
+        details: { max: "500kb" },
+      });
+    }
+
+    if (err) {
+      next(err);
+      return;
+    }
+
+    res.json({ ok: 1, err: null, details: { url: req.file.location } });
+  });
+});
+
+app.post(
+  "/product/:slug/tool",
+  ajaxOnly,
+  ajaxOnly,
+  express.json(),
+  (req, res, next) => {
+    const data = req.body;
+    const slug = req.params.slug;
+    db("products")
+      .select("id")
+      .where({ user_id: req.user.id, slug })
+      .first()
+      .then((productResult) => {
+        if (!productResult) {
+          return res.status(400).json({
+            ok: 0,
+            err: `No such product (slug: ${slug}).`,
+            details: null,
+          });
+        }
+
+        db("product_tools")
+          .insert({ text: data.text, product_id: productResult.id })
+          .returning(["id", "text"])
+          .then((productToolsResult) => {
+            res.json({
+              ok: 1,
+              err: null,
+              details: { tool: productToolsResult[0] },
+            });
+          })
+          .catch((err) => {
+            next(err);
+          });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
+
+app.delete("/product/:slug/tool/:id", authOnly, ajaxOnly, (req, res, next) => {
+  const { id, slug } = req.params;
+  db("products")
+    .select("id")
+    .where({ user_id: req.user.id, slug })
+    .first()
+    .then((productResult) => {
+      if (!productResult) {
+        return res.status(400).json({
+          ok: 0,
+          err: `No such product (slug: ${slug}).`,
+          details: null,
+        });
+      }
+
+      db("product_tools")
+        .where({ id })
+        .del()
+        .then((productToolsResult) => {
+          res.json({
+            ok: 1,
+            err: null,
+            details: null,
+          });
+        })
+        .catch((err) => {
+          next(err);
+        });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.post("/feedback", authOnly, ajaxOnly, express.json(), (req, res, next) => {
+  const user = req.user;
+  const data = req.body;
+  db("feedback")
+    .insert({
+      user_id: user.id,
+      email: data.email,
+      type: data.type,
+      text: data.text,
+    })
+    .returning("id")
+    .then((result) => {
+      res.json({ ok: 1, err: null, details: { id: result[0] } });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+// payments
+app.get("/checkout", authOnly, (req, res) => {
+  // TODO: the checkout page should check if the user has an email.
+  // user.email v -> show the plan selector
+  // user.email x -> show the email field -> create customer
+  res.render("checkout", {
+    meta: defaultMetas,
+    flash,
+    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+  });
+});
+
+app.post(
+  "/create-customer",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  async (req, res) => {
+    const { email } = req.body;
+    const user = req.user;
+
+    try {
+      const customer = await createCustomer({ email, user });
+      // save the customer id to the user's entity
+
+      db("users")
+        .where("id", user.id)
+        .update({ email, stripe_customer_id: customer.id })
+        .returning("email")
+        .then(async ([email]) => {
+          req.logIn({ ...user, email }, async function(reloginErr) {
+            if (reloginErr) {
+              return res.json({
+                ok: 0,
+                err: "We couldn't update your email, please try again.",
+                details: null,
+              });
+            } else {
+              return res.json({ ok: 1, err: null, details: { customer } });
+            }
+          });
+        });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+app.post("/stripe-wh", bodyParser.raw({ type: "application/json" }), webhook);
+
+// 404
+app.get("*", function(req, res, next) {
+  res.status(404).render("404", { meta: defaultMetas });
 });
 
 // error handler
@@ -137,10 +1191,10 @@ app.use((err, req, res, next) => {
   console.log("An error occurred.", err);
   if (res.headersSent) return next(err);
   if (isAjaxCall(req))
-    return res.json({
+    return res.status(500).json({
       ok: 0,
       err:
-        "Something went wrong. 😱 Please, write to me in twitter to resolve this issue for you.",
+        "Something went wrong. 😱 Sorry for the inconvenience. Please, write to me in twitter to resolve this issue for you.",
       details: { err },
     });
   res.status(500);

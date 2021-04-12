@@ -1,0 +1,9 @@
+include ./icon.pug
+mixin toast()
+  div(class="pb-2" data-toast-id)
+    div(class="px-4 py-2 rounded-xl shadow-xl")
+      div(class="flex items-center text-white justify-between")
+        div(class="mr-4")
+          p(data-toast-content) This is some toast
+        div
+          +icon("x", { width: 18, height: 18, stroke: 'white' })(data-toast-close-btn class="cursor-pointer")

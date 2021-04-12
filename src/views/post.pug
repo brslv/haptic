@@ -1,0 +1,27 @@
+extends layouts/base.layout.pug
+
+include partials/top-bar.pug
+include partials/post.pug
+include partials/require-module.pug
+
+block append scripts
+  +require-module('post')
+
+block content
+  - var post_text = post.text;
+  +top-bar
+  div(class="container mx-auto p-4")
+    div(class="md:w-2/3 mx-auto")
+      +post({
+        product_slug: product.slug,
+        product_name: product.name,
+        post_id: post.id,
+        img: post.user_twitter_profile_image_url,
+        img_url: post.image_url,
+        twitter_name: post.user_twitter_name,
+        twitter_screen_name: post.user_twitter_screen_name,
+        date_str: post.created_at_formatted,
+        show_opts: false,
+        show_view_btn: false,
+        boosts_count: post.boosts_count
+      }) !{post_text}
