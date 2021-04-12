@@ -36,7 +36,7 @@ mixin detail(title, isSoon = false)
       block
 
 block content
-  div(class="bg-yellow-50")
+  div(class="bg-yellow-50" id="top")
     div(class="mb-8 sm:mb-32")
       +top-bar
 
@@ -51,11 +51,19 @@ block content
 
           h2(class="text-2xl text-gray-600 mx-auto pb-10" style="width: 28ch") You have a story. Your product, too. Share it with the world.
 
-          div(class="flex items-center justify-center flex-col mb-24")
-            div(class="relative")
-              img(src="/static/images/landing/arrow.svg" class="absolute -top-2 -left-28 select-none")
-              a(class="btn btn-primary text-lg md:text-xl px-6 py-4 mb-1 click-scale" href="/login") Start sharing your story
-            span(class="text-sm text-gray-600") FREE, no credit cards required!
+          if isProd 
+            div(class="mb-16 max-w-lg mx-auto")
+              h2(class="font-bold text-lg mb-4") Join the waitlist
+              form(class="flex" data-waitlist-form)
+                input(class="input" placeholder="Email" type="email" class="flex-1 mr-4")
+                button(type="submit" class="btn btn-primary") Join now
+              span(class="mt-4 text-gray-600 block text-sm max-w-xs mx-auto") Haptic is under development, but will go live soon. Join the waitlist and make sure you don't miss the launch.
+          else
+            div(class="flex items-center justify-center flex-col mb-24")
+              div(class="relative")
+                img(src="/static/images/landing/arrow.svg" class="absolute -top-2 -left-28 select-none")
+                a(class="btn btn-primary text-lg md:text-xl px-6 py-4 mb-1 click-scale" href="/login") Start sharing your story
+              span(class="text-sm text-gray-600") FREE, no credit cards required!
 
       div(class="flex flex-col items-center")
         // img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none hidden md:block")
@@ -199,7 +207,7 @@ block content
             +use-case("You", "heart", "shape-6") For You and your story. Whoever you are. Whatever your story.
 
           div(class="flex flex-col items-center justify-center")
-            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href="/login") Start sharing your story
+            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href=(isProd ? "/#top" : "/login")) Start sharing your story
             span(class="text-sm text-gray-600") FREE, no credit cards required!
 
       div(class="mb-32" id="pricing")
@@ -223,7 +231,10 @@ block content
                   span Post comments
                   span(class="uppercase ml-2 bg-yellow-50 rounded px-2 py-1.5 text-xs") Soon
               div(class="mt-8")
-                a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as observer
+                if isProd
+                  button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
+                else
+                  a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as observer
             div(class="flex-1 w-full bg-white shadow-lg border border-gray-100 rounded-xl p-4 md:p-8 hover:shadow-xl transition")
               div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") 10$ / month
               h2(class="text-xl md:text-2xl font-bold") Creator
@@ -235,7 +246,18 @@ block content
                 li(class="p-4 border-b") Create product pages
                 li(class="p-4 pb-0") All of Haptic's content creation tools
               div(class="mt-8")
-                a(href="/login" class="btn btn-primary lg:text-xl text-center py-3") Join as creator
+                if isProd
+                  button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
+                else
+                  a(href="/login" class="btn btn-primary lg:text-xl text-center py-3") Join as creator
+
+      div(class="mb-48 mt-16 text-center")
+        div(class="max-w-lg mx-auto")
+          h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Join the waitlist
+          form(class="flex" data-waitlist-form)
+            input(class="input" placeholder="Email" type="email" class="flex-1 mr-4")
+            button(type="submit" class="btn btn-primary") Join now
+          span(class="mt-4 text-gray-600 block text-sm max-w-xs mx-auto") Haptic is under development, but will go live soon. Join the waitlist and make sure you don't miss the launch.
 
       // - div(class="mb-48 mt-16")
       // -   div(class="container mx-auto p-4")

@@ -21,6 +21,7 @@ import boost from "./widgets/boost";
 import collect from "./widgets/collect";
 import payments from "./widgets/payments";
 import cookieConsent from "./widgets/cookie-consent";
+import waitlistForm from "./widgets/waitlist-form";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -43,3 +44,4 @@ collect();
 collectionContextMenu();
 payments();
 cookieConsent();
+waitlistForm();

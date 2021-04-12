@@ -155,6 +155,9 @@ app.use((req, res, next) => {
 app.use(flash({ sessionKeyName: SID }));
 
 // helpers / middlewares
+const isDev = () => process.env.ENV === "development";
+const isStage = () => process.env.ENV === "stage";
+const isProd = () => process.env.ENV === "production";
 const mdConverter = new showdown.Converter({
   noHeaderId: true,
   simplifiedAutoLink: true,
@@ -191,7 +194,7 @@ const loadNotifications = (req, res, next) => {
   notificationsActions
     .getAll()
     .then((notificationsResult) => {
-      app.locals.notifications = notificationsResult;
+      res.locals.notifications = notificationsResult;
       next();
     })
     .catch((err) => {
@@ -199,6 +202,14 @@ const loadNotifications = (req, res, next) => {
     });
 };
 app.use(loadNotifications);
+const injectEnv = (req, res, next) => {
+  res.locals.env = process.env.ENV;
+  res.locals.isDev = isDev();
+  res.locals.isProd = isProd();
+  res.locals.isStage = isStage();
+  next();
+};
+app.use(injectEnv);
 
 const dateFmt = (dateStr) => {
   return day(dateStr).format("DD MMM, HH:mm");
@@ -708,9 +719,11 @@ app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === dbErrCodes.DUP_CODE)
-        return res
-          .status(400)
-          .json({ ok: 0, err: "Email already used. 😱", details: null });
+        return res.status(400).json({
+          ok: 0,
+          err: "Email has been already used. 😱",
+          details: null,
+        });
 
       next(err);
     });
