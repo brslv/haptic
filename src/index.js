@@ -717,7 +717,7 @@ app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
   db("subs")
     .insert({
       email: req.body.email,
-      accepted_marketing_mails: req.body.accept_emails,
+      accepted_marketing_mails: true, // previously it was a checkbox -> req.body.accept_emails,
     })
     .then((result) => {
       res.json({
