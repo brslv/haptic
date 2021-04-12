@@ -20,6 +20,7 @@ import flashMessages from "./widgets/flash-messages";
 import boost from "./widgets/boost";
 import collect from "./widgets/collect";
 import payments from "./widgets/payments";
+import cookieConsent from "./widgets/cookie-consent";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -41,3 +42,4 @@ boost();
 collect();
 collectionContextMenu();
 payments();
+cookieConsent();
