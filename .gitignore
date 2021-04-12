@@ -1,6 +1,7 @@
 node_modules
 .idea
 .env
+.env.stage
 .env.dev
 public/js
 notes.md
