@@ -1181,6 +1181,11 @@ app.post(
 
 app.post("/stripe-wh", bodyParser.raw({ type: "application/json" }), webhook);
 
+// 404
+app.get("*", function(req, res, next) {
+  res.status(404).render("404", { meta: defaultMetas });
+});
+
 // error handler
 app.use((err, req, res, next) => {
   console.log("An error occurred.", err);
