@@ -9,16 +9,16 @@ mixin top-bar()
 
         ul(class="flex items-center")
           li
-            a(href="#pricing" class={"hover:underline": true, "mr-4": !isProd}) Pricing
+            a(href="#pricing" class={"hover:underline": true, "mr-4": isDev}) Pricing
           // - li
           // -   a(href="/products" class="mr-4 hover:underline") Browse
           // - li
           // -   a(href="/faq" class="mr-4 hover:underline") FAQ
-          if user && !isProd
+          if user && isDev
             a(href="/dashboard" class="btn btn-icon mr-4 click-scale" data-tippy-content="Dashboard")
               li
                 +icon('box')
-          if !user && !isProd
+          if !user && isDev
             li
               a(href="/login" class="btn border border-gray-800 hover:bg-yellow-300 hover:border-transparent click-scale flex items-center")
                 +icon("twitter", { width: 14, height: 14, fill: "default" })(class="mr-2")
