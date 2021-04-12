@@ -4,13 +4,14 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node ./src/index.js",
-    "defer-fks": "node ./src/defer-fks.js",
-    "dev": "nodemon ./src/index.js",
+    "start": "NODE_ENV=production node ./src/index.js",
+    "start:stage": "NODE_ENV=stage node ./src/index.js",
+    "dev": "NODE_ENV=development nodemon ./src/index.js",
     "css:dev": "postcss ./src/css/styles.css -o ./public/css/styles.css",
     "css:prod": "NODE_ENV=production postcss ./src/css/styles.css -o ./public/css/styles.css",
     "js:dev": "rollup --config ./rollup.config.js --watch",
-    "js:prod": "rollup --config ./rollup.config.js"
+    "js:prod": "rollup --config ./rollup.config.js",
+    "defer-fks": "node ./src/defer-fks.js"
   },
   "keywords": [],
   "author": "",

@@ -61,6 +61,7 @@ mixin top-bar(activePage)
                                 li
                                     +icon('log-out')
                         else
+                          if isDev
                             a(href="/login" class="btn btn-icon click-scale" data-tippy-content="Log in")
                                 li
                                     +icon('log-in')

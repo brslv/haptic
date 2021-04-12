@@ -25,10 +25,16 @@ const notifications = require("./notifications");
 const { webhook, createCustomer } = require("./payments");
 const bodyParser = require("body-parser");
 
+console.log({ env: process.env.NODE_ENV });
+
 // constants
 const HOUR_IN_MS = 3600000;
+
+// env constants
 const IS_DEV = process.env.NODE_ENV === "development";
 const IS_PROD = process.env.NODE_ENV === "production";
+const IS_STAGE = process.env.NODE_ENV === "stage";
+
 const SID = "__sid__";
 const dbErrCodes = {
   DUP_CODE: "23505",
@@ -48,7 +54,13 @@ const defaultMetas = {
 };
 
 // setup env
-const dotenvConfigPath = IS_PROD ? ".env" : ".env.dev";
+const dotEnvConfigs = {
+  production: ".env",
+  development: ".env.dev",
+  stage: ".env.stage",
+};
+const dotenvConfigPath = dotEnvConfigs[process.env.NODE_ENV];
+console.log({ dotenvConfigPath });
 dotenv.config({ path: dotenvConfigPath });
 
 // setup rollbar
@@ -59,7 +71,12 @@ const rollbar = new Rollbar({
 });
 
 // setup db
-const db = knex(IS_PROD ? dbConfig.production : dbConfig.development);
+const dbConfigs = {
+  production: "production",
+  development: "development",
+  stage: "stage",
+};
+const db = knex(dbConfig[dbConfigs[process.env.NODE_ENV]]);
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -129,7 +146,7 @@ app.use(
     contentSecurityPolicy: false,
   })
 );
-if (IS_PROD) app.set("trust proxy", 1);
+if (IS_PROD || IS_STAGE) app.set("trust proxy", 1);
 app.use(
   expressSession({
     name: SID,
@@ -141,7 +158,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: IS_PROD,
+      secure: IS_PROD || IS_STAGE,
       maxAge: HOUR_IN_MS * 24, // one day
     },
   })
@@ -155,9 +172,6 @@ app.use((req, res, next) => {
 app.use(flash({ sessionKeyName: SID }));
 
 // helpers / middlewares
-const isDev = () => process.env.ENV === "development";
-const isStage = () => process.env.ENV === "stage";
-const isProd = () => process.env.ENV === "production";
 const mdConverter = new showdown.Converter({
   noHeaderId: true,
   simplifiedAutoLink: true,
@@ -203,10 +217,10 @@ const loadNotifications = (req, res, next) => {
 };
 app.use(loadNotifications);
 const injectEnv = (req, res, next) => {
-  res.locals.env = process.env.ENV;
-  res.locals.isDev = isDev();
-  res.locals.isProd = isProd();
-  res.locals.isStage = isStage();
+  res.locals.env = process.env.NODE_ENV;
+  res.locals.isDev = IS_DEV;
+  res.locals.isProd = IS_PROD;
+  res.locals.isStage = IS_STAGE;
   next();
 };
 app.use(injectEnv);
