@@ -209,6 +209,18 @@ app.get("/", (req, res) => {
   res.render("index", { meta: defaultMetas, isHomepage: true });
 });
 
+app.get("/terms-of-service", (req, res) => {
+  res.render("legal/terms-of-service.pug", { meta: defaultMetas });
+});
+
+app.get("/privacy-policy", (req, res) => {
+  res.render("legal/privacy-policy.pug", { meta: defaultMetas });
+});
+
+app.get("/cookie-policy", (req, res) => {
+  res.render("legal/cookie-policy.pug", { meta: defaultMetas });
+});
+
 app.get("/dashboard", authOnly, async (req, res, next) => {
   const flash = {
     success: await req.consumeFlash("success"),
