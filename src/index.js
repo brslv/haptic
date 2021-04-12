@@ -44,10 +44,10 @@ const defaultMetas = {
   description: "You have a story. Your product, too. Share it with the world.",
   og: {
     title: "Haptic - Humanize your product",
-    image: "https://haptic.so/static/images/landing/social-img.png",
+    image: "https://haptic.so/static/images/landing/social-image.png",
   },
   twitter: {
-    image: "https://haptic.so/static/images/landing/social-img.png",
+    image: "https://haptic.so/static/images/landing/social-image.png",
     image_alt: "Haptic.so social media sharing image",
   },
 };
