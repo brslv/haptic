@@ -4,7 +4,7 @@ include landing/partials/top-bar.pug
 include partials/icon.pug
 
 mixin use-case(title, icon, shapeSrc)
-  div(class="relative p-8 rounded-xl")
+  div(class="bg-white shadow sm:shadow-none sm:bg-transparent border border-gray-100 sm:border-none relative p-8 rounded-xl")
     img(src=`/static/images/landing/shapes/${shapeSrc}.svg` class="absolute -top-2 left-4" style="width: 100px; height: 100px;")
     div(class="relative z-10")
       +icon(icon, { width: 32, height: 32 })(class="mb-8")
@@ -49,7 +49,7 @@ block content
               img(src="/static/images/landing/underline.svg" class="absolute top-10 left-2 md:top-14 md:left-6 select-none" style="width: 180px")
             span(class="relative z-10") your product
 
-          h2(class="text-2xl text-gray-600 mx-auto pb-10" style="width: 28ch") You have a story. Your product, too. Share it with the world.
+          h2(class="text-2xl text-gray-600 mx-auto pb-10" style="max-width: 28ch") You have a story. Your product, too. Share it with the world.
 
           if isProd || isStage
             div(class="mb-16 max-w-lg mx-auto")
@@ -67,7 +67,7 @@ block content
 
       div(class="flex flex-col items-center")
         // img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none hidden md:block")
-        div(class="relative overflow-hidden bg-gray-50 z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none transition transform" style="max-width: 90%")
+        div(class="hidden md:block relative overflow-hidden bg-gray-50 z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none transition transform" style="max-width: 90%")
           div(class="flex items-center bg-gray-100 w-full h-12 px-4 border-b border-gray-200")
             div(class="flex items-center mr-4")
               div(class="w-4 h-4 rounded-full bg-red-500 mr-2")
@@ -76,6 +76,9 @@ block content
             div(class="flex-1 flex items-center px-4 bg-white rounded-lg w-32 h-8 border border-gray-200")
               span(class="text-sm font-medium") haptic.so/p/#[span(class="font-bold") your-product]
           div(class="relative overflow-y-scroll" style="min-height: 450px; max-height: 600px; width: 100%;")
+            img(src="/static/images/landing/product-image-hq.png" class="w-full" style="max-width: 1200px;")
+        div(class="block md:hidden -mb-16")
+          div(class="relative overflow-y-scroll mx-auto shadow-lg rounded-xl" style="max-height: 600px; width: 90%;")
             img(src="/static/images/landing/product-image-hq.png" class="w-full" style="max-width: 1200px;")
 
   // - features
@@ -94,7 +97,7 @@ block content
               div(class="grid grid-cols-1 md:grid-cols-8 gap-8 mt-32")
                 div(class="col-span-8 md:col-span-4 lg:col-span-3")
                   div(class="relative bg-white border border-gray-100 rounded-xl transition shadow")
-                    img(src="/static/images/landing/me-bw-optimized.jpg" class="absolute -top-20 left-1/2 rounded-full w-36 h-36 shadow-2xl border-4 border-gray-500" style="transform: translateX(-50%);" alt="Borislav Grigorov")
+                    img(src="/static/images/landing/me-bw-optimized.jpg" class="absolute -top-20 left-1/2 rounded-full w-32 h-32 shadow-2xl border-4 border-gray-500" style="transform: translateX(-50%);" alt="Borislav Grigorov")
                     div(class="mt-12 p-4 md:p-8")
                       p(class="mb-4 md:mb-8") Hey, there! 👋
                       p(class="mb-4 md:mb-8") I'm Borislav &mdash; full-stack developer, part time indie maker.
@@ -198,7 +201,7 @@ block content
           span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Popular usecases
           h3(class="font-bold text-center mx-auto text-3xl lg:text-4xl mb-28 sm:mb-16") Who is Haptic built for
 
-          div(class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-16")
+          div(class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-16")
             +use-case("Makers", "hexagon", "shape-1") For the problem-solvers, who create reusable solutions.
             +use-case("Writers", "edit-2", "shape-2") For those, who tame the words for us.
             +use-case("Learners", "book-open", "shape-3") For all of us, who master the chaos of knowledge.
