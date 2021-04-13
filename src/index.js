@@ -90,9 +90,12 @@ passport.use(
     {
       consumerKey: process.env.TWITTER_API_KEY,
       consumerSecret: process.env.TWITTER_API_SECRET,
+      userProfileURL:
+        "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true",
       callbackURL: process.env.TWITTER_API_CALLBACK_URL,
     },
     function(accessToken, refreshToken, profile, done) {
+      const emails = profile.emails;
       const twitterData = profile._json;
       db.select()
         .table("users")
@@ -103,6 +106,7 @@ passport.use(
             db("users")
               .insert({
                 bio: twitterData.description,
+                email: emails[0] ? emails[0].value : undefined,
                 twitter_id: twitterData.id,
                 twitter_name: twitterData.name,
                 twitter_screen_name: twitterData.screen_name,
