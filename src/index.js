@@ -22,7 +22,13 @@ const upload = require("./img-upload");
 const singleUpload = upload.single("image");
 const showdown = require("showdown");
 const notifications = require("./notifications");
-const { webhook, createCustomer } = require("./payments");
+const {
+  webhook,
+  createCustomer,
+  attachPaymentMethod,
+  updateCustomer,
+  createSubscription,
+} = require("./payments");
 const bodyParser = require("body-parser");
 
 console.log({ env: process.env.NODE_ENV });
@@ -1144,10 +1150,14 @@ app.get("/checkout", authOnly, (req, res) => {
   // TODO: the checkout page should check if the user has an email.
   // user.email v -> show the plan selector
   // user.email x -> show the email field -> create customer
+  const paymentWentOk = req.query.ok && req.query.ok.toString() === "1";
+
   res.render("checkout", {
     meta: defaultMetas,
     flash,
     stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+    creatorPriceId: process.env.STRIPE_CREATOR_PRICE_ID,
+    paymentWentOk,
   });
 });
 
@@ -1173,8 +1183,9 @@ app.post(
             if (reloginErr) {
               return res.json({
                 ok: 0,
-                err: "We couldn't update your email, please try again.",
-                details: null,
+                err:
+                  "Create customer: we couldn't update your email, please try again.",
+                details: { customer },
               });
             } else {
               return res.json({ ok: 1, err: null, details: { customer } });
@@ -1184,6 +1195,45 @@ app.post(
     } catch (err) {
       return next(err);
     }
+  }
+);
+
+app.post(
+  "/create-subscription",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  async (req, res) => {
+    // Attach the payment method to the customer
+    try {
+      await attachPaymentMethod({
+        paymentMethodId: req.body.paymentMethodId,
+        customerId: req.body.customerId,
+      });
+    } catch (error) {
+      return res
+        .status("402")
+        .json({ ok: 0, err: error.message, details: null });
+    }
+
+    // Change the default invoice settings on the customer to the new payment method
+    await updateCustomer({
+      customerId: req.body.customerId,
+      details: {
+        invoice_settings: {
+          default_payment_method: req.body.paymentMethodId,
+        },
+      },
+    });
+
+    // Create the subscription
+    const subscription = await createSubscription({
+      customer: req.body.customerId,
+      items: [{ price: req.body.priceId }],
+      expand: ["latest_invoice.payment_intent"],
+    });
+
+    res.json({ ok: 1, err: null, details: { subscription } });
   }
 );
 

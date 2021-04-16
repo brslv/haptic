@@ -60,7 +60,24 @@ async function webhook(req, res, next) {
   res.sendStatus(200);
 }
 
+async function attachPaymentMethod({ paymentMethodId, customerId }) {
+  return stripe.paymentMethods.attach(paymentMethodId, {
+    customer: customerId,
+  });
+}
+
+async function updateCustomer({ customerId, details }) {
+  return stripe.customers.update(customerId, details);
+}
+
+async function createSubscription(...data) {
+  return stripe.subscriptions.create(...data);
+}
+
 module.exports = {
   webhook,
   createCustomer,
+  attachPaymentMethod,
+  updateCustomer,
+  createSubscription,
 };
