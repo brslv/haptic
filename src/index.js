@@ -35,6 +35,7 @@ console.log({ env: process.env.NODE_ENV });
 
 // constants
 const HOUR_IN_MS = 3600000;
+const USER_TYPES = { OBSERVER: 0, CREATOR: 1 };
 
 // env constants
 const IS_DEV = process.env.NODE_ENV === "development";
@@ -179,6 +180,10 @@ app.use((req, res, next) => {
   next();
 });
 app.use(flash({ sessionKeyName: SID }));
+app.use((req, res, next) => {
+  res.locals.USER_TYPES = USER_TYPES;
+  next();
+});
 
 // helpers / middlewares
 const mdConverter = new showdown.Converter({

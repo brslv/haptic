@@ -29,5 +29,12 @@ block content
       div(class="flex-1 container mx-auto")
         div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
           span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded mb-4") Current plan
-          p(class="mb-4") You're on the #[span(class="font-medium") Observer] plan.
-          a(href="/checkout" class="btn btn-primary text-md text-center w-full") Upgrade to Creator
+          if user.type === USER_TYPES.OBSERVER
+            p(class="mb-4") You're on the #[span(class="font-medium") Observer] plan.
+            a(href="/checkout" class="btn btn-primary text-md text-center w-full") Upgrade to Creator
+          else if user.type === USER_TYPES.CREATOR
+            div(class="flex items-center")
+              div(class=" p-2 rounded-full bg-yellow-50 mr-2")
+                +icon("star", { fill: "primary", stroke: "primary", width: 12, height: 12 })
+              p You're on the #[span(class="font-medium") Creator] plan.
+
