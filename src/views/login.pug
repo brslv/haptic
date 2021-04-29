@@ -7,6 +7,6 @@ block content
       div(class="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl")
         h1(class="text-xl font-bold mb-4") Login
         if isDev
-          a(href="/auth/twitter" class="block btn btn-twitter") Login with Twitter
+          a(href=(creator ? "/auth/twitter?creator=true" : "/auth/twitter") class="block btn btn-twitter") Login with Twitter
         else
           p Soon

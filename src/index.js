@@ -35,7 +35,7 @@ console.log({ env: process.env.NODE_ENV });
 
 // constants
 const HOUR_IN_MS = 3600000;
-const USER_TYPES = { OBSERVER: 0, CREATOR: 1 };
+const USER_TYPES = { CREATOR_LITE: 0, CREATOR: 1 };
 
 // env constants
 const IS_DEV = process.env.NODE_ENV === "development";
@@ -89,7 +89,22 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(user, done) {
-  done(null, user);
+  if (!user) return done(null, user);
+
+  // We need to refetch the user every time, in order to
+  // get the latest user information from the db.
+  db("users")
+    .select()
+    .where({ id: user.id })
+    .first()
+    .then((result) => {
+      if (result.subscription_deactivation_date !== null)
+        result.subscription_deactivation_date = dateFmt(
+          Number(result.subscription_deactivation_date),
+          "DD MMM, YYYY"
+        );
+      done(null, result);
+    });
 });
 
 passport.use(
@@ -239,8 +254,8 @@ const injectEnv = (req, res, next) => {
 };
 app.use(injectEnv);
 
-const dateFmt = (dateStr) => {
-  return day(dateStr).format("DD MMM, HH:mm");
+const dateFmt = (dateStr, format = "DD MMM, HH:mm") => {
+  return day(dateStr).format(format);
 };
 
 // setup routes
@@ -276,6 +291,8 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
           og: { title: "Dashboard | Haptic" },
         },
         products: result,
+        canCreateProducts:
+          req.user.type === USER_TYPES.CREATOR || result.length === 0,
         flash,
       });
     })
@@ -707,19 +724,33 @@ app.post("/mark-notifications-read", authOnly, (req, res, next) => {
 });
 
 app.get("/login", guestsOnly, (req, res) => {
-  res.render("login", { meta: defaultMetas });
+  res.render("login", {
+    meta: defaultMetas,
+    creator: req.query && req.query.creator === "true",
+  });
 });
 
 app.get("/auth/error", (req, res) => res.send("Unknown Error"));
 
-app.get("/auth/twitter", passport.authenticate("twitter"));
+app.get(
+  "/auth/twitter",
+  function(req, res, next) {
+    req.session.creator = req.query.creator;
+    next();
+  },
+  passport.authenticate("twitter")
+);
 
 app.get(
   "/auth/twitter/callback",
   passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
   function(req, res) {
     req.session.save(function onSessionSave() {
-      res.redirect("/dashboard");
+      if (req.session.creator) {
+        res.redirect("/checkout");
+      } else {
+        res.redirect("/dashboard");
+      }
     });
   }
 );
@@ -1027,7 +1058,6 @@ app.delete("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
         .where({ user_id: user.id, product_id: productResult.id })
         .del()
         .then((collectionResult) => {
-          console.log("collectionResult", collectionResult);
           res.json({ ok: 1, err: null, details: null });
         });
     })
@@ -1152,97 +1182,223 @@ app.post("/feedback", authOnly, ajaxOnly, express.json(), (req, res, next) => {
 
 // payments
 app.get("/checkout", authOnly, (req, res) => {
-  // TODO: the checkout page should check if the user has an email.
-  // user.email v -> show the plan selector
-  // user.email x -> show the email field -> create customer
-  const paymentWentOk = req.query.ok && req.query.ok.toString() === "1";
-
   res.render("checkout", {
     meta: defaultMetas,
-    flash,
-    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
-    creatorPriceId: process.env.STRIPE_CREATOR_PRICE_ID,
-    paymentWentOk,
   });
 });
 
-app.post(
-  "/create-customer",
-  ajaxOnly,
-  authOnly,
-  express.json(),
-  async (req, res) => {
-    const { email } = req.body;
-    const user = req.user;
+// ----------- OLD STRIPE CHECKOUT
+// app.get("/checkout", authOnly, (req, res) => {
+//   // TODO: the checkout page should check if the user has an email.
+//   // user.email v -> show the plan selector
+//   // user.email x -> show the email field -> create customer
+//   const paymentWentOk = req.query.ok && req.query.ok.toString() === "1";
+//
+//   res.render("checkout", {
+//     meta: defaultMetas,
+//     flash,
+//     stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+//     creatorPriceId: process.env.STRIPE_CREATOR_PRICE_ID,
+//     paymentWentOk,
+//   });
+// });
 
-    try {
-      const customer = await createCustomer({ email, user });
-      // save the customer id to the user's entity
+// app.post(
+//   "/create-customer",
+//   ajaxOnly,
+//   authOnly,
+//   express.json(),
+//   async (req, res) => {
+//     const { email } = req.body;
+//     const user = req.user;
+//
+//     try {
+//       const customer = await createCustomer({ email, user });
+//       // save the customer id to the user's entity
+//
+//       db("users")
+//         .where("id", user.id)
+//         .update({ email, stripe_customer_id: customer.id })
+//         .returning("email")
+//         .then(async ([email]) => {
+//           req.logIn({ ...user, email }, async function(reloginErr) {
+//             if (reloginErr) {
+//               return res.json({
+//                 ok: 0,
+//                 err:
+//                   "Create customer: we couldn't update your email, please try again.",
+//                 details: { customer },
+//               });
+//             } else {
+//               return res.json({ ok: 1, err: null, details: { customer } });
+//             }
+//           });
+//         });
+//     } catch (err) {
+//       return next(err);
+//     }
+//   }
+// );
+
+// app.post(
+//   "/create-subscription",
+//   ajaxOnly,
+//   authOnly,
+//   express.json(),
+//   async (req, res) => {
+//     // Attach the payment method to the customer
+//     try {
+//       await attachPaymentMethod({
+//         paymentMethodId: req.body.paymentMethodId,
+//         customerId: req.body.customerId,
+//       });
+//     } catch (error) {
+//       return res
+//         .status("402")
+//         .json({ ok: 0, err: error.message, details: null });
+//     }
+//
+//     // Change the default invoice settings on the customer to the new payment method
+//     await updateCustomer({
+//       customerId: req.body.customerId,
+//       details: {
+//         invoice_settings: {
+//           default_payment_method: req.body.paymentMethodId,
+//         },
+//       },
+//     });
+//
+//     // Create the subscription
+//     const subscription = await createSubscription({
+//       customer: req.body.customerId,
+//       items: [{ price: req.body.priceId }],
+//       expand: ["latest_invoice.payment_intent"],
+//     });
+//
+//     res.json({ ok: 1, err: null, details: { subscription } });
+//   }
+// );
+
+app.post("/wh", express.json(), (req, res) => {
+  const events = req.body.events;
+
+  if (!events || !events.length) return res.status(500).send("No events");
+
+  events.forEach((event) => {
+    if (event.type === "order.completed") {
+      console.log(event);
+      console.log("Handling event:", event.type);
+      const hapticUid = event.data.tags["haptic-uid"];
+      const plan = event.data.items[0];
+      const subscriptionId = plan.subscription.subscription;
+      const sku = plan.sku;
+      const orderId = event.data.reference;
+
+      // update the user with type = sku
+      if (isNaN(hapticUid))
+        return res.status(500).send("Invalid haptic-uid: " + hapticUid);
 
       db("users")
-        .where("id", user.id)
-        .update({ email, stripe_customer_id: customer.id })
-        .returning("email")
-        .then(async ([email]) => {
-          req.logIn({ ...user, email }, async function(reloginErr) {
-            if (reloginErr) {
-              return res.json({
-                ok: 0,
-                err:
-                  "Create customer: we couldn't update your email, please try again.",
-                details: { customer },
-              });
-            } else {
-              return res.json({ ok: 1, err: null, details: { customer } });
-            }
-          });
+        .where({ id: hapticUid })
+        .update({
+          type: sku,
+          order_id: orderId,
+          subscription_id: subscriptionId,
+          updated_at: new Date(),
+        })
+        .then((result) => {
+          res.status(200).send();
         });
-    } catch (err) {
-      return next(err);
-    }
-  }
-);
-
-app.post(
-  "/create-subscription",
-  ajaxOnly,
-  authOnly,
-  express.json(),
-  async (req, res) => {
-    // Attach the payment method to the customer
-    try {
-      await attachPaymentMethod({
-        paymentMethodId: req.body.paymentMethodId,
-        customerId: req.body.customerId,
-      });
-    } catch (error) {
-      return res
-        .status("402")
-        .json({ ok: 0, err: error.message, details: null });
     }
 
-    // Change the default invoice settings on the customer to the new payment method
-    await updateCustomer({
-      customerId: req.body.customerId,
-      details: {
-        invoice_settings: {
-          default_payment_method: req.body.paymentMethodId,
-        },
-      },
-    });
+    if (event.type === "subscription.charge.completed") {
+      console.log("Handling event:", event.type);
+      const hapticUid = event.data.subscription.tags["haptic-uid"];
+      const subscriptionId = event.data.subscription.subscription;
+      const plan = event.data.order.items[0];
+      const sku = plan.sku;
 
-    // Create the subscription
-    const subscription = await createSubscription({
-      customer: req.body.customerId,
-      items: [{ price: req.body.priceId }],
-      expand: ["latest_invoice.payment_intent"],
-    });
+      // update the user with type = sku
+      if (isNaN(hapticUid))
+        return res.status(500).send("Invalid haptic-uid: " + hapticUid);
 
-    res.json({ ok: 1, err: null, details: { subscription } });
-  }
-);
+      db("users")
+        .where({ id: hapticUid })
+        .update({
+          type: sku,
+          subscription_id: subscriptionId,
+          updatedAt: new Date(),
+        })
+        .then((result) => {
+          res.status(200).send();
+        });
+    }
 
-app.post("/stripe-wh", bodyParser.raw({ type: "application/json" }), webhook);
+    if (event.type === "subscription.deactivated") {
+      console.log("Handling event:", event.type);
+      const hapticUid = event.data.tags["haptic-uid"];
+
+      if (isNaN(hapticUid))
+        return res.status(500).send("Invalid haptic-uid: " + hapticUid);
+
+      db("users")
+        .where({ id: hapticUid })
+        .update({
+          type: 0,
+          subscription_deactivation_date: null,
+          order_id: null,
+          subscription_id: null,
+          updated_at: new Date(),
+        })
+        .then((result) => {
+          res.status(200).send();
+        });
+    }
+
+    if (event.type === "subscription.canceled") {
+      console.log(event);
+      console.log("Handling event:", event.type);
+      const hapticUid = event.data.tags["haptic-uid"];
+      const deactivationDateTimestamp = event.data.deactivationDate;
+
+      if (isNaN(hapticUid))
+        return res.status(500).send("Invalid haptic-uid: " + hapticUid);
+
+      db("users")
+        .where({ id: hapticUid })
+        .update({
+          subscription_deactivation_date: deactivationDateTimestamp,
+          updated_at: new Date(),
+        })
+        .then((result) => {
+          res.status(200).send();
+        });
+    }
+
+    if (event.type === "subscription.uncanceled") {
+      console.log("Handling event:", event.type);
+      const product = event.data.product;
+      const sku = product.sku;
+      const hapticUid = event.data.tags["haptic-uid"];
+
+      if (isNaN(hapticUid))
+        return res.status(500).send("Invalid haptic-uid: " + hapticUid);
+
+      db("users")
+        .where({ id: hapticUid })
+        .update({
+          subscription_deactivation_date: null,
+          type: sku,
+          updated_at: new Date(),
+        })
+        .then((result) => {
+          res.status(200).send();
+        });
+    }
+  });
+});
+
+// app.post("/stripe-wh", bodyParser.raw({ type: "application/json" }), webhook);
 
 // 404
 app.get("*", function(req, res, next) {

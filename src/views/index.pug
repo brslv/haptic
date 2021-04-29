@@ -221,9 +221,10 @@ block content
           div(class="flex flex-col md:flex-row items-start")
             div(class="flex-1 w-full bg-white border border-gray-100 rounded-xl p-4 md:p-8 mb-8 md:mb-0 md:mr-8 hover:shadow-md transition")
               div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") FREE
-              h2(class="text-xl md:text-2xl font-bold") Observer
+              h2(class="text-xl md:text-2xl font-bold") Creator Lite
               p(class="text-lg lg:text-xl text-gray-600 mb-4 md:mb-8") For the inspiration seekers.
               ul
+                li(class="p-4 border-b") One product page
                 li(class="p-4 border-b") Collect products
                 li(class="p-4 border-b") Boost products
                 li(class="p-4 border-b") Boost posts
@@ -237,7 +238,7 @@ block content
                 if isProd || isStage
                   button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
                 else
-                  a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as observer
+                  a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as Creator Lite
             div(class="flex-1 w-full bg-white shadow-lg border border-gray-100 rounded-xl p-4 md:p-8 hover:shadow-xl transition")
               div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") 10$ / month
               h2(class="text-xl md:text-2xl font-bold") Creator
@@ -246,13 +247,13 @@ block content
                 li(class="flex items-center p-4 border-b font-bold")
                   +icon("arrow-left")(class="mr-2")
                   span All from Observer
-                li(class="p-4 border-b") Create product pages
+                li(class="p-4 border-b") #[span(class="underline") Unlimited] product pages
                 li(class="p-4 pb-0") All of Haptic's content creation tools
               div(class="mt-8")
                 if isProd || isStage
                   button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
                 else
-                  a(href="/login" class="btn btn-primary lg:text-xl text-center py-3") Join as creator
+                  a(href="/login?creator=true" class="btn btn-primary lg:text-xl text-center py-3") Join as Creator
 
       if isProd || isStage
         div(class="mb-48 mt-16 text-center container mx-auto p-4")

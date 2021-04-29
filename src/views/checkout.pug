@@ -1,67 +1,64 @@
 extends layouts/base.layout.pug
 
-include partials/top-bar.pug
 include partials/icon.pug
+include partials/top-bar.pug
 include partials/page-title.pug
 
+block append head
+  meta(name="turbo-visit-control" content="reload")
+
 block append head_scripts
+  script(
+    id="fsc-api"
+    src="https://d1f8f9xcsvx3ha.cloudfront.net/sbl/0.8.5/fastspring-builder.min.js"
+    type="text/javascript"
+    data-storefront="hapticstore.test.onfastspring.com/popup-hapticstore"
+    data-popup-webhook-received="onPopupWebhookReceived"
+  )
   script.
-    window.___spk___ = "!{stripePublishableKey}";
-    window.___selectedPriceId___ = "!{creatorPriceId}";
+    fastspring.builder.push({ paymentContact: { email: "!{user.email}" } });
+    fastspring.builder.tag('haptic-uid', !{user.id});
+    function onPopupWebhookReceived() {
+      var successEl = document.querySelector("[data-checkout-success]");
+      var plansEl = document.querySelector("[data-checkout-plans]");
+      plansEl.classList.add("hidden");
+      successEl.classList.remove("hidden");
+    }
 
 block content
   +top-bar
-  div(class="container mx-auto p-4")
+  div(class="container max-w-lg mx-auto p-4")
     +page-title Checkout
 
-    div(class="my-4")
-      div(class="md:grid grid-cols-1 md:grid-cols-7 gap-4")
-        div(class="mb-4 md:mb-0 md:col-span-3")
-          span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded") Chosen plan
+    if user.type === USER_TYPES.CREATOR
+      div(class="my-4 text-gray-500")
+        p You're already a Creator.
+        a(href="/dashboard" class="underline hover:no-underline") Go to Dashboard
+
+    div(class="my-4 hidden" data-checkout-success)
+      div(class="p-4 bg-white shadow-md rounded-xl")
+        div(class="flex items-start")
+          div(class="flex-1")
+            +icon("check", { stroke: "white", width: 18, height: 18 })(class="bg-green-500 p-2 rounded-full w-8 h-8 mr-4")
+          div
+            h2(class="text-xl font-bold mb-4") Thank you for your purchase.
+            p(class="mb-4") An email with details about your order is waiting in your inbox already. It's sent from FastSpring, our payments provider.
+            p(class="mb-4") If you have any questions or comments, feel free to reach out - #[a(href="mailto:borislav@haptic.so" class="underline hover:no-underline") send me an email.]
+            a(href="/dashboard" class="btn btn-primary inline-block") Go to Dashboard
+        // - You will get an email by FastSpring with:
+        // - Subscription details by FastSpring
+        // - Details on how to manage your subscriptions
+        // - Invoice
+
+    if user.type !== USER_TYPES.CREATOR
+      div(class="my-4" data-checkout-plans)
+        div(class="mb-4 md:mb-0")
+          // span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded") Chosen plan
           div(class=" bg-white p-4 rounded-xl border border-gray-100 transition shadow")
             h2(class="font-black text-2xl") Creator
             p(class="font-black text-4xl my-4 text-yellow-300") $10
             p(class="text-gray-600") Per month
-            p(class="text-gray-600") Billed monthly
-        div(class="col-span-4")
-          div(class="bg-white p-4 rounded-xl border border-gray-100 transition shadow-lg hover:shadow-xl")
-
-            if (paymentWentOk) 
-              span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded mb-4") Payment success
-              div(class="text-gray-600 text-2xl font-bold border border-green-400 bg-green-50 rounded-lg p-4 mb-4") Payment went smooth. #[br] Welcome to the creators gang! 🎉
-              div Now, #[a(href="/dashboard" class="btn btn-small btn-default inline-block") go and create your first product] on Haptic. 🚀
-                
-            else
-              span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded mb-4") Payment details
-
-              // - Invalid payment config message
-              div(class="hidden bg-red-50 border border-red-400 p-4 rounded-lg" data-invalid-payment-config)
-                p Invalid/missing payments configuration. Please, refresh the page or contact us if the issue persists.
-              div
-                form(id="payment-form")
-                  div(class="mb-4")
-                    label(class="mb-1 label block" for="email")
-                      span Billing email
-                    input(id="email" type="email" class="input py-3" value=user.email data-billing-email disabled=(user.email))
-                    div(id="email-errors" class="text-red-500 text-xs mt-2" role="alert")
-
-                  label(class="label mb-1")
-                    span Card details
-                    div(id="card-element")
-                      span(data-loader class="mr-2")
-                        span(class="animate-spin icon-container opacity-75 my-0 inline-block relative")
-                          +icon("refresh-cw")
-                  div
-                    span(data-loader class="hidden mr-2")
-                      span(class="animate-pulse icon-container opacity-75 my-0 inline-block relative").
-                        Just a sec...processing your payment.
-                  div(id="card-element-errors" class="text-red-500 text-xs mt-2" role="alert")
-                  button(type="submit" class="flex justify-center btn btn-primary text-lg w-full py-3 mt-4")
-                    span(data-loader class="hidden mr-2")
-                      span(class="animate-spin icon-container opacity-75 my-0 block relative")
-                        +icon("refresh-cw")
-                    span(data-submit-button-label) Subscribe
-          div(class="flex items-center justify-center mt-2 text-sm")
-            if !paymentWentOk
-              div Payments powered by #[a(href="https://stripe.com" class="underline font-medium" target="_blank" rel="noopener noreferrer") Stripe]
-
+            p(class="text-gray-600 mb-4") Billed monthly
+            a(href='#' data-fsc-action="Add,Checkout" data-fsc-item-path-value="creator" data-turbo="false" class="btn btn-primary text-center text-xl") Upgrade now
+          div(class="text-center text-xs mt-4")
+            p Payments powered by #[a(href="https://fastspring.com" class="text-gray-600 underline" target="_blank" rel="noreferrer noopener") FastSpring]. #[+icon("info", { width: 12, height: 12 })(class="inline-block cursor-help" data-tippy-content="Haptic is using FastSpring as a Merchant of Record (MOR). This means that FastSpring is a reseller of the subscription, provided by Haptic. By clicking on \"Upgrade now\", you will be presented with a popup screen, where you must provide the information, needed by FastSpring in order to fulfill your purchase.")]

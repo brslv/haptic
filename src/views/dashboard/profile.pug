@@ -29,12 +29,33 @@ block content
       div(class="flex-1 container mx-auto")
         div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
           span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded mb-4") Current plan
-          if user.type === USER_TYPES.OBSERVER
-            p(class="mb-4") You're on the #[span(class="font-medium") Observer] plan.
-            a(href="/checkout" class="btn btn-primary text-md text-center w-full") Upgrade to Creator
+          if user.type === USER_TYPES.CREATOR_LITE
+            div(class="border rounded-lg overflow-hidden")
+              div
+                div(class="flex items-center")
+                  div(class="flex-1 p-2 border-r")
+                    p(class="font-bold") Observer
+                  div(class="p-2 bg-yellow-50")
+                    // a(class="underline hover:no-underline" href="https://hapticstore.test.onfastspring.com/account") Manage
+                    a(href="/checkout" class="underline hover:no-underline") Upgrade
           else if user.type === USER_TYPES.CREATOR
-            div(class="flex items-center")
-              div(class=" p-2 rounded-full bg-yellow-50 mr-2")
-                +icon("star", { fill: "primary", stroke: "primary", width: 12, height: 12 })
-              p You're on the #[span(class="font-medium") Creator] plan.
+            div(class="border rounded-lg")
+              div
+                div(class="flex items-center")
+                  div(class="flex-1 p-2 border-r")
+                    p(class="font-bold") Creator
+                  div(class="p-2")
+                    a(class="underline hover:no-underline" href="https://hapticstore.test.onfastspring.com/account") Manage
+                if user.subscription_deactivation_date
+                  div(class="text-xs p-2 border-t") Your subscription ends on: #[strong !{user.subscription_deactivation_date}]
+
+
+            // - div(class="flex items-center justify-between")
+            // -   div(class="p-1 px-4 rounded-full bg-yellow-50 mr-2 flex items-center")
+            // -     p(class="font-medium bg-yellow-50 rounded-md flex-1") Creator
+            // -   a(class="underline hover:no-underline" href="https://hapticstore.test.onfastspring.com/account") Manage
+
+
+            // - if user.subscription_deactivation_date
+            // -   div(class="text-xs bg-red-50 rounded-md p-1 inline-block mt-4") Your subscription ends on: #[strong !{user.subscription_deactivation_date}]
 
