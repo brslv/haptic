@@ -113,6 +113,14 @@ export default function shortUpdate() {
           turbo.actions.visit(window.location.pathname, { action: "replace" });
         }
       },
+      fail: function fail(err) {
+        if (err.response && err.response.status === 400) {
+          $(document).trigger("haptic:add-toast", {
+            content: err.response.data.err,
+            type: "error",
+          });
+        }
+      },
     });
   }
 
@@ -120,10 +128,12 @@ export default function shortUpdate() {
     const text = $els.$text.val();
     const uploadedImage = $els.$uploadedImg.val();
     const productId = $els.$productIdInput.val();
+    const csrf = $els.$csrf.val();
     return {
       text: text,
       image: uploadedImage,
       productId: productId,
+      csrf: csrf,
     };
   }
 
@@ -239,6 +249,7 @@ export default function shortUpdate() {
       $allTriggers,
       $postTypesContainer,
       $form: $root.find("form"),
+      $csrf: $root.find('input[name="csrf"]'),
       $submit: $root.find(`button[type="submit"]`),
       $uploadImgBtn: $root.find(`[data-upload-image-btn]`),
       $cancelBtn: $root.find(`[data-post-type-cancel]`),

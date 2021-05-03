@@ -7,6 +7,7 @@ include ../../partials/modal.pug
 include ../../partials/post.pug
 include ../../partials/icon.pug
 include ../../partials/require-module.pug
+include ../../partials/csrf.pug
 
 mixin post-type-btn({trigger, icon, disabled, tooltip, text}, attr = {})
   div(
@@ -52,6 +53,7 @@ block content
 
           div(data-post-type="short-update" class="hidden")
             form
+              +csrf
               input(type="file" id="image-upload" data-upload-file class="hidden")
               input(type="hidden" name="uploaded_image" value="" data-uploaded)
               input(type="hidden" name="id" value=product.id)

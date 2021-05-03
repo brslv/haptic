@@ -853,28 +853,35 @@ app.post(
   }
 );
 
-app.post("/product", express.json(), ajaxOnly, authOnly, (req, res, next) => {
-  db("products")
-    .insert({
-      user_id: req.user.id,
-      name: req.body.name,
-      slug: req.body.slug.replace(/[\.]+/g, "-").toLowerCase(),
-    })
-    .returning(["id", "slug"])
-    .then((result) => {
-      res.json({ ok: 1, err: null, details: { ...result[0] } });
-    })
-    .catch((err) => {
-      if (err.code === dbErrCodes.DUP_CODE)
-        return res.status(400).json({
-          ok: 0,
-          err: "Slug already taken 😕. Please, use another slug.",
-          details: null,
-        });
+app.post(
+  "/product",
+  express.json(),
+  csrfProtected,
+  ajaxOnly,
+  authOnly,
+  (req, res, next) => {
+    db("products")
+      .insert({
+        user_id: req.user.id,
+        name: req.body.name,
+        slug: req.body.slug.replace(/[\. ]+/g, "-").toLowerCase(),
+      })
+      .returning(["id", "slug"])
+      .then((result) => {
+        res.json({ ok: 1, err: null, details: { ...result[0] } });
+      })
+      .catch((err) => {
+        if (err.code === dbErrCodes.DUP_CODE)
+          return res.status(400).json({
+            ok: 0,
+            err: "Slug already taken 😕. Please, use another slug.",
+            details: null,
+          });
 
-      next(err);
-    });
-});
+        next(err);
+      });
+  }
+);
 
 app.post("/post/:id/boost", ajaxOnly, authOnly, (req, res, next) => {
   const id = req.params.id;
@@ -915,6 +922,7 @@ app.post(
   ajaxOnly,
   authOnly,
   express.json(),
+  csrfProtected,
   (req, res, next) => {
     const types = posts.types;
     const type = req.params.type;
