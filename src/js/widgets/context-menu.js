@@ -82,23 +82,28 @@ export default function contextMenu() {
 
 export function postContextMenu() {
   function deletePost(postId, $el) {
-    req("/post/" + postId, {
-      method: "delete",
-      ok: function postDelResponse(response) {
-        // remove the post element
-        const $post = $('[data-post-id="' + postId + '"]');
-        if (!$post) {
-          console.warn("No post with post_id" + postId + " to remove.");
-          return;
-        }
+    const data = { csrf: $('meta[name="csrf"]').attr("content") };
+    req(
+      "/post/" + postId,
+      { data },
+      {
+        method: "delete",
+        ok: function postDelResponse(response) {
+          // remove the post element
+          const $post = $('[data-post-id="' + postId + '"]');
+          if (!$post) {
+            console.warn("No post with post_id" + postId + " to remove.");
+            return;
+          }
 
-        $post.remove();
-        $(document).trigger("haptic:add-toast", {
-          content: "Post deleted successfully",
-          type: "success",
-        });
-      },
-    });
+          $post.remove();
+          $(document).trigger("haptic:add-toast", {
+            content: "Post deleted successfully",
+            type: "success",
+          });
+        },
+      }
+    );
   }
 
   function onOpen(e, data) {

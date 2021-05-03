@@ -966,26 +966,33 @@ app.post(
   }
 );
 
-app.delete("/post/:id", ajaxOnly, authOnly, (req, res, next) => {
-  const id = req.params.id;
-  posts
-    .actions({ db, user: req.user })
-    .removePost(id)
-    .then((result) => {
-      if (result) {
-        return res.json({ ok: 1, err: null, details: { id } });
-      } else {
-        return res.status(400).json({
-          ok: 0,
-          err: "Post deletion failed unexpectedly. Please, try again 🙏",
-          details: null,
-        });
-      }
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+app.delete(
+  "/post/:id",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const id = req.params.id;
+    posts
+      .actions({ db, user: req.user })
+      .removePost(id)
+      .then((result) => {
+        if (result) {
+          return res.json({ ok: 1, err: null, details: { id } });
+        } else {
+          return res.status(400).json({
+            ok: 0,
+            err: "Post deletion failed unexpectedly. Please, try again 🙏",
+            details: null,
+          });
+        }
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
 
 app.post("/p/:slug/boost", ajaxOnly, authOnly, (req, res, next) => {
   const slug = req.params.slug;
