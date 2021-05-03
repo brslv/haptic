@@ -30,6 +30,7 @@ const {
   createSubscription,
 } = require("./payments");
 const bodyParser = require("body-parser");
+const { randomBytes } = require("crypto");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -182,6 +183,7 @@ app.use(
     secret: process.env.COOKIES_SECRET,
     resave: false,
     saveUninitialized: true,
+    sameSite: "lax",
     cookie: {
       secure: IS_PROD || IS_STAGE,
       maxAge: HOUR_IN_MS * 24, // one day
@@ -201,6 +203,34 @@ app.use((req, res, next) => {
 });
 
 // helpers / middlewares
+const setupCsrf = (req, res, next) => {
+  if (req.session.csrf === undefined) {
+    req.session.csrf = randomBytes(100).toString("base64"); // convert random data to a string
+  }
+  res.locals.csrf = req.session.csrf;
+  next();
+};
+app.use(setupCsrf);
+const csrfProtected = (req, res, next) => {
+  const isAjax = isAjaxCall(req);
+  if (!req.body.csrf) {
+    if (isAjax)
+      return res
+        .status(400)
+        .json({ ok: 0, err: "No csrf token found.", details: null });
+    return res.status(400).send(`No csrf token found.`);
+  }
+
+  if (req.body.csrf !== req.session.csrf) {
+    if (isAjax)
+      return res
+        .status(400)
+        .json({ ok: 0, err: "Invalid csrf token.", details: null });
+    return res.status(400).send("Invalid csrf token.");
+  }
+
+  next();
+};
 const mdConverter = new showdown.Converter({
   noHeaderId: true,
   simplifiedAutoLink: true,
@@ -480,23 +510,28 @@ app.post(
   }
 );
 
-app.post("/dashboard/product/:slug/delete", authOnly, (req, res, next) => {
-  const slug = req.params.slug;
-  const user = req.user;
-  const productsActions = products.actions({ db, user: req.user });
-  productsActions
-    .delProduct({ slug })
-    .then((result) => {
-      if (result) {
-        req.flash("success", "Product deleted ✅").then(() => {
-          res.set("Location", "/dashboard").sendStatus(303);
-        });
-      }
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+app.post(
+  "/dashboard/product/:slug/delete",
+  authOnly,
+  csrfProtected,
+  (req, res, next) => {
+    const slug = req.params.slug;
+    const user = req.user;
+    const productsActions = products.actions({ db, user: req.user });
+    productsActions
+      .delProduct({ slug })
+      .then((result) => {
+        if (result) {
+          req.flash("success", "Product deleted ✅").then(() => {
+            res.set("Location", "/dashboard").sendStatus(303);
+          });
+        }
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
 
 app.get("/dashboard/profile", authOnly, (req, res, next) => {
   return res.render("dashboard/profile", {
@@ -816,7 +851,7 @@ app.post(
   }
 );
 
-app.post("/product", ajaxOnly, authOnly, express.json(), (req, res, next) => {
+app.post("/product", express.json(), ajaxOnly, authOnly, (req, res, next) => {
   db("products")
     .insert({
       user_id: req.user.id,

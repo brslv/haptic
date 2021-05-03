@@ -6,6 +6,7 @@ include partials/page-title.pug
 include partials/flash-msg.pug
 include partials/feedbackBtn.pug
 include partials/require-module.pug
+include partials/csrf.pug
 
 block append scripts
   +require-module('dashboard')
@@ -39,9 +40,10 @@ block modals
       h2(class="font-medium text-gray-600 dark:text-gray-200 text-xs uppercase") Please upgrade
       div(class="pt-8")
         div
-          div(class="bg-gray-100 p-4 rounded-full inline-block mb-4")
-            +icon("credit-card", { width: 32, height: 32 })
-          p(class="mb-2") As an #[strong Observer], you can only have one product.
+          div(class="flex items-start")
+            div(class="bg-gray-100 p-4 rounded-full inline-block mr-4")
+              +icon("credit-card", { width: 32, height: 32 })
+            p(class="mb-2") As #[strong Creator Lite], you can only have one product.
           hr(class="my-4")
           a(href="/checkout" class="btn btn-primary w-full text-center") Upgrade now
 
@@ -49,6 +51,7 @@ block modals
     +modal("new-product", { style: "width: 300px;" })
       h2(class="font-medium text-gray-600 dark:text-gray-200 text-xs uppercase") Create product
       form(action="/create-product" method="POST" data-create-product-form)
+        +csrf
         div(class="pt-8")
           div(class="pb-4")
             label

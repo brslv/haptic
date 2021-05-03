@@ -4,6 +4,7 @@ include ../../partials/top-bar.pug
 include ../../partials/product-header.pug
 include ../../partials/flash-msg.pug
 include ../../partials/require-module.pug
+include ../../partials/csrf.pug
 
 block append scripts
   +require-module('settings')
@@ -15,6 +16,7 @@ block content
     div(class="container mx-auto pt-4")
       +flash-msg(flash)
     form(action=`${form.delete.action}` method="POST" data-delete-product-form class="hidden")
+      +csrf
     form(action=`${form.action}` method="POST" id="product-settings-form")
       div(class="flex items-start md:flex-row flex-col")
 

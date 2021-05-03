@@ -56,12 +56,13 @@ export default function createProduct() {
 
   function onFormSubmit($els, e) {
     e.preventDefault();
+    const csrf = $els.$csrf.val();
     const name = $els.$name.val();
     const slug = $els.$slug.val();
 
     req(
       "/product",
-      { name, slug },
+      { name, slug, csrf },
       {
         method: "post",
         ok: (result) => {
@@ -96,6 +97,7 @@ export default function createProduct() {
     const $form = $("[data-create-product-form]");
     $els = {
       $form,
+      $csrf: $('input[name="csrf"]', $form),
       $name: $("[data-product-name-input]", $form),
       $slug: $("[data-product-slug-input]", $form),
       $slugBtn: $("[data-product-slug-btn]", $form),
