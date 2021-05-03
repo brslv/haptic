@@ -18,6 +18,7 @@ block content
     form(action=`${form.delete.action}` method="POST" data-delete-product-form class="hidden")
       +csrf
     form(action=`${form.action}` method="POST" id="product-settings-form")
+      +csrf
       div(class="flex items-start md:flex-row flex-col")
 
         // -- left

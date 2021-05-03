@@ -38,10 +38,11 @@ export default function createProduct() {
     $submit.attr("disabled", "disabled");
 
     const name = $name.val();
+    const csrf = $els.$csrf.val();
 
     req(
       "/product-slug",
-      { name },
+      { name, csrf },
       {
         method: "post",
         ok: function(result) {

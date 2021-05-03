@@ -466,6 +466,7 @@ app.get(
 app.post(
   "/dashboard/product/:slug/settings/update",
   authOnly,
+  csrfProtected,
   (req, res, next) => {
     const slug = req.params.slug;
     const productsActions = products.actions({ db, user: req.user });
@@ -828,6 +829,7 @@ app.post(
   ajaxOnly,
   authOnly,
   express.json(),
+  csrfProtected,
   (req, res, next) => {
     let slug = nanoid(6).toLowerCase();
     if (req.body.name)
