@@ -745,19 +745,25 @@ app.get("/notifications", authOnly, async (req, res, next) => {
   res.render("notifications", { meta: defaultMetas, flash });
 });
 
-app.post("/mark-notifications-read", authOnly, (req, res, next) => {
-  const notificationsActions = notifications.actions({ db, user: req.user });
-  notificationsActions
-    .readAll()
-    .then((result) => {
-      req.flash("success", "Notifications cleared 🎉").then(() => {
-        res.redirect(`/notifications`);
+app.post(
+  "/mark-notifications-read",
+  authOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const notificationsActions = notifications.actions({ db, user: req.user });
+    notificationsActions
+      .readAll()
+      .then((result) => {
+        req.flash("success", "Notifications cleared 🎉").then(() => {
+          res.redirect(`/notifications`);
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+  }
+);
 
 app.get("/login", guestsOnly, (req, res) => {
   res.render("login", {
@@ -883,39 +889,46 @@ app.post(
   }
 );
 
-app.post("/post/:id/boost", ajaxOnly, authOnly, (req, res, next) => {
-  const id = req.params.id;
-  const user = req.user;
-  const notificationsActions = notifications.actions({ db, user });
+app.post(
+  "/post/:id/boost",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const id = req.params.id;
+    const user = req.user;
+    const notificationsActions = notifications.actions({ db, user });
 
-  db.table("post_boosts")
-    .insert({ post_id: id, user_id: user.id })
-    .then((boostResult) => {
-      return notificationsActions
-        .add(notifications.typesMap.POST_BOOSTS_TYPE, { post_id: id })
-        .then((notificationsResult) => {
-          return db("post_boosts")
-            .select("id")
-            .where({ post_id: id })
-            .then((allBoostsResult) => {
-              res.json({
-                ok: 1,
-                err: null,
-                details: { boosts: allBoostsResult },
+    db.table("post_boosts")
+      .insert({ post_id: id, user_id: user.id })
+      .then((boostResult) => {
+        return notificationsActions
+          .add(notifications.typesMap.POST_BOOSTS_TYPE, { post_id: id })
+          .then((notificationsResult) => {
+            return db("post_boosts")
+              .select("id")
+              .where({ post_id: id })
+              .then((allBoostsResult) => {
+                res.json({
+                  ok: 1,
+                  err: null,
+                  details: { boosts: allBoostsResult },
+                });
               });
-            });
-        });
-    })
-    .catch((err) => {
-      if (err.code === dbErrCodes.DUP_CODE)
-        return res.status(400).json({
-          ok: 0,
-          err: "You've already boosted this post. 🚀",
-          details: null,
-        });
-      next(err);
-    });
-});
+          });
+      })
+      .catch((err) => {
+        if (err.code === dbErrCodes.DUP_CODE)
+          return res.status(400).json({
+            ok: 0,
+            err: "You've already boosted this post. 🚀",
+            details: null,
+          });
+        next(err);
+      });
+  }
+);
 
 app.post(
   "/post/:pid/:type",
@@ -994,129 +1007,150 @@ app.delete(
   }
 );
 
-app.post("/p/:slug/boost", ajaxOnly, authOnly, (req, res, next) => {
-  const slug = req.params.slug;
-  const user = req.user;
-  const notificationsActions = notifications.actions({ db, user: req.user });
+app.post(
+  "/p/:slug/boost",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const slug = req.params.slug;
+    const user = req.user;
+    const notificationsActions = notifications.actions({ db, user: req.user });
 
-  db("products")
-    .select("id")
-    .where({ slug })
-    .first()
-    .then((productResult) => {
-      if (!productResult) {
-        return res.status(400).json({
-          ok: 0,
-          err: `No such product (slug: ${slug}).`,
-          details: null,
-        });
-      }
+    db("products")
+      .select("id")
+      .where({ slug })
+      .first()
+      .then((productResult) => {
+        if (!productResult) {
+          return res.status(400).json({
+            ok: 0,
+            err: `No such product (slug: ${slug}).`,
+            details: null,
+          });
+        }
 
-      return db("product_boosts")
-        .insert({ product_id: productResult.id, user_id: user.id })
-        .then((boostResult) => {
-          return notificationsActions
-            .add(notifications.typesMap.PRODUCT_BOOSTS_TYPE, {
-              product_id: productResult.id,
-            })
-            .then((notificationResult) => {
-              return db("product_boosts")
-                .select("id")
-                .where({ product_id: productResult.id })
-                .then((allBoostsResult) => {
-                  res.json({
-                    ok: 1,
-                    err: null,
-                    details: { boosts: allBoostsResult },
+        return db("product_boosts")
+          .insert({ product_id: productResult.id, user_id: user.id })
+          .then((boostResult) => {
+            return notificationsActions
+              .add(notifications.typesMap.PRODUCT_BOOSTS_TYPE, {
+                product_id: productResult.id,
+              })
+              .then((notificationResult) => {
+                return db("product_boosts")
+                  .select("id")
+                  .where({ product_id: productResult.id })
+                  .then((allBoostsResult) => {
+                    res.json({
+                      ok: 1,
+                      err: null,
+                      details: { boosts: allBoostsResult },
+                    });
                   });
-                });
-            });
-        });
-    })
-    .catch((err) => {
-      if (err.code === dbErrCodes.DUP_CODE)
-        return res.status(400).json({
-          ok: 0,
-          err: "You've already boosted this product. 🚀",
-          details: null,
-        });
-      next(err);
-    });
-});
-
-app.post("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
-  const slug = req.params.slug;
-  const user = req.user;
-  const notificationsActions = notifications.actions({ db, user: req.user });
-  db("products")
-    .select("id")
-    .where({ slug })
-    .first()
-    .then((productResult) => {
-      if (!productResult) {
-        return res.status(400).json({
-          ok: 0,
-          err: `No such product (slug: ${slug}).`,
-          details: null,
-        });
-      }
-
-      return db("collections")
-        .insert({ user_id: user.id, product_id: productResult.id })
-        .returning("id")
-        .then((collectionResult) => {
-          notificationsActions
-            .add(notifications.typesMap.PRODUCT_COLLECTIONS_TYPE, {
-              product_id: productResult.id,
-            })
-            .then((notificationResult) => {
-              res.json({
-                ok: 1,
-                err: null,
-                details: { id: collectionResult.id },
               });
-            });
-        });
-    })
-    .catch((err) => {
-      if (err.code === dbErrCodes.DUP_CODE)
-        return res.status(400).json({
-          ok: 0,
-          err: "You've already collected this product.",
-          details: null,
-        });
-      next(err);
-    });
-});
+          });
+      })
+      .catch((err) => {
+        if (err.code === dbErrCodes.DUP_CODE)
+          return res.status(400).json({
+            ok: 0,
+            err: "You've already boosted this product. 🚀",
+            details: null,
+          });
+        next(err);
+      });
+  }
+);
 
-app.delete("/p/:slug/collect", authOnly, ajaxOnly, (req, res, next) => {
-  const slug = req.params.slug;
-  const user = req.user;
-  db("products")
-    .select("id")
-    .where({ slug })
-    .first()
-    .then((productResult) => {
-      if (!productResult) {
-        return res.status(400).json({
-          ok: 0,
-          err: `No such product (slug: ${slug}).`,
-          details: null,
-        });
-      }
+app.post(
+  "/p/:slug/collect",
+  authOnly,
+  ajaxOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const slug = req.params.slug;
+    const user = req.user;
+    const notificationsActions = notifications.actions({ db, user: req.user });
+    db("products")
+      .select("id")
+      .where({ slug })
+      .first()
+      .then((productResult) => {
+        if (!productResult) {
+          return res.status(400).json({
+            ok: 0,
+            err: `No such product (slug: ${slug}).`,
+            details: null,
+          });
+        }
 
-      return db
-        .table("collections")
-        .where({ user_id: user.id, product_id: productResult.id })
-        .del()
-        .then((collectionResult) => {
-          res.json({ ok: 1, err: null, details: null });
-        });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+        return db("collections")
+          .insert({ user_id: user.id, product_id: productResult.id })
+          .returning("id")
+          .then((collectionResult) => {
+            notificationsActions
+              .add(notifications.typesMap.PRODUCT_COLLECTIONS_TYPE, {
+                product_id: productResult.id,
+              })
+              .then((notificationResult) => {
+                res.json({
+                  ok: 1,
+                  err: null,
+                  details: { id: collectionResult.id },
+                });
+              });
+          });
+      })
+      .catch((err) => {
+        if (err.code === dbErrCodes.DUP_CODE)
+          return res.status(400).json({
+            ok: 0,
+            err: "You've already collected this product.",
+            details: null,
+          });
+        next(err);
+      });
+  }
+);
+
+app.delete(
+  "/p/:slug/collect",
+  authOnly,
+  ajaxOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const slug = req.params.slug;
+    const user = req.user;
+    db("products")
+      .select("id")
+      .where({ slug })
+      .first()
+      .then((productResult) => {
+        if (!productResult) {
+          return res.status(400).json({
+            ok: 0,
+            err: `No such product (slug: ${slug}).`,
+            details: null,
+          });
+        }
+
+        return db
+          .table("collections")
+          .where({ user_id: user.id, product_id: productResult.id })
+          .del()
+          .then((collectionResult) => {
+            res.json({ ok: 1, err: null, details: null });
+          });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
 
 app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
   singleUpload(req, res, function handleUpload(err) {
@@ -1143,6 +1177,7 @@ app.post(
   ajaxOnly,
   ajaxOnly,
   express.json(),
+  csrfProtected,
   (req, res, next) => {
     const data = req.body;
     const slug = req.params.slug;
@@ -1179,58 +1214,72 @@ app.post(
   }
 );
 
-app.delete("/product/:slug/tool/:id", authOnly, ajaxOnly, (req, res, next) => {
-  const { id, slug } = req.params;
-  db("products")
-    .select("id")
-    .where({ user_id: req.user.id, slug })
-    .first()
-    .then((productResult) => {
-      if (!productResult) {
-        return res.status(400).json({
-          ok: 0,
-          err: `No such product (slug: ${slug}).`,
-          details: null,
-        });
-      }
-
-      db("product_tools")
-        .where({ id })
-        .del()
-        .then((productToolsResult) => {
-          res.json({
-            ok: 1,
-            err: null,
+app.delete(
+  "/product/:slug/tool/:id",
+  authOnly,
+  ajaxOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const { id, slug } = req.params;
+    db("products")
+      .select("id")
+      .where({ user_id: req.user.id, slug })
+      .first()
+      .then((productResult) => {
+        if (!productResult) {
+          return res.status(400).json({
+            ok: 0,
+            err: `No such product (slug: ${slug}).`,
             details: null,
           });
-        })
-        .catch((err) => {
-          next(err);
-        });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+        }
 
-app.post("/feedback", authOnly, ajaxOnly, express.json(), (req, res, next) => {
-  const user = req.user;
-  const data = req.body;
-  db("feedback")
-    .insert({
-      user_id: user.id,
-      email: data.email,
-      type: data.type,
-      text: data.text,
-    })
-    .returning("id")
-    .then((result) => {
-      res.json({ ok: 1, err: null, details: { id: result[0] } });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+        db("product_tools")
+          .where({ id })
+          .del()
+          .then((productToolsResult) => {
+            res.json({
+              ok: 1,
+              err: null,
+              details: null,
+            });
+          })
+          .catch((err) => {
+            next(err);
+          });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
+
+app.post(
+  "/feedback",
+  authOnly,
+  ajaxOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const user = req.user;
+    const data = req.body;
+    db("feedback")
+      .insert({
+        user_id: user.id,
+        email: data.email,
+        type: data.type,
+        text: data.text,
+      })
+      .returning("id")
+      .then((result) => {
+        res.json({ ok: 1, err: null, details: { id: result[0] } });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+);
 
 // payments
 app.get("/checkout", authOnly, (req, res) => {

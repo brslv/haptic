@@ -3,6 +3,7 @@ extends layouts/base.layout.pug
 include partials/top-bar.pug
 include partials/page-title.pug
 include partials/flash-msg.pug
+include partials/csrf.pug
 
 mixin notif({ notif })
   div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
@@ -42,6 +43,7 @@ block content
           +page-title(class="bg-gray-200 px-4 py-1 rounded-full mr-4") Unread
           if notifications && notifications.unread && notifications.unread.length
             form(action="/mark-notifications-read" method="POST")
+              +csrf
               button(type="submit" class="btn btn-primary btn-small click-scale") Mark as read
         if notifications && notifications.unread && notifications.unread.length
           each notif in notifications.unread

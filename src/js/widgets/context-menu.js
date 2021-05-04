@@ -144,12 +144,17 @@ export function collectionContextMenu() {
 
   function deleteCollectedItem($el) {
     const slug = $el.data("product-slug");
+    const csrf = $('meta[name="csrf"]').attr("content");
 
-    req(`/p/${slug}/collect`, {
-      method: "delete",
-      ok: onOk.bind(null, $el),
-      fail: onFail,
-    });
+    req(
+      `/p/${slug}/collect`,
+      { data: { csrf } },
+      {
+        method: "delete",
+        ok: onOk.bind(null, $el),
+        fail: onFail,
+      }
+    );
   }
 
   function onAction(e, data) {

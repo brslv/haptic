@@ -28,10 +28,11 @@ export default function feedback() {
     const email = $els.$email.val();
     const type = $els.$type.val();
     const text = $els.$text.val();
+    const csrf = $els.$csrf.val();
 
     req(
       "/feedback",
-      { email, text, type },
+      { email, text, type, csrf },
       {
         method: "post",
         ok: (result) => {
@@ -78,6 +79,7 @@ export default function feedback() {
       $type: $("[data-feedback-type-input]", $form),
       $text: $("[data-feedback-text-input]", $form),
       $submit: $(`button[type="submit"]`, $form),
+      $csrf: $('input[name="csrf"]', $form),
     };
 
     $(document).on("haptic:modal-open", function(e, data) {

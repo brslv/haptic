@@ -37,10 +37,11 @@ export default function tools() {
     if (!text.length) return;
 
     const slug = $els.$root.data("product-tools-product-slug");
+    const csrf = $('meta[name="csrf"]').attr("content");
 
     req(
       `/product/${slug}/tool`,
-      { text },
+      { text, csrf },
       {
         method: "post",
         ok: function(response) {
@@ -71,14 +72,19 @@ export default function tools() {
     const $target = $(e.currentTarget).parents("[data-product-tool-id]");
     const id = $target.data("product-tool-id");
     const slug = $els.$root.data("product-tools-product-slug");
-    req(`/product/${slug}/tool/${id}`, {
-      method: "delete",
-      ok: function(result) {
-        if (result.data.ok) {
-          $target.remove();
-        }
-      },
-    });
+    const csrf = $('meta[name="csrf"]').attr("content");
+    req(
+      `/product/${slug}/tool/${id}`,
+      { data: { csrf } },
+      {
+        method: "delete",
+        ok: function(result) {
+          if (result.data.ok) {
+            $target.remove();
+          }
+        },
+      }
+    );
   }
 
   function closeForm($els) {

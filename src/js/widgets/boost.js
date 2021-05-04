@@ -22,13 +22,19 @@ export default function boost() {
       console.log(err);
     }
 
-    req(`/post/${postId}/boost`, { method: "post", ok: onOk, fail: onFail });
+    const csrf = $('meta[name="csrf"]').attr("content");
+    req(
+      `/post/${postId}/boost`,
+      { csrf },
+      { method: "post", ok: onOk, fail: onFail }
+    );
   }
 
   function onProductBoostClick($el, $els) {
     const $counter = $("[data-product-boost-counter]");
     const $slug = $("[data-product-slug]");
     const $boostsCounter = $("[data-product-boosts-count]");
+    const csrf = $('meta[name="csrf"]').attr("content");
     const slug = $slug.data("product-slug");
     const boostsCount = $boostsCounter.data("product-boosts-count");
     if (!slug) return;
@@ -47,11 +53,15 @@ export default function boost() {
       });
     }
 
-    req(`/p/${slug}/boost`, {
-      method: "post",
-      ok: onOk,
-      fail: onFail,
-    });
+    req(
+      `/p/${slug}/boost`,
+      { csrf },
+      {
+        method: "post",
+        ok: onOk,
+        fail: onFail,
+      }
+    );
   }
 
   function load($els) {
