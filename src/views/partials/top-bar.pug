@@ -55,7 +55,7 @@ mixin top-bar(activePage)
                               data-tippy-content="Profile settings"
                             )
                                 li(class="relative")
-                                  img(class="rounded-full w-8 h-8" style=(user.type === USER_TYPES.CREATOR ? "box-shadow: 0 5px 15px -2px #FCD34D" : undefined) src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
+                                  img(class={"rounded-full w-8 h-8": true, "w-9 h-9 border-4 border-double border-yellow-300": user.type === USER_TYPES.CREATOR } src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
 
                             a(href="/logout" class="h-full flex items-center hover:bg-gray-50 px-4" data-tippy-content="Log out")
                                 li
