@@ -19,7 +19,6 @@ import deleteProduct from "./widgets/delete-product";
 import flashMessages from "./widgets/flash-messages";
 import boost from "./widgets/boost";
 import collect from "./widgets/collect";
-// import payments from "./widgets/payments";
 import cookieConsent from "./widgets/cookie-consent";
 import waitlistForm from "./widgets/waitlist-form";
 
@@ -42,6 +41,5 @@ flashMessages();
 boost();
 collect();
 collectionContextMenu();
-// payments();
 cookieConsent();
 waitlistForm();

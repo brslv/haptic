@@ -22,13 +22,6 @@ const upload = require("./img-upload");
 const singleUpload = upload.single("image");
 const showdown = require("showdown");
 const notifications = require("./notifications");
-const {
-  webhook,
-  createCustomer,
-  attachPaymentMethod,
-  updateCustomer,
-  createSubscription,
-} = require("./payments");
 const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
 
@@ -1288,98 +1281,6 @@ app.get("/checkout", authOnly, (req, res) => {
   });
 });
 
-// ----------- OLD STRIPE CHECKOUT
-// app.get("/checkout", authOnly, (req, res) => {
-//   // TODO: the checkout page should check if the user has an email.
-//   // user.email v -> show the plan selector
-//   // user.email x -> show the email field -> create customer
-//   const paymentWentOk = req.query.ok && req.query.ok.toString() === "1";
-//
-//   res.render("checkout", {
-//     meta: defaultMetas,
-//     flash,
-//     stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
-//     creatorPriceId: process.env.STRIPE_CREATOR_PRICE_ID,
-//     paymentWentOk,
-//   });
-// });
-
-// app.post(
-//   "/create-customer",
-//   ajaxOnly,
-//   authOnly,
-//   express.json(),
-//   async (req, res) => {
-//     const { email } = req.body;
-//     const user = req.user;
-//
-//     try {
-//       const customer = await createCustomer({ email, user });
-//       // save the customer id to the user's entity
-//
-//       db("users")
-//         .where("id", user.id)
-//         .update({ email, stripe_customer_id: customer.id })
-//         .returning("email")
-//         .then(async ([email]) => {
-//           req.logIn({ ...user, email }, async function(reloginErr) {
-//             if (reloginErr) {
-//               return res.json({
-//                 ok: 0,
-//                 err:
-//                   "Create customer: we couldn't update your email, please try again.",
-//                 details: { customer },
-//               });
-//             } else {
-//               return res.json({ ok: 1, err: null, details: { customer } });
-//             }
-//           });
-//         });
-//     } catch (err) {
-//       return next(err);
-//     }
-//   }
-// );
-
-// app.post(
-//   "/create-subscription",
-//   ajaxOnly,
-//   authOnly,
-//   express.json(),
-//   async (req, res) => {
-//     // Attach the payment method to the customer
-//     try {
-//       await attachPaymentMethod({
-//         paymentMethodId: req.body.paymentMethodId,
-//         customerId: req.body.customerId,
-//       });
-//     } catch (error) {
-//       return res
-//         .status("402")
-//         .json({ ok: 0, err: error.message, details: null });
-//     }
-//
-//     // Change the default invoice settings on the customer to the new payment method
-//     await updateCustomer({
-//       customerId: req.body.customerId,
-//       details: {
-//         invoice_settings: {
-//           default_payment_method: req.body.paymentMethodId,
-//         },
-//       },
-//     });
-//
-//     // Create the subscription
-//     const subscription = await createSubscription({
-//       customer: req.body.customerId,
-//       items: [{ price: req.body.priceId }],
-//       expand: ["latest_invoice.payment_intent"],
-//     });
-//
-//     res.json({ ok: 1, err: null, details: { subscription } });
-//   }
-// );
-
 app.post("/wh", express.json(), (req, res) => {
   const events = req.body.events;
 
@@ -1498,8 +1399,6 @@ app.post("/wh", express.json(), (req, res) => {
     }
   });
 });
-
-// app.post("/stripe-wh", bodyParser.raw({ type: "application/json" }), webhook);
 
 // 404
 app.get("*", function(req, res, next) {
