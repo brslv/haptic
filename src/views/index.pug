@@ -51,7 +51,7 @@ block content
 
           h2(class="text-2xl text-gray-600 mx-auto pb-10" style="max-width: 28ch") You have a story. Your product, too. Share it with the world.
 
-          if isProd || isStage
+          if isProd
             div(class="mb-16 max-w-lg mx-auto")
               h2(class="font-bold text-lg mb-4") Join the waitlist
               form(class="flex" data-waitlist-form)
@@ -210,7 +210,7 @@ block content
             +use-case("You", "heart", "shape-6") For You and your story. Whoever you are. Whatever your story.
 
           div(class="flex flex-col items-center justify-center")
-            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href=(isProd || isStage ? "/#top" : "/login")) Start sharing your story
+            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href=(isProd ? "/#top" : "/login")) Start sharing your story
             span(class="text-sm text-gray-600") FREE, no credit cards required!
 
       div(class="mb-32" id="pricing")
@@ -235,7 +235,7 @@ block content
                   span Post comments
                   span(class="uppercase ml-2 bg-yellow-50 rounded px-2 py-1.5 text-xs") Soon
               div(class="mt-8")
-                if isProd || isStage
+                if isProd
                   button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
                 else
                   a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as Creator Lite
@@ -250,12 +250,12 @@ block content
                 li(class="p-4 border-b") #[span(class="underline") Unlimited] product pages
                 li(class="p-4 pb-0") All of Haptic's content creation tools
               div(class="mt-8")
-                if isProd || isStage
+                if isProd 
                   button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
                 else
                   a(href="/login?creator=true" class="btn btn-primary lg:text-xl text-center py-3") Join as Creator
 
-      if isProd || isStage
+      if isProd
         div(class="mb-48 mt-16 text-center container mx-auto p-4")
           div(class="max-w-lg mx-auto")
             h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Join the waitlist
