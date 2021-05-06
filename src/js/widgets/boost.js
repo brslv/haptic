@@ -66,15 +66,15 @@ export default function boost() {
 
   function load($els) {
     $els.$postBoostBtns.on("click", function(e) {
-      e.preventDefault();
       const $this = $(this);
       if ($this.data("disabled") !== undefined) return;
+      e.preventDefault();
       onPostBoostClick($this, $els);
     });
     $els.$productBoostBtn.on("click", function(e) {
-      e.preventDefault();
       const $this = $(this);
       if ($this.data("disabled") !== undefined) return;
+      e.preventDefault();
       onProductBoostClick($this, $els);
     });
   }

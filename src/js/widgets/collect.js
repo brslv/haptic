@@ -28,6 +28,8 @@ export default function collect() {
     if (!$els.$btn) return;
 
     const slug = $els.$btn.data("product-slug");
+    const disabled = $els.$btn.data("disabled");
+    if (disabled !== undefined) return;
 
     $els.$btn.on("click", onBtnClick.bind(null, slug));
   }

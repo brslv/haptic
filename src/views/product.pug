@@ -2,6 +2,7 @@ extends layouts/base.layout.pug
 
 include partials/top-bar.pug
 include partials/post.pug
+include partials/login-modal.pug
 include partials/icon.pug
 include partials/require-module.pug
 
@@ -47,7 +48,9 @@ block content
                 twitter_screen_name: post.user_twitter_screen_name,
                 date_str: post.created_at_formatted,
                 show_opts: false,
-                boosts_count: post.boosts_count
+                boosts_count: post.boosts_count,
+                trigger_login_modal: !user,
+                disable_boost_btn: !user
               }) !{post_text}
           else
             div(class="flex items-center justify-center bg-white shadow p-4 rounded-xl border border-gray-100" style="min-height: 300px")
@@ -63,7 +66,7 @@ block content
           nav(id="product-nav")
             ul
               li(class="w-full mb-2")
-                div(tabindex="0" role="button" class="product-btn click-scale" data-product-boost-btn data-tippy-content="Boosting shows the creator that you have liked their project. You're also helping them to reach higher positions in the haptic's rankings.")
+                div(tabindex="0" role="button" class="product-btn click-scale" data-product-boost-btn data-tippy-content="Boosting shows the creator that you have liked their project. You're also helping them to reach higher positions in the haptic's rankings." data-disabled=(!user ? 'disabled' : undefined) data-modal-trigger=(!user ? 'login' : undefined))
                   span(class="flex justify-between")
                     span(class="flex items-center")
                       span(class="mr-4")
@@ -71,7 +74,7 @@ block content
                       span(class="mr-4")= `Boost`
                     span(class="px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase" data-product-boost-counter)= boosts.length
               li(class="w-full")
-                div(tabindex="0" role="button" class="product-btn click-scale" data-product-collect-btn data-product-slug=product.slug data-tippy-content="Add this product to your collection")
+                div(tabindex="0" role="button" class="product-btn click-scale" data-product-collect-btn data-product-slug=product.slug data-tippy-content="Add this product to your collection" data-disabled=(!user ? 'disabled' : undefined) data-modal-trigger=(!user ? 'login' : undefined))
                   span(class="flex justify-between")
                     span(class="flex items-center")
                       span(class="mr-4")
@@ -96,3 +99,6 @@ block content
               each tool of tools
                 div(class="px-2 py-1 border border-gray-300 rounded-lg")= tool.text
 
+block modals
+  if !user
+    +login-modal

@@ -1,7 +1,7 @@
 include ./page-title.pug
 include ./icon.pug
 
-mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0 })
+mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false })
   div(class="post p-4 rounded-xl bg-white border border-gray-100 shadow-sm mb-4 transition hover:shadow-md" data-post-id=post_id)
     div(class="flex flex-row sm:items-center justify-between mb-4")
       div(class="flex items-center mb-4 sm:mb-0")
@@ -51,12 +51,13 @@ mixin post({ product_name, product_slug, post_id, post_text, img, img_url, twitt
         class={
           "product-btn product-btn-small text-xs": true,
           "cursor-pointer click-scale": !disable_boost_btn,
-          "cursor-auto focus:ring-0 text-gray-500 hover:border-gray-300 hover:bg-transparent dark:hover:bg-transparent": disable_boost_btn
+          "cursor-pointer focus:ring-0 text-gray-500 hover:border-gray-300 hover:bg-transparent dark:hover:bg-transparent": disable_boost_btn
         }
         data-post-boost-btn
         data-post-id=post_id
         data-disabled=disable_boost_btn
         data-boosts-count=boosts_count
+        data-modal-trigger=(trigger_login_modal ? 'login' : undefined)
       )
         span(class="flex justify-between")
           span(class="flex items-center")
