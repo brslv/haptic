@@ -2,11 +2,14 @@ extends ../layouts/base.layout.pug
 
 include ../partials/top-bar.pug
 include ../partials/page-title.pug
+include ../partials/csrf.pug
+include ../partials/flash-msg.pug
 
 block content
   +top-bar("profile")
   div(class="container mx-auto p-4")
     +page-title(class="mb-4") Profile
+    +flash-msg(flash)
 
     div(class="flex items-start md:flex-row flex-col")
       // - left
@@ -15,16 +18,17 @@ block content
           div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
             span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded mb-4") Details
             form(action=`${form.action}` method="POST" id="profile-form")
+              +csrf
               div(class="pb-4")
                 div(class="label pb-1 pl-1") Email
-                input(class="input w-full" placeholder="Email" name="email" type="email" id="email" rows="4" disabled value=user.email)
+                input(class="input w-full" placeholder="Email" name="email" type="email" id="email" rows="4" value=user.email)
 
               div(class="pb-8")
                 label
                   div(class="label pb-1 pl-1") Bio
-                  textarea(class="textarea w-full" placeholder="..." name="bio" id="bio" rows="4" disabled)= user.bio
+                  textarea(class="textarea w-full" placeholder="..." name="bio" id="bio" rows="4")= user.bio
                 span(class="text-sm text-gray-500") Be brief. Max: 280 symbols.
-              button(type="submit" class="btn btn-primary" disabled) Update (soon)
+              button(type="submit" class="btn btn-primary") Update
       // - right
       div(class="flex-1 container mx-auto")
         div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")

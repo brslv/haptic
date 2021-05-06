@@ -153,7 +153,7 @@ export default function shortUpdate() {
   function validateFormValues(formValues) {
     var errors = {};
     if (formValues.text.length < 2) {
-      errors.text = "OK, but what's the meaning, tho 🤔";
+      errors.text = "Post is too short";
     }
     if (formValues.text.length > 300) {
       errors.text = "Text is too long. Maximum symbols allowed: 300";

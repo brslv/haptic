@@ -410,6 +410,7 @@ app.get(
     const flash = {
       success: await req.consumeFlash("success"),
       error: await req.consumeFlash("error"),
+      data: await req.consumeFlash("data"),
     };
     const productsActions = products.actions({ db, user: req.user });
 
@@ -463,7 +464,30 @@ app.post(
   (req, res, next) => {
     const slug = req.params.slug;
     const productsActions = products.actions({ db, user: req.user });
+    const input = req.body;
     // check if the user owns the product
+
+    // validate
+    let errors = {};
+    if (
+      input.website.length &&
+      (!input.website.startsWith("http://") &&
+        !input.website.startsWith("https://"))
+    ) {
+      errors.website = {
+        msg: 'URL must start with "http://" or "https://"',
+        val: input.website,
+      };
+    }
+
+    if (Object.keys(errors).length) {
+      return req.flash("data", { errors }).then(() => {
+        res
+          .set(`Location`, `/dashboard/product/${slug}/settings`)
+          .sendStatus(303);
+      });
+    }
+
     db("products")
       .select()
       .where({
@@ -481,7 +505,6 @@ app.post(
           });
         }
 
-        var input = req.body;
         productsActions
           .updateProduct({ slug, input })
           .then((result) => {
@@ -527,14 +550,45 @@ app.post(
   }
 );
 
-app.get("/dashboard/profile", authOnly, (req, res, next) => {
+app.get("/dashboard/profile", authOnly, async (req, res, next) => {
+  const flash = {
+    success: await req.consumeFlash("success"),
+  };
   return res.render("dashboard/profile", {
     meta: defaultMetas,
     form: {
       action: "/dashboard/profile/update",
     },
+    flash,
   });
 });
+
+app.post(
+  "/dashboard/profile/update",
+  authOnly,
+  csrfProtected,
+  (req, res, next) => {
+    const data = req.body;
+    const userId = req.user.id;
+
+    db("users")
+      .update({ email: data.email, bio: data.bio })
+      .where({ id: userId })
+      .then((result) => {
+        if (result) {
+          req.flash("success", "Profile updated 🎉").then(() => {
+            res.set(`Location`, `/dashboard/profile`).sendStatus(303);
+          });
+        } else {
+          req
+            .flash("error", "Something went wrong, please try again.")
+            .then(() => {
+              res.set(`Location`, `/dashboard/profile`).sendStatus(303);
+            });
+        }
+      });
+  }
+);
 
 app.get("/p/:slug", (req, res, next) => {
   const slug = req.params.slug;

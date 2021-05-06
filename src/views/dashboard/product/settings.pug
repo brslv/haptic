@@ -10,6 +10,7 @@ block append scripts
   +require-module('settings')
 
 block content
+  - var formErrors = flash && flash.data && flash.data[0] && flash.data[0].errors || {};
   +top-bar
   div(class="container mx-auto px-4")
     +product-header(product, links, 'settings')
@@ -17,7 +18,7 @@ block content
       +flash-msg(flash)
     form(action=`${form.delete.action}` method="POST" data-delete-product-form class="hidden")
       +csrf
-    form(action=`${form.action}` method="POST" id="product-settings-form")
+    form(action=`${form.action}` method="POST" id="product-settings-form" data-product-settings-form)
       +csrf
       div(class="flex items-start md:flex-row flex-col")
 
@@ -39,7 +40,10 @@ block content
               div(class="pb-8")
                 label
                   div(class="label pb-1 pl-1") Website/URL
-                  input(class="input w-full" name="website" id="product-website" value=product.website) 
+                  input(class={"input w-full": true, "border-red-500": formErrors.website} name="website" id="product-website" value=(formErrors.website && formErrors.website.val || product.website)) 
+                  if formErrors.website
+                    p(class="text-xs text-red-500 mt-1")= formErrors.website.msg
+
 
           div(class="container mx-auto")
             div(class="p-4 bg-white rounded-xl shadow-sm border-4 border-red-100 mb-4 relative")
