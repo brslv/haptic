@@ -9,7 +9,41 @@ mixin top-bar(activePage)
                         img(src="/static/images/logo/logo-main.svg" class="h-8 logo-dark")
                         img(src="/static/images/logo/logo-main-light.svg" class="h-8 logo-light")
                 nav
-                    ul(class="flex items-center h-16 relative")
+                    div(class="flex md:hidden items-center justify-center")
+                      +icon("menu", { width: 24, height: 24 })(data-mobile-nav-open)
+                    ul(class="hidden md:hidden text-lg absolute top-0 left-0 h-screen w-screen bg-white m-0 p-0 flex flex-col items-center justify-center z-10" data-mobile-nav)
+                      +icon("x", { width: 24, height: 24 })(class="absolute top-5 right-4" data-mobile-nav-close)
+                      if user
+                        li(class="mb-4")
+                          a(href="/dashboard" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
+                            +icon("box")(class="mr-2")
+                            span Dashboard
+                        li(class="mb-4")
+                          a(href="/collections" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
+                            +icon("bookmark")(class="mr-2")
+                            span Collections
+                        li(class="mb-4")
+                          a(href="/notifications" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
+                            div(class="relative")
+                              +icon("mail")(class="mr-2")
+                              if notifications && notifications.unread && notifications.unread.length > 0
+                                span(class="absolute -top-4 -left-4 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notifications.unread.length
+                            span Notifications
+                        li(class="mb-4")
+                          a(href="/dashboard/profile" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
+                            img(class={"rounded-full w-8 h-8 mr-2": true, "w-9 h-9 border-4 border-double border-yellow-300": user.type === USER_TYPES.CREATOR } src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
+                            span Profile
+                        li(class="mb-4")
+                          a(href="/logout" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
+                            +icon('log-out')(class="mr-2")
+                            span Log out
+                      else
+                        li(class="mb-4")
+                          a(href="/login" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
+                            +icon('log-in')(class="mr-2")
+                            span Login
+
+                    ul(class="hidden md:flex items-center h-16 relative")
                         if user
                             a(
                               href="/dashboard"
