@@ -40,7 +40,6 @@ block content
                   div(class="flex-1 p-2 border-r")
                     p(class="font-light") Creator Lite
                   div(class="p-2 bg-yellow-50")
-                    // a(class="underline hover:no-underline" href="https://hapticstore.test.onfastspring.com/account") Manage
                     a(href="/checkout" class="underline hover:no-underline") Upgrade
           else if user.type === USER_TYPES.CREATOR
             div(class="border rounded-lg")
@@ -49,7 +48,7 @@ block content
                   div(class="flex-1 p-2 border-r")
                     p(class="font-bold") Creator
                   div(class="p-2")
-                    a(class="underline hover:no-underline" href="https://hapticstore.test.onfastspring.com/account") Manage
+                    a(class="underline hover:no-underline" href=fsAccountUrl) Manage
                 if user.subscription_deactivation_date
                   div(class="text-xs p-2 border-t") Your subscription ends on: #[strong !{user.subscription_deactivation_date}]
 
@@ -57,7 +56,6 @@ block content
             // - div(class="flex items-center justify-between")
             // -   div(class="p-1 px-4 rounded-full bg-yellow-50 mr-2 flex items-center")
             // -     p(class="font-medium bg-yellow-50 rounded-md flex-1") Creator
-            // -   a(class="underline hover:no-underline" href="https://hapticstore.test.onfastspring.com/account") Manage
 
 
             // - if user.subscription_deactivation_date

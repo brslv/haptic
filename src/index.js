@@ -35,11 +35,7 @@ const USER_TYPES = { CREATOR_LITE: 0, CREATOR: 1 };
 const IS_DEV = process.env.NODE_ENV === "development";
 const IS_PROD = process.env.NODE_ENV === "production";
 const IS_STAGE = process.env.NODE_ENV === "stage";
-const ROOT_URL = IS_DEV
-  ? "http://localhost:3035"
-  : IS_STAGE
-  ? "https://haptic-stage.onrender.com"
-  : "https://haptic.so";
+const ROOT_URL = process.env.ROOT_URL;
 
 const SID = "__sid__";
 const dbErrCodes = {
@@ -186,14 +182,14 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use((req, res, next) => {
+  // common variables
   res.locals.user = req.user;
+  res.locals.USER_TYPES = USER_TYPES;
+  res.locals.fsStorefrontUrl = process.env.FAST_SPRING_STOREFRONT_URL;
+  res.locals.fsAccountUrl = process.env.FAST_SPRING_ACCOUNT_URL;
   next();
 });
 app.use(flash({ sessionKeyName: SID }));
-app.use((req, res, next) => {
-  res.locals.USER_TYPES = USER_TYPES;
-  next();
-});
 
 // helpers / middlewares
 const setupCsrf = (req, res, next) => {
