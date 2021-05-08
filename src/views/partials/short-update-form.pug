@@ -1,0 +1,30 @@
+include ./csrf.pug
+
+mixin short-update-form({ mode, isHidden, showCancelBtn })
+  // - mode: edit | create
+
+  div(data-post-type=`short-update-${mode}` class={ "hidden": isHidden })
+    form(class="relative")
+      +csrf
+      input(type="file" id="image-upload" data-upload-file class="hidden")
+      input(type="hidden" name="uploaded_image" value="" data-uploaded)
+      input(type="hidden" name="id" value=product.id)
+      div(class="border border-gray-300 p-1.5 rounded-xl relative mb-2" style="display: none;" data-upload-image-preview)
+      label
+        div(class="bg-yellow-100 px-2 py-1 rounded-full absolute top-1 right-1 flex items-center justify-center font-medium cursor-help" style="font-size: 8px;" data-tippy-content="Markdown supported") MD
+        textarea(data-autoresize="3" rows="3" class="textarea w-full" placeholder="Share something great about your product..." data-text)
+        p(class="hidden text-red-500 text-xs mb-2" data-error)
+      div(class="flex flex-row-reverse items-center justify-between")
+        div(class="flex flex-row-reverse items-center")
+          button(type="submit" class="btn btn-primary click-scale") Publish
+          button(type="button" class="mr-2 btn btn-text flex items-center click-scale" data-upload-image-btn)
+            span(class="mr-2")
+              +icon('image', { width: '21', height: '21' })
+            span(class="hidden md:block") Attach image
+          span(data-image-upload-loader class="hidden mr-2")
+            span(class="animate-spin icon-container opacity-75 my-0 block relative")
+              +icon("refresh-cw")
+        if showCancelBtn
+          button(data-post-type-cancel type="button" class="btn bg-gray-100 rounded-xl px-2 py-1.5 text-xs flex items-center click-scale")
+            span Quick update
+            +icon("x", { width: 18, height: 18 })(class="ml-2 bg-gray-200 rounded-full p-1")

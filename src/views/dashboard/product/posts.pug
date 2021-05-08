@@ -8,6 +8,7 @@ include ../../partials/post.pug
 include ../../partials/icon.pug
 include ../../partials/require-module.pug
 include ../../partials/csrf.pug
+include ../../partials/short-update-form.pug
 
 mixin post-type-btn({trigger, icon, disabled, tooltip, text}, attr = {})
   div(
@@ -44,38 +45,15 @@ block content
         +page-title(class="mb-4") Publish new
         div(class="bg-white p-2 mb-4 rounded-xl shadow-sm border-4 border-yellow-300" data-post-types-container)
           div(class="gap-2 flex overflow-y-auto")
-            +post-type-btn({ trigger: "short-update", icon: "file-text", disabled: false, text: "Quick Update" })
+            +post-type-btn({ trigger: "short-update-create", icon: "file-text", disabled: false, text: "Quick Update" })
             +post-type-btn({ trigger: "long-update", icon: "feather", disabled: true, tooltip: "Soon!", text: "Article" })
             +post-type-btn({ trigger: "youtube", icon: "youtube", disabled: true, tooltip: "Soon!", text: "YouTube video" }) 
             +post-type-btn({ trigger: "survey", icon: "check-circle", disabled: true, tooltip: "Soon!", text: "Survey" }) 
             +post-type-btn({ trigger: "milestone", icon: "smile", disabled: true, tooltip: "Soon!", text: "Milestone" }) 
             +post-type-btn({ trigger: "roadmap", icon: "map", disabled: true, tooltip: "Soon!", text: "Roadmap" }) 
 
-          div(data-post-type="short-update" class="hidden")
-            form(class="relative")
-              +csrf
-              input(type="file" id="image-upload" data-upload-file class="hidden")
-              input(type="hidden" name="uploaded_image" value="" data-uploaded)
-              input(type="hidden" name="id" value=product.id)
-              div(class="border border-gray-300 p-1.5 rounded-xl relative mb-2" style="display: none;" data-upload-image-preview)
-              label
-                div(class="bg-yellow-100 px-2 py-1 rounded-full absolute top-1 right-1 flex items-center justify-center font-medium cursor-help" style="font-size: 8px;" data-tippy-content="Markdown supported") MD
-                textarea(data-autoresize="3" rows="3" class="textarea w-full" placeholder="Share something great about your product..." data-text)
-                p(class="hidden text-red-500 text-xs mb-2" data-error)
-              div(class="flex flex-row-reverse items-center justify-between")
-                div(class="flex flex-row-reverse items-center")
-                  button(type="submit" class="btn btn-primary click-scale") Publish
-                  button(type="button" class="mr-2 btn btn-text flex items-center click-scale" data-upload-image-btn)
-                    span(class="mr-2")
-                      +icon('image', { width: '21', height: '21' })
-                    span(class="hidden md:block") Attach image
-                  span(data-image-upload-loader class="hidden mr-2")
-                    span(class="animate-spin icon-container opacity-75 my-0 block relative")
-                      +icon("refresh-cw")
-                button(data-post-type-cancel type="button" class="btn bg-gray-100 rounded-xl px-2 py-1.5 text-xs flex items-center click-scale")
-                  span Quick update
-                  +icon("x", { width: 18, height: 18 })(class="ml-2 bg-gray-200 rounded-full p-1")
-
+          div
+            +short-update-form({ mode: 'create', isHidden: true, showCancelBtn: true })
       
         div
           +page-title(class="mb-4") Posts
@@ -130,21 +108,12 @@ block content
               input(class="input mb-2" placeholder="E.g. React" id="tools-input" data-product-tools-input)
               button(type="submit" class="hidden") Submit
 
-  template(data-post-tpl)
-    +post({
-      product_slug: product.slug,
-      product_name: product.name,
-      post_id: -1,
-      img: user.twitter_profile_image_url,
-      img_url: null,
-      twitter_name: user.twitter_name,
-      twitter_screen_name: user.twitter_screen_name,
-      date_str: 'Now',
-      disable_boost_btn: true,
-      boosts_count: 0
-    })
-
   template(data-product-tool-tpl)
     div(class="px-2 py-1 border border-gray-300 rounded-lg flex items-center justify-between" data-product-tool-id="-1")
       span(class="pr-2" data-text-container)
       +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale" data-product-tools-remove-btn)
+
+block modals
+  +modal('edit-post')
+    div
+      +short-update-form({ mode: 'edit', isHidden: false, showCancelBtn: false })

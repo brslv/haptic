@@ -9,7 +9,7 @@ export default function imageZoom() {
       const $this = $(this);
       const src = $this.attr("src");
       $container = $(
-        `<div data-zoom-container class="cursor-pointer bg-white w-screen h-screen flex items-center fixed top-0 left-0"><div class="flex items-center justify-center relative w-full h-full" data-zoom-image-container></div></div>`
+        `<div data-zoom-container class="cursor-pointer bg-white w-screen h-screen flex items-center fixed top-0 left-0 z-10"><div class="flex items-center justify-center relative w-full h-full" data-zoom-image-container></div></div>`
       );
       const $img = $(
         `<img src=${src} style="max-width: 90%; max-height: 90%;" class="p-1.5 border border-gray-300 rounded-md" />`

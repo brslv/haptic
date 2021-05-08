@@ -5,7 +5,7 @@ export default function modal() {
 
   function openModal($modal, modalName) {
     $modal.removeClass("hidden");
-    $(document).trigger("haptic:modal-open", { $modal, modalName });
+    $(document).trigger("haptic:modal-open", { $modal, modalName, $triggerEl });
     $(document).one("haptic:close-modals", closeAllModals);
   }
 
@@ -27,7 +27,7 @@ export default function modal() {
     const $modal = $(`[data-modal-name="${trigger}"]`);
     const $close = $("[data-modal-close]", $modal);
 
-    openModal($modal, trigger);
+    openModal($modal, trigger, $triggerEl);
 
     // handle close
     $close.one("click", closeModal.bind(null, $modal, trigger));
