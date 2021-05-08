@@ -2,22 +2,76 @@ import { $, turbo, req } from "../../utils";
 import * as shortUpdateUtils from "./utils";
 
 export default function shortUpdateEdit() {
-  function activate($els) {
-    console.log("activating short update create");
+  function activate($els, $triggerEl) {
+    const postId = $triggerEl.data("post-id");
+    const text = $triggerEl.data("text");
+    const img = $triggerEl.data("img");
+
+    // populate the update form
+    $els.$text.val(text);
+    if (img) $els.$uploadedImg.val(img);
+    if (img) shortUpdateUtils.previewImage(img, $els);
+    else shortUpdateUtils.clearImagePreview($els);
 
     shortUpdateUtils.registerForm({
       $form: $els.$form,
       $uploadImgBtn: $els.$uploadImgBtn,
       $fileUpload: $els.$fileUpload,
-      onFormSubmit: onFormSubmit.bind(null, $els), // @Todo
-      onUploadImageBtnClick: onUploadImageBtnClick.bind(null, $els), // @Todo
-      onFileSelected: onFileSelected, // @Todo
-      onImageUploaded: onImageUploaded.bind(null, $els), // @Todo
+      onFormSubmit: shortUpdateUtils.onFormSubmit.bind(null, {
+        formValuesExtractorFn: shortUpdateUtils.extractFormValues.bind(null, {
+          $text: $els.$text,
+          $uploadedImg: $els.$uploadedImg,
+          $productIdInput: $els.$productIdInput,
+          $csrf: $els.$csrf,
+        }),
+        validatorFn: shortUpdateUtils.validateFormValues,
+        hideErrorsFn: shortUpdateUtils.hideErrors.bind(null, $els),
+        showErrorsFn: shortUpdateUtils.showErrors.bind(null, $els),
+        requestFn: request.bind(null, postId),
+        onOk: function ok(response) {
+          const data = response.data;
+          if (data.ok) {
+            $(document).trigger("haptic:add-toast", {
+              content: "Post updated successfully 🎉",
+              type: "success",
+            });
+            turbo.actions.visit(window.location.pathname, {
+              action: "replace",
+            });
+          }
+        },
+        onFail: function fail(err) {
+          if (err.response && err.response.status === 400) {
+            $(document).trigger("haptic:add-toast", {
+              content: err.response.data.err,
+              type: "error",
+            });
+          }
+        },
+      }),
+      onUploadImageBtnClick: shortUpdateUtils.onUploadImageBtnClick.bind(
+        null,
+        $els
+      ),
+      onFileSelected: shortUpdateUtils.onFileSelected.bind(null, $els),
+      onImageUploaded: shortUpdateUtils.onImageUploaded.bind(null, $els),
     });
   }
 
+  function request(postId, data, opts) {
+    return req(
+      `/post/${postId}`,
+      data,
+      Object.assign(opts, { method: "post" })
+    );
+  }
+
   function clear($els) {
-    console.log("clearing short update edit");
+    shortUpdateUtils.unregisterForm({
+      $form: $els.$form,
+      $uploadImgBtn: $els.$uploadImgBtn,
+      $fileUpload: $els.$fileUpload,
+    });
   }
 
   let $els = {};
@@ -40,7 +94,19 @@ export default function shortUpdateEdit() {
       $productIdInput: $root.find("input[name=id]"),
     };
 
-    activate($els);
+    $(document).on("haptic:modal-open", function onModalOpen(e, data) {
+      const { $modal, $triggerEl, modalName } = data;
+      if (modalName === "edit-post") {
+        activate($els, $triggerEl);
+      }
+    });
+
+    $(document).on("haptic:modal-close", function onModalClose(e, data) {
+      const { $modal, $triggerEl, modalName } = data;
+      if (modalName === "edit-post") {
+        clear($els, $triggerEl);
+      }
+    });
   });
 
   turbo.beforeCache(() => {

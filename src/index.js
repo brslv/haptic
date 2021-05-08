@@ -380,6 +380,7 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
                 posts: [
                   ...postsResult.map((post) => ({
                     ...post,
+                    text_md: post.text,
                     text: mdConverter.makeHtml(post.text),
                     created_at_formatted: dateFmt(post.created_at),
                   })),
@@ -1018,6 +1019,63 @@ app.post(
             res.json({ ok: 1, err: null, details: { post } });
           })
           .catch((err) => next(err));
+      });
+  }
+);
+
+app.post(
+  "/post/:pid",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const pid = req.params.pid;
+    const data = req.body;
+    const postsActions = posts.actions({ db, user: req.user });
+
+    if (isNaN(pid)) {
+      return res.status(400).json({
+        ok: 0,
+        err: `Invalid product id: ${pid}. 🧐 Should be numeric.`,
+        details: null,
+      });
+    }
+
+    if (data.text.length < 2) {
+      return res.status(400).json({
+        ok: 0,
+        err: `Invalid text length. Min: 2 symbols.`,
+        details: null,
+      });
+    }
+
+    const type = posts.TEXT_TYPE;
+    postsActions
+      .getPost(type, { postId: pid, userId: req.user.id })
+      .then((result) => {
+        if (!result) {
+          return res.status(400).json({
+            ok: 0,
+            err: `Post not found.`,
+            details: null,
+          });
+        }
+
+        postsActions
+          .updatePost(type, pid, data)
+          .then((result) => {
+            if (result) {
+              // result = 1
+              return res.status(200).json({ ok: 1, err: null, details: null });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        throw err;
       });
   }
 );

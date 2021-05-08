@@ -109,7 +109,6 @@ export default function shortUpdateCreate() {
   turbo.load(() => {
     const $allTriggers = $("[data-post-type-trigger]");
     const $root = $(`[data-post-type="short-update-create"]`);
-    console.log({ $root });
     const $trigger = $(`[data-post-type-trigger="short-update-create"]`);
     const $postTypesContainer = $("[data-post-types-container]");
     $els = {

@@ -1,6 +1,6 @@
 include ./csrf.pug
 
-mixin short-update-form({ mode, isHidden, showCancelBtn })
+mixin short-update-form({ mode, isHidden, showCancelBtn, text })
   // - mode: edit | create
 
   div(data-post-type=`short-update-${mode}` class={ "hidden": isHidden })
@@ -11,9 +11,10 @@ mixin short-update-form({ mode, isHidden, showCancelBtn })
       input(type="hidden" name="id" value=product.id)
       div(class="border border-gray-300 p-1.5 rounded-xl relative mb-2" style="display: none;" data-upload-image-preview)
       label
-        div(class="bg-yellow-100 px-2 py-1 rounded-full absolute top-1 right-1 flex items-center justify-center font-medium cursor-help" style="font-size: 8px;" data-tippy-content="Markdown supported") MD
-        textarea(data-autoresize="3" rows="3" class="textarea w-full" placeholder="Share something great about your product..." data-text)
-        p(class="hidden text-red-500 text-xs mb-2" data-error)
+        div(class="relative")
+          div(class="bg-yellow-100 px-2 py-1 rounded-full absolute top-1 right-1 flex items-center justify-center font-medium cursor-help" style="font-size: 8px;" data-tippy-content="Markdown supported") MD
+          textarea(data-autoresize="3" rows="3" class="textarea w-full" placeholder="Share something great about your product..." data-text)
+          p(class="hidden text-red-500 text-xs mb-2" data-error)
       div(class="flex flex-row-reverse items-center justify-between")
         div(class="flex flex-row-reverse items-center")
           button(type="submit" class="btn btn-primary click-scale") Publish

@@ -20,6 +20,13 @@ export function registerForm({
   $(document).on("haptic:short-update-img-uploaded", onImageUploaded);
 }
 
+export function unregisterForm({ $form, $uploadImgBtn, $fileUpload }) {
+  $form.off("submit");
+  $uploadImgBtn.off("click");
+  $fileUpload.off("change");
+  $(document).off("haptic:short-update-img-uploaded");
+}
+
 export function onFormSubmit({
   formValuesExtractorFn,
   validatorFn,
@@ -96,7 +103,6 @@ export function onUploadImageBtnClick($els) {
 export function onFileSelected($els, e) {
   const image = e.currentTarget.files[0];
 
-  console.log(image);
   if (!validateImageFiletype(image)) {
     return $(document).trigger("haptic:add-toast", {
       content: "Invalid file format",
@@ -149,8 +155,12 @@ function uploadImageToServer(image, opts) {
 }
 
 export function onImageUploaded($els, e, data) {
-  clearImagePreview($els);
   const url = data.data.data.details.url;
+  previewImage(url, $els);
+}
+
+export function previewImage(url, $els) {
+  clearImagePreview($els);
   const $container = $(
     `<div class="relative flex items-center justify-center"><div data-content></div></div>`
   );

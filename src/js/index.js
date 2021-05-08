@@ -33,7 +33,7 @@ toasts();
 createProduct();
 feedback();
 shortUpdateCreate();
-// shortUpdateEdit();
+shortUpdateEdit();
 textareaAutoresize();
 imageZoom();
 contextMenu();
