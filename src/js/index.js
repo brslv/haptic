@@ -11,10 +11,7 @@ import shortUpdateCreate from "./widgets/short-update/short-update-create";
 import shortUpdateEdit from "./widgets/short-update/short-update-edit";
 import textareaAutoresize from "./widgets/textarea-autoresize";
 import imageZoom from "./widgets/image-zoom";
-import contextMenu, {
-  postContextMenu,
-  collectionContextMenu,
-} from "./widgets/context-menu";
+import contextMenu, { collectionContextMenu } from "./widgets/context-menu";
 import tools from "./widgets/tools";
 import deleteProduct from "./widgets/delete-product";
 import flashMessages from "./widgets/flash-messages";
@@ -23,6 +20,7 @@ import collect from "./widgets/collect";
 import cookieConsent from "./widgets/cookie-consent";
 import waitlistForm from "./widgets/waitlist-form";
 import mobileNav from "./widgets/mobile-nav";
+import postActions from "./widgets/post-actions";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -37,7 +35,6 @@ shortUpdateEdit();
 textareaAutoresize();
 imageZoom();
 contextMenu();
-postContextMenu();
 tools();
 deleteProduct();
 flashMessages();
@@ -47,3 +44,4 @@ collectionContextMenu();
 cookieConsent();
 waitlistForm();
 mobileNav();
+postActions();
