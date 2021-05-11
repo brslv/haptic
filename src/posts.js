@@ -186,17 +186,83 @@ function actions({ db, user }) {
 
   function _updateTextPost(postId, data) {
     return new Promise((res, rej) => {
-      db("posts_text")
-        .update({ text: data.text })
-        .where({ id: postId })
-        .then((result) => {
-          cache.del(cacheKeys.productPosts(result.product_id));
-          res(result);
-          return true;
-        })
-        .catch((err) => {
-          rej(err);
-        });
+      db.transaction().then((trx) => {
+        db.transacting(trx)
+          .table("posts_text")
+          .update({ text: data.text }) // update the post
+          .where({ id: postId })
+          .then((result) => {
+            cache.del(cacheKeys.productPosts(result.product_id));
+
+            if (!result) throw Error("Couldn't update post" + postId);
+            return result;
+          })
+          .then((updateResult) => {
+            // find the post's images
+            return db
+              .transacting(trx)
+              .table("images")
+              .select("id", "url")
+              .where({ post_id: postId })
+              .first()
+              .then((imagesResult) => {
+                if (imagesResult) {
+                  return imagesResult.id;
+                } else {
+                  return null;
+                }
+              });
+          })
+          .then((imageId) => {
+            if (!data.image && imageId) {
+              // no data is passed through the "data.image", but the post already has an image
+              // so remove it from the db
+              db.transacting(trx)
+                .table("images")
+                .del({ id: imageId })
+                .then((result) => {
+                  trx.commit().then(() => res(true));
+                });
+            }
+
+            // update/add the image if any images are being passed through "data.image"
+            if (imageId) {
+              // the post already has an image, so update it
+              db.transacting(trx)
+                .table("images")
+                .update({ url: data.image })
+                .where({ id: imageId })
+                .then((updateImageResult) => {
+                  if (updateImageResult) {
+                    trx.commit().then(() => res(true));
+                  } else {
+                    throw new Error("Image update failed.");
+                  }
+                })
+                .catch((err) => {
+                  throw err;
+                });
+            } else {
+              // the post doesn't have any images, so add the image
+              db.transacting(trx)
+                .table("images")
+                .insert({ url: data.image, post_id: postId })
+                .then((insertImageResult) => {
+                  if (insertImageResult) {
+                    trx.commit().then(() => res(true));
+                  } else {
+                    throw new Error("Image insert failed.");
+                  }
+                })
+                .catch((err) => {
+                  throw err;
+                });
+            }
+          })
+          .catch((err) => {
+            trx.rollback().then(() => rej(err));
+          });
+      });
     });
   }
 

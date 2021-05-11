@@ -1,6 +1,6 @@
 include ./csrf.pug
 
-mixin short-update-form({ mode, isHidden, showCancelBtn, text })
+mixin short-update-form({ mode, isHidden, showCancelPill, showCancelButton, text })
   // - mode: edit | create
 
   div(data-post-type=`short-update-${mode}` class={ "hidden": isHidden })
@@ -25,7 +25,9 @@ mixin short-update-form({ mode, isHidden, showCancelBtn, text })
           span(data-image-upload-loader class="hidden mr-2")
             span(class="animate-spin icon-container opacity-75 my-0 block relative")
               +icon("refresh-cw")
-        if showCancelBtn
+        if showCancelButton
+          button(data-modal-close type="button" class="btn btn-default click-scale") Cancel
+        if showCancelPill
           button(data-post-type-cancel type="button" class="btn bg-gray-100 rounded-xl px-2 py-1.5 text-xs flex items-center click-scale")
             span Quick update
             +icon("x", { width: 18, height: 18 })(class="ml-2 bg-gray-200 rounded-full p-1")
