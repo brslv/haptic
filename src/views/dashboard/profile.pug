@@ -15,7 +15,7 @@ block content
       // - left
       div(class="w-full md:w-2/3 md:mr-4")
         div(class="container mx-auto")
-          div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
+          div(class="p-4 bg-white rounded-md shadow-sm border border-gray-100 mb-4")
             span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded mb-4") Details
             form(action=`${form.action}` method="POST" id="profile-form")
               +csrf
@@ -31,10 +31,10 @@ block content
               button(type="submit" class="btn btn-primary") Update
       // - right
       div(class="flex-1 container mx-auto")
-        div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
+        div(class="p-4 bg-white rounded-md shadow-sm border border-gray-100 mb-4")
           span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded mb-4") Current plan
           if user.type === USER_TYPES.CREATOR_LITE
-            div(class="border rounded-lg overflow-hidden")
+            div(class="border rounded-md overflow-hidden")
               div
                 div(class="flex items-center")
                   div(class="flex-1 p-2 border-r")
@@ -42,7 +42,7 @@ block content
                   div(class="p-2 bg-yellow-50")
                     a(href="/checkout" class="underline hover:no-underline") Upgrade
           else if user.type === USER_TYPES.CREATOR
-            div(class="border rounded-lg")
+            div(class="border rounded-md")
               div
                 div(class="flex items-center")
                   div(class="flex-1 p-2 border-r")

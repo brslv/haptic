@@ -9,7 +9,7 @@ mixin short-update-form({ mode, isHidden, showCancelPill, showCancelButton, text
       input(type="file" id="image-upload" data-upload-file class="hidden")
       input(type="hidden" name="uploaded_image" value="" data-uploaded)
       input(type="hidden" name="id" value=product.id)
-      div(class="border border-gray-300 p-1.5 rounded-xl relative mb-2" style="display: none;" data-upload-image-preview)
+      div(class="border border-gray-300 p-1.5 rounded-md relative mb-2" style="display: none;" data-upload-image-preview)
       label
         div(class="relative")
           div(class="bg-yellow-100 px-2 py-1 rounded-full absolute top-1 right-1 flex items-center justify-center font-medium cursor-help" style="font-size: 8px;" data-tippy-content="Markdown supported") MD
@@ -28,6 +28,6 @@ mixin short-update-form({ mode, isHidden, showCancelPill, showCancelButton, text
         if showCancelButton
           button(data-modal-close type="button" class="btn btn-default click-scale") Cancel
         if showCancelPill
-          button(data-post-type-cancel type="button" class="btn bg-gray-100 rounded-xl px-2 py-1.5 text-xs flex items-center click-scale")
+          button(data-post-type-cancel type="button" class="btn bg-gray-100 rounded-md px-2 py-1.5 text-xs flex items-center click-scale")
             span Quick update
             +icon("x", { width: 18, height: 18 })(class="ml-2 bg-gray-200 rounded-full p-1")

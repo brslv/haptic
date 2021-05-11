@@ -6,7 +6,7 @@ include partials/flash-msg.pug
 include partials/csrf.pug
 
 mixin notif({ notif })
-  div(class="p-4 rounded-xl bg-white shadow-sm mt-4" data-notification-id=notif.id)
+  div(class="p-4 rounded-md bg-white shadow-sm mt-4" data-notification-id=notif.id)
     div(class="flex items-center mb-2")
       div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
       a(href=`/p/${notif.product_slug}`)

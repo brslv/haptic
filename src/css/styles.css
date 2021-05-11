@@ -24,7 +24,7 @@
   }
 
   .btn {
-    @apply text-sm cursor-pointer block px-4 py-2 rounded-lg font-medium;
+    @apply text-sm cursor-pointer block px-4 py-2 rounded-md font-medium;
     outline: none !important;
   }
 
@@ -99,7 +99,7 @@
   }
 
   .product-btn {
-    @apply select-none cursor-pointer block px-4 py-2 rounded-lg border border-gray-300 hover:bg-yellow-50 hover:border-yellow-300 outline-none focus:ring-2 focus:ring-yellow-200;
+    @apply select-none cursor-pointer block px-4 py-2 rounded-md border border-gray-300 hover:bg-yellow-50 hover:border-yellow-300 outline-none focus:ring-2 focus:ring-yellow-200;
   }
 
   .product-btn-small {
@@ -107,7 +107,7 @@
   }
 
   .input {
-    @apply bg-transparent focus:ring-2 focus:ring-yellow-300 px-4 py-2 rounded-lg border border-gray-300 w-full focus:border-transparent;
+    @apply bg-transparent focus:ring-2 focus:ring-yellow-300 px-4 py-2 rounded-md border border-gray-300 w-full focus:border-transparent;
     outline: none !important;
   }
 
@@ -120,7 +120,7 @@
   }
 
   .textarea {
-    @apply bg-white border border-gray-300 focus:border-transparent focus:ring-2 focus:ring-yellow-300 rounded-lg p-4 resize-none;
+    @apply bg-white border border-gray-300 focus:border-transparent focus:ring-2 focus:ring-yellow-300 rounded-md p-4 resize-none;
     outline: none !important;
   }
 
@@ -129,11 +129,11 @@
   }
 
   .error-container {
-    @apply px-4 py-2 rounded-xl bg-red-500 text-white;
+    @apply px-4 py-2 rounded-md bg-red-500 text-white;
   }
 
   .success-container {
-    @apply px-4 py-2 rounded-xl bg-green-500 text-white;
+    @apply px-4 py-2 rounded-md bg-green-500 text-white;
   }
 
   .icon-container {
@@ -164,7 +164,7 @@
   }
 
   .tippy-box[data-theme~="haptic"] {
-    @apply rounded-lg bg-gray-700 border-gray-600 text-gray-200;
+    @apply rounded-md bg-gray-700 border-gray-600 text-gray-200;
   }
 
   .fade-in {

@@ -53,14 +53,14 @@ block content
                 disable_boost_btn: !user
               }) !{post_text}
           else
-            div(class="flex items-center justify-center bg-white shadow p-4 rounded-xl border border-gray-100" style="min-height: 300px")
-              div(class="rounded-xl flex items-center text-gray-500")
+            div(class="flex items-center justify-center bg-white shadow p-4 rounded-md border border-gray-100" style="min-height: 300px")
+              div(class="rounded-md flex items-center text-gray-500")
                 span(class="mr-2 p-2 w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full")
                   +icon("activity", { width: '32', height: '32', stroke: "muted" })
                 p(class="text-xl") Still no public updates available
 
       aside(class="md:w-2/6 mb-16 md:mb-0")
-        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl mb-4")
+        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-md mb-4")
           span(class="flex items-center font-medium text-sm mb-4 block")
             span(class="mr-2") Show some love
           nav(id="product-nav")
@@ -81,7 +81,7 @@ block content
                         +icon("bookmark")
                       span(class="mr-4") Collect
 
-        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl mb-4")
+        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-md mb-4")
           span(class="font-medium text-sm mb-4 block") Creator
           div
             div(class="flex items-start")
@@ -93,7 +93,7 @@ block content
 
 
         if tools.length
-          div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl")
+          div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-md")
             span(class="font-medium text-sm mb-4 block") Tools
             div(class="flex flex-wrap gap-2")
               each tool of tools
