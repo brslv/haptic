@@ -98,6 +98,7 @@ export default function shortUpdateEdit() {
       const { $modal, $triggerEl, modalName } = data;
       if (modalName === "edit-post") {
         activate($els, $triggerEl);
+        if ($els.$text) $els.$text.trigger("focus").trigger("change");
       }
     });
 

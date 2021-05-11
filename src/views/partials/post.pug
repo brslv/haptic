@@ -1,7 +1,7 @@
 include ./page-title.pug
 include ./icon.pug
 
-mixin post({ product_name, product_slug, post_id, post_text_md, img, img_url, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false })
+mixin post({ product_name, product_slug, post_id, post_text_md, post_twitter_text, img, img_url, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false })
   div(class="post p-4 rounded-md bg-white border border-gray-100 shadow-sm mb-4 transition hover:shadow-md" data-post-id=post_id)
     div(class="flex flex-row sm:items-center justify-between mb-4")
       div(class="flex items-center mb-4 sm:mb-0")
@@ -22,7 +22,7 @@ mixin post({ product_name, product_slug, post_id, post_text_md, img, img_url, tw
             div(data-ctx-menu=`share_${post_id}` class="hidden absolute top-8 -right-2 bg-white shadow-xl rounded-md border border-gray-100" style="min-width: 150px;")
               +page-title(class="px-4 py-2 inline-block w-full") Share
               div(class="py-2 pb-4 px-4")
-                a(href=`https://twitter.com/share?url=https://haptic.so&via=hapticso&hashtags=buildinpublic,onhapticso&text=Update on ${product_name} 🚀` class="flex items-center btn btn-twitter text-sm click-scale" onclick="window.open(this.href);return false;")
+                a(href=`https://twitter.com/share?url=https://haptic.so/p/${product_slug}/${post_id}&via=hapticso&hashtags=buildinpublic,onhapticso&text=${post_twitter_text}` class="flex items-center btn btn-twitter text-sm click-scale" onclick="window.open(this.href);return false;")
                     span(class="icon-container mr-2")
                       +icon("twitter", { stroke: "white", width: '18', height: '18' })
                     span(style="white-space: nowrap;") Twitter

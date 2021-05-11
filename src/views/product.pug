@@ -42,6 +42,7 @@ block content
                 product_slug: product.slug,
                 product_name: product.name,
                 post_id: post.id,
+                post_twitter_text: post.twitter_text,
                 img: post.user_twitter_profile_image_url,
                 img_url: post.image_url,
                 twitter_name: post.user_twitter_name,
@@ -50,7 +51,7 @@ block content
                 show_opts: false,
                 boosts_count: post.boosts_count,
                 trigger_login_modal: !user,
-                disable_boost_btn: !user
+                disable_boost_btn: !user,
               }) !{post_text}
           else
             div(class="flex items-center justify-center bg-white shadow p-4 rounded-md border border-gray-100" style="min-height: 300px")
@@ -66,7 +67,7 @@ block content
           nav(id="product-nav")
             ul
               li(class="w-full mb-2")
-                div(tabindex="0" role="button" class="product-btn click-scale" data-product-boost-btn data-tippy-content="Boosting shows the creator that you have liked their project. You're also helping them to reach higher positions in the haptic's rankings." data-disabled=(!user ? 'disabled' : undefined) data-modal-trigger=(!user ? 'login' : undefined))
+                div(tabindex="0" role="button" class="product-btn click-scale" data-product-boost-btn data-tippy-content="Boosting shows the creator that you like their project. You're also helping them to reach higher positions in the haptic's rankings." data-disabled=(!user ? 'disabled' : undefined) data-modal-trigger=(!user ? 'login' : undefined))
                   span(class="flex justify-between")
                     span(class="flex items-center")
                       span(class="mr-4")

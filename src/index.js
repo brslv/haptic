@@ -24,6 +24,7 @@ const showdown = require("showdown");
 const notifications = require("./notifications");
 const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
+const removeMd = require("remove-markdown");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -378,12 +379,20 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
                 product: { ...productResult },
                 tools: [...toolsResult],
                 posts: [
-                  ...postsResult.map((post) => ({
-                    ...post,
-                    text_md: post.text,
-                    text: mdConverter.makeHtml(post.text),
-                    created_at_formatted: dateFmt(post.created_at),
-                  })),
+                  ...postsResult.map((post) => {
+                    const strippedMdText = removeMd(post.text);
+                    const twitterText =
+                      strippedMdText.length > 180
+                        ? strippedMdText.substring(0, 180) + "..."
+                        : strippedMdText;
+                    return {
+                      ...post,
+                      text_md: post.text,
+                      twitter_text: twitterText,
+                      text: mdConverter.makeHtml(post.text),
+                      created_at_formatted: dateFmt(post.created_at),
+                    };
+                  }),
                 ],
                 links: {
                   posts: `/dashboard/product/${slug}/posts`,
@@ -759,15 +768,26 @@ app.get("/p/:slug/:postId", (req, res, next) => {
             result.text.length > 100
               ? result.text.slice(0, 100) + "..."
               : result.text;
+
+          const ogTags = { ...defaultMetas.og, title: `${title} | Haptic` };
+          if (result.image_url) ogTags.image = result.image_url;
+
+          const strippedMdText = removeMd(result.text);
+          const twitterText =
+            strippedMdText.length > 180
+              ? strippedMdText.substring(0, 180) + "..."
+              : strippedMdText;
+
           return res.render("post", {
             meta: {
               ...defaultMetas,
               title: `${title} | Haptic`,
-              og: { ...defaultMetas.og, title: `${title} | Haptic` },
+              og: ogTags,
             },
             product: productResult,
             post: {
               ...result,
+              twitter_text: twitterText,
               text: mdConverter.makeHtml(result.text),
               created_at_formatted: dateFmt(result.created_at),
             },

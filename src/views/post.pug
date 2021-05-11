@@ -17,6 +17,7 @@ block content
         product_slug: product.slug,
         product_name: product.name,
         post_id: post.id,
+        post_twitter_text: post.twitter_text,
         img: post.user_twitter_profile_image_url,
         img_url: post.image_url,
         twitter_name: post.user_twitter_name,
@@ -26,7 +27,7 @@ block content
         show_view_btn: false,
         boosts_count: post.boosts_count,
         disable_boost_btn: !user,
-        trigger_login_modal: !user
+        trigger_login_modal: !user,
       }) !{post_text}
 
 block modals
