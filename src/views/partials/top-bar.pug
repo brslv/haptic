@@ -11,7 +11,7 @@ mixin top-bar(activePage)
                 nav
                     div(class="flex md:hidden items-center justify-center")
                       +icon("menu", { width: 24, height: 24 })(data-mobile-nav-open)
-                    ul(class="hidden md:hidden text-lg absolute top-0 left-0 h-screen w-screen bg-white m-0 p-0 flex flex-col items-center justify-center z-10" data-mobile-nav)
+                    ul(class="hidden md:hidden text-lg absolute top-0 left-0 h-screen w-screen bg-white m-0 p-0 flex flex-col items-center justify-center z-20" data-mobile-nav)
                       +icon("x", { width: 24, height: 24 })(class="absolute top-5 right-4" data-mobile-nav-close)
                       if user
                         li(class="mb-4")
