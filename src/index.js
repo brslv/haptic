@@ -186,6 +186,7 @@ app.use((req, res, next) => {
   // common variables
   res.locals.user = req.user;
   res.locals.USER_TYPES = USER_TYPES;
+  res.locals.ROOT_URL = ROOT_URL;
   res.locals.fsStorefrontUrl = process.env.FAST_SPRING_STOREFRONT_URL;
   res.locals.fsAccountUrl = process.env.FAST_SPRING_ACCOUNT_URL;
   next();
