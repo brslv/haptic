@@ -770,7 +770,10 @@ app.get("/p/:slug/:postId", (req, res, next) => {
               ? result.text.slice(0, 100) + "..."
               : result.text;
 
-          const ogTags = { ...defaultMetas.og, title: `${title} | Haptic` };
+          const ogTags = {
+            ...defaultMetas.og,
+            title: `${title} | ${productResult.name}`,
+          };
           if (result.image_url) ogTags.image = result.image_url;
 
           const strippedMdText = removeMd(result.text);
@@ -782,7 +785,9 @@ app.get("/p/:slug/:postId", (req, res, next) => {
           return res.render("post", {
             meta: {
               ...defaultMetas,
-              title: `${title} | Haptic`,
+              title: `${title} | ${productResult.name}`,
+              description: productResult.description || undefined,
+              author: productResult.user_twitter_name,
               og: ogTags,
             },
             product: productResult,
