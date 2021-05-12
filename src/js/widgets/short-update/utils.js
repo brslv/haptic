@@ -8,6 +8,7 @@ export function registerForm({
   onUploadImageBtnClick,
   onFileSelected,
   onImageUploaded,
+  imageUploadedEventName,
 }) {
   $form.on("submit", function(e) {
     e.preventDefault();
@@ -17,14 +18,19 @@ export function registerForm({
     onUploadImageBtnClick();
   });
   $fileUpload.on("change", onFileSelected);
-  $(document).on("haptic:short-update-img-uploaded", onImageUploaded);
+  $(document).on(imageUploadedEventName, onImageUploaded);
 }
 
-export function unregisterForm({ $form, $uploadImgBtn, $fileUpload }) {
+export function unregisterForm({
+  $form,
+  $uploadImgBtn,
+  $fileUpload,
+  imageUploadedEventName,
+}) {
   $form.off("submit");
   $uploadImgBtn.off("click");
   $fileUpload.off("change");
-  $(document).off("haptic:short-update-img-uploaded");
+  $(document).off(imageUploadedEventName);
 }
 
 export function onFormSubmit({
@@ -116,7 +122,13 @@ export function onFileSelected($els, e) {
 
   uploadImageToServer(image, {
     ok: function ok(data) {
-      $(document).trigger("haptic:short-update-img-uploaded", { data });
+      const isEdit = $els.$root.data("post-type") === "short-update-edit";
+      const event = isEdit
+        ? "haptic:short-update:img-uploaded-edit"
+        : "haptic:short-update:img-uploaded-create";
+      $(document).trigger(event, {
+        data,
+      });
       // emitter.emit(emitter.events.imageUploaded, data);
     },
     fail: function fail(err) {
@@ -154,8 +166,8 @@ function uploadImageToServer(image, opts) {
   );
 }
 
-export function onImageUploaded($els, e, data) {
-  const url = data.data.data.details.url;
+export function onImageUploaded($els, e, { data }) {
+  const url = data.data.details.url;
   previewImage(url, $els);
 }
 

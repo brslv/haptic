@@ -68,6 +68,7 @@ export default function shortUpdateCreate() {
       ),
       onFileSelected: shortUpdateUtils.onFileSelected.bind(null, $els),
       onImageUploaded: shortUpdateUtils.onImageUploaded.bind(null, $els),
+      imageUploadedEventName: "haptic:short-update:img-uploaded-create",
     });
   }
 
@@ -95,6 +96,12 @@ export default function shortUpdateCreate() {
   function clear($els) {
     $els.$text.val("");
     shortUpdateUtils.clearImagePreview($els);
+    shortUpdateUtils.unregisterForm({
+      $form: $els.$form,
+      $uploadImgBtn: $els.$uploadImgBtn,
+      $fileUpload: $els.$fileUpload,
+      imageUploadedEventName: "haptic:short-update:img-uploaded-create",
+    });
   }
 
   function request(data, opts) {

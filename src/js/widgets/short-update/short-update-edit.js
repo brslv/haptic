@@ -55,6 +55,7 @@ export default function shortUpdateEdit() {
       ),
       onFileSelected: shortUpdateUtils.onFileSelected.bind(null, $els),
       onImageUploaded: shortUpdateUtils.onImageUploaded.bind(null, $els),
+      imageUploadedEventName: "haptic:short-update:img-uploaded-edit",
     });
   }
 
@@ -71,6 +72,7 @@ export default function shortUpdateEdit() {
       $form: $els.$form,
       $uploadImgBtn: $els.$uploadImgBtn,
       $fileUpload: $els.$fileUpload,
+      imageUploadedEventName: "haptic:short-update:img-uploaded-edit",
     });
   }
 
