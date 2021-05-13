@@ -4,6 +4,7 @@ include partials/top-bar.pug
 include partials/page-title.pug
 include partials/flash-msg.pug
 include partials/csrf.pug
+include partials/empty-list-message.pug
 
 mixin notif({ notif })
   div(class="p-4 rounded-md bg-white shadow-sm mt-4" data-notification-id=notif.id)
@@ -49,7 +50,8 @@ block content
           each notif in notifications.unread
             +notif({notif})
         else
-          p(class="text-gray-500") No unread notifications.
+          +empty-list-message
+            span No notifications found
 
       div(class="flex items-center justify-between mb-4")
         +page-title(class="bg-gray-200 px-4 py-1 rounded-full") Read
@@ -57,4 +59,6 @@ block content
         each notif in notifications.read
           +notif({ notif })
       else
-        p(class="text-gray-500") No read notifications
+        +empty-list-message
+          span No notifications found
+        // p(class="text-gray-500") No notifications here

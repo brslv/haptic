@@ -5,6 +5,7 @@ include partials/modal.pug
 include partials/page-title.pug
 include partials/flash-msg.pug
 include partials/require-module.pug
+include partials/empty-list-message.pug
 
 block append scripts
   +require-module('collections')
@@ -41,6 +42,7 @@ block content
                   p= product.description
 
       div(class={"hidden": collections.length > 0, "text-gray-500":true} data-collections-no-items-msg)
-        p(class="pb-2") No collected products found
+        +empty-list-message
+          span No collected items
         // - button(class="btn btn-primary click-scale") Browse products
 
