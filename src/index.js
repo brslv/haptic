@@ -659,6 +659,7 @@ app.get("/p/:slug", (req, res, next) => {
                   meta: {
                     ...defaultMetas,
                     title: `${result.name} | Haptic`,
+                    description: result.description,
                     og: {
                       ...defaultMetas.og,
                       title: `${result.name} | Haptic`,
