@@ -50,20 +50,12 @@ block content
             span(class="relative z-10") your product
 
           h2(class="text-2xl text-gray-600 mx-auto pb-10" style="max-width: 28ch") You have a story. Your product, too. Share it with the world.
-
-          if isProd
-            div(class="mb-16 max-w-lg mx-auto")
-              h2(class="font-bold text-lg mb-4") Join the waitlist
-              form(class="flex" data-waitlist-form)
-                input(class="input" placeholder="Email" type="email" class="flex-1 mr-4")
-                button(type="submit" class="btn btn-primary") Join now
-              span(class="mt-4 text-gray-600 block text-sm max-w-xs mx-auto") Haptic is under development, but will go live soon. Join the waitlist and make sure you don't miss the launch.
-          else
-            div(class="flex items-center justify-center flex-col mb-24")
-              div(class="relative")
-                img(src="/static/images/landing/arrow.svg" class="absolute -top-2 -left-28 select-none")
-                a(class="btn btn-primary text-lg md:text-xl px-6 py-4 mb-1 click-scale" href="/login") Start sharing your story
-              span(class="text-sm text-gray-600") FREE, no credit cards required!
+  
+          div(class="flex items-center justify-center flex-col mb-24")
+            div(class="relative")
+              img(src="/static/images/landing/arrow.svg" class="absolute -top-2 -left-28 select-none")
+              a(class="btn btn-primary text-lg md:text-xl px-6 py-4 mb-1 click-scale" href="/login") Start sharing your story
+            span(class="text-sm text-gray-600") FREE, no credit cards required!
 
       div(class="flex flex-col items-center")
         // img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none hidden md:block")
@@ -116,31 +108,6 @@ block content
                     p(class="mb-4 md:mb-8") Haptic aims to streamline the process. It provides a set of content creation tools which help you narrate a coherent story.
                     p(class="mb-4 md:mb-8") Think of Haptic as your product's public diary.
                     p Having it all in one place makes it easier for your audience to engage and enjoy the ride with you.
-
-      // - div(class="container p-4 mx-auto")
-      // -   div(class="z-10 mb-32 mt-32")
-      // -     div(class="relative z-10")
-      // -       div(class="md:grid md:grid-cols-10 gap-4 mb-16 bg-white border border-gray-100 hover:bg-white hover:shadow p-8 rounded-md transition")
-      // -         +icon("anchor", { width: 42, height: 42 })(class="mb-8 sm:mb-0")
-      // -         //- img(src="/static/images/landing/sun.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
-      // -         div(class="md:mb-0 md:col-span-4")
-      // -           h3(class="text-2xl font-bold mb-4") Ideas meet reality on Haptic
-      // -         p(class="col-span-5").
-      // -           Building in isolation is a lonely experience. More importantly, it's disconnected from reality, which makes it counterproductive. Join Haptic and reconnect by engaging with your audience and future customers.
-      // -       div(class="md:grid md:grid-cols-10 gap-4 mb-16 border border-gray-100 bg-white hover:bg-white hover:shadow p-8 rounded-md transition")
-      // -         +icon("message-circle", { width: 42, height: 42 })(class="mb-8 sm:mb-0")
-      // -         //- img(src="/static/images/landing/leaf.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
-      // -         div(class="md:mb-0 md:col-span-4")
-      // -           h3(class="text-2xl font-bold mb-4") Good stories always catch people's attention
-      // -         p(class="col-span-5").
-      // -           Social media is not meant for building a narative because of it's ephemeral nature. That's where haptic shines. We give you the playgroind and the tools to grow your idea from the seed in your consciousness to the story of your life.
-      // -       div(class="md:grid md:grid-cols-10 gap-4 mb-16 border border-gray-100 bg-white hover:bg-white hover:shadow p-8 rounded-md transition")
-      // -         +icon("package", { width: 42, height: 42 })(class="mb-8 sm:mb-0")
-      // -         //- img(src="/static/images/landing/product-lifecycle.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
-      // -         div(class="md:mb-0 md:col-span-4")
-      // -           h3(class="text-2xl font-bold mb-4") Build better products
-      // -         p(class="col-span-5").
-      // -           Building great products is a non-linear process. You have to validate, ship and iterate. Haptic helps you get the valueable feedback needed for your next move on every step of the process.
 
       div(class="relative")
         div(class="container mx-auto p-4")
@@ -210,7 +177,7 @@ block content
             +use-case("You", "heart", "shape-6") For You and your story. Whoever you are. Whatever your story.
 
           div(class="flex flex-col items-center justify-center")
-            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href=(isProd ? "/#top" : "/login")) Start sharing your story
+            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href=("/login")) Start sharing your story
             span(class="text-sm text-gray-600") FREE, no credit cards required!
 
       div(class="mb-32" id="pricing")
@@ -235,10 +202,7 @@ block content
                   span Post comments
                   span(class="uppercase ml-2 bg-yellow-50 rounded px-2 py-1.5 text-xs") Soon
               div(class="mt-8")
-                if isProd
-                  button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
-                else
-                  a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as Creator Lite
+                a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as Creator Lite
             div(class="flex-1 w-full bg-white shadow-lg border border-gray-100 rounded-md p-4 md:p-8 hover:shadow-xl transition")
               div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") 10$ / month
               h2(class="text-xl md:text-2xl font-bold") Creator
@@ -250,32 +214,7 @@ block content
                 li(class="p-4 border-b") #[span(class="underline") Unlimited] product pages
                 li(class="p-4 pb-0") All of Haptic's content creation tools
               div(class="mt-8")
-                if isProd 
-                  button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
-                else
-                  a(href="/login?creator=true" class="btn btn-primary lg:text-xl text-center py-3") Join as Creator
-
-      if isProd
-        div(class="mb-48 mt-16 text-center container mx-auto p-4")
-          div(class="max-w-lg mx-auto")
-            h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Join the waitlist
-            form(class="flex" data-waitlist-form)
-              input(class="input" placeholder="Email" type="email" class="flex-1 mr-4")
-              button(type="submit" class="btn btn-primary") Join now
-            span(class="mt-4 text-gray-600 block text-sm max-w-xs mx-auto") Haptic is under development, but will go live soon. Join the waitlist and make sure you don't miss the launch.
-
-      // - div(class="mb-48 mt-16")
-      // -   div(class="container mx-auto p-4")
-      // -     div(class="max-w-lg mx-auto relative")
-      // -       img(src="/static/images/landing/shapes/blob-3.svg" class="absolute top-0 right-0")
-      // -       div(class="relative")
-      // -         h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Join now
-
-      // -         div(class="flex flex-col items-center justify-center")
-      // -           div(class="relative")
-      // -             img(src="/static/images/landing/arrow.svg" class="absolute -top-2 -left-28 select-none")
-      // -             a(class="btn btn-primary text-xl px-6 py-4 mb-1 click-scale" href="/login") Start sharing your story
-      // -           span(class="text-sm text-gray-600") FREE, no credit cards required!
+                a(href="/login?creator=true" class="btn btn-primary lg:text-xl text-center py-3") Join as Creator
   
   div(class="border-t border-gray-100")
     div(class="text-center p-8 text-sm")
