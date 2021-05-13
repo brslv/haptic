@@ -4,24 +4,28 @@ include ../../partials/top-bar.pug
 include ../../partials/product-header.pug
 include ../../partials/flash-msg.pug
 include ../../partials/require-module.pug
+include ../../partials/csrf.pug
 
 block append scripts
   +require-module('settings')
 
 block content
+  - var formErrors = flash && flash.data && flash.data[0] && flash.data[0].errors || {};
   +top-bar
   div(class="container mx-auto px-4")
     +product-header(product, links, 'settings')
     div(class="container mx-auto pt-4")
       +flash-msg(flash)
     form(action=`${form.delete.action}` method="POST" data-delete-product-form class="hidden")
-    form(action=`${form.action}` method="POST" id="product-settings-form")
+      +csrf
+    form(action=`${form.action}` method="POST" id="product-settings-form" data-product-settings-form)
+      +csrf
       div(class="flex items-start md:flex-row flex-col")
 
         // -- left
         div(class="w-full md:w-2/3 md:mr-4")
           div(class="container mx-auto")
-            div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
+            div(class="p-4 bg-white rounded-md shadow-sm border border-gray-100 mb-4")
               div(class="pb-8")
                 label
                   div(class="label pb-1 pl-1") Name
@@ -36,18 +40,21 @@ block content
               div(class="pb-8")
                 label
                   div(class="label pb-1 pl-1") Website/URL
-                  input(class="input w-full" name="website" id="product-website" value=product.website) 
+                  input(class={"input w-full": true, "border-red-500": formErrors.website} name="website" id="product-website" value=(formErrors.website && formErrors.website.val || product.website)) 
+                  if formErrors.website
+                    p(class="text-xs text-red-500 mt-1")= formErrors.website.msg
+
 
           div(class="container mx-auto")
-            div(class="p-4 bg-white rounded-xl shadow-sm border-4 border-red-100 mb-4 relative")
+            div(class="p-4 bg-white rounded-md shadow-sm border-4 border-red-100 mb-4 relative")
               div(class="px-2 py-1 bg-red-300 rounded-full text-xs absolute -top-4 left-4") Danger zone
-              div(class="relative rounded-xl pt-2")
+              div(class="relative rounded-md pt-2")
                 button(type="button" class="btn btn-danger click-scale" data-delete-product-btn) Delete product
                 span(class="text-gray-500 text-xs pt-1") Cannot be undone!
 
         // -- right
         div(class="flex-1 container mx-auto")
-          div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
+          div(class="p-4 bg-white rounded-md shadow-sm border border-gray-100 mb-4")
             div
               div(class="pb-8")
                 label(class="flex items-center")
@@ -61,5 +68,5 @@ block content
                   span(class="label cursor-pointer") List on Haptic
                 span(class="text-sm text-gray-500") By having this on, you agree that we can list your product on our homepage
 
-          div(class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4")
+          div(class="p-4 bg-white rounded-md shadow-sm border border-gray-100 mb-4")
             button(type="submit" class="btn btn-primary w-full") Save

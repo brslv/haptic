@@ -4,7 +4,7 @@ include landing/partials/top-bar.pug
 include partials/icon.pug
 
 mixin use-case(title, icon, shapeSrc)
-  div(class="bg-white shadow sm:shadow-none sm:bg-transparent border border-gray-100 sm:border-none relative p-8 rounded-xl")
+  div(class="bg-white shadow sm:shadow-none sm:bg-transparent border border-gray-100 sm:border-none relative p-8 rounded-md")
     img(src=`/static/images/landing/shapes/${shapeSrc}.svg` class="absolute -top-2 left-4" style="width: 100px; height: 100px;")
     div(class="relative z-10")
       +icon(icon, { width: 32, height: 32 })(class="mb-8")
@@ -14,10 +14,10 @@ mixin use-case(title, icon, shapeSrc)
           block
 
 mixin step(nr, title, imageSrc, mobileImgHeight, blobSrc, imageAttrs, blobWidth)
-  div(class="flex relative sm:bg-transparent flex-col-reverse rounded-xl sm:flex-row items-start mb-32 sm:mb-20")
+  div(class="flex relative sm:bg-transparent flex-col-reverse rounded-md sm:flex-row items-start mb-32 sm:mb-20")
     div(class="absolute")&attributes(imageAttrs)
       img(src=`/static/images/landing/shapes/${blobSrc}.svg` style=`width: ${blobWidth}px;`)
-    div(class="relative z-10 border border-gray-100 bg-white shadow hover:shadow-lg transition p-4 md:p-8 text-center sm:text-left rounded-xl sm:mr-10 sm:max-w-lg")
+    div(class="relative z-10 border border-gray-100 bg-white shadow hover:shadow-lg transition p-4 md:p-8 text-center sm:text-left rounded-md sm:mr-10 sm:max-w-lg")
       div(class="relative")
         span(class="block text-xs font-medium text-gray-600 uppercase mb-4 mt-10 sm:mt-0") Step #{nr}
         h4(class="text-xl md:text-2xl font-bold mb-8 bg-yellow-100 p-1 inline-block transform -rotate-1")= title
@@ -28,7 +28,7 @@ mixin step(nr, title, imageSrc, mobileImgHeight, blobSrc, imageAttrs, blobWidth)
       img(src=`/static/images/landing/${imageSrc}.svg` class="hidden sm:block w-full transition transform hover:scale-105" style="min-width: 300px; max-width: 350px;")
 
 mixin detail(title, isSoon = false)
-  li(class={"relative p-4 md:p-8 transition rounded-xl": true, "bg-red-50 hover:bg-red-100": isSoon, "bg-yellow-50 hover:bg-yellow-100": !isSoon})
+  li(class={"relative p-4 md:p-8 transition rounded-md": true, "bg-red-50 hover:bg-red-100": isSoon, "bg-yellow-50 hover:bg-yellow-100": !isSoon})
     if isSoon
       span(class="bg-red-200 absolute -top-2 -right-2 uppercase font-medium text-xs px-2 py-1.5 rounded-md") Soon
     h2(class="font-bold text-xl md:text-2xl mb-4")= title
@@ -51,7 +51,7 @@ block content
 
           h2(class="text-2xl text-gray-600 mx-auto pb-10" style="max-width: 28ch") You have a story. Your product, too. Share it with the world.
 
-          if isProd || isStage
+          if isProd
             div(class="mb-16 max-w-lg mx-auto")
               h2(class="font-bold text-lg mb-4") Join the waitlist
               form(class="flex" data-waitlist-form)
@@ -67,18 +67,18 @@ block content
 
       div(class="flex flex-col items-center")
         // img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none hidden md:block")
-        div(class="hidden md:block relative overflow-hidden bg-gray-50 z-10 -mb-32 lg:-mb-64 shadow-xl rounded-xl border border-gray-200 select-none transition transform" style="max-width: 90%")
+        div(class="hidden md:block relative overflow-hidden bg-gray-50 z-10 -mb-32 lg:-mb-64 shadow-xl rounded-md border border-gray-200 select-none transition transform" style="max-width: 90%")
           div(class="flex items-center bg-gray-100 w-full h-12 px-4 border-b border-gray-200")
             div(class="flex items-center mr-4")
               div(class="w-4 h-4 rounded-full bg-red-500 mr-2")
               div(class="w-4 h-4 rounded-full bg-yellow-400 mr-2")
               div(class="w-4 h-4 rounded-full bg-green-500 mr-2")
-            div(class="flex-1 flex items-center px-4 bg-white rounded-lg w-32 h-8 border border-gray-200")
+            div(class="flex-1 flex items-center px-4 bg-white rounded-md w-32 h-8 border border-gray-200")
               span(class="text-sm font-medium") haptic.so/p/#[span(class="font-bold") your-product]
           div(class="relative overflow-y-scroll" style="min-height: 450px; max-height: 600px; width: 100%;")
             img(src="/static/images/landing/product-image-hq.png" class="w-full" style="max-width: 1200px;")
         div(class="block md:hidden -mb-16")
-          div(class="relative overflow-y-scroll mx-auto shadow-lg rounded-xl" style="max-height: 600px; width: 90%;")
+          div(class="relative overflow-y-scroll mx-auto shadow-lg rounded-md" style="max-height: 600px; width: 90%;")
             img(src="/static/images/landing/product-image-hq.png" class="w-full" style="max-width: 1200px;")
 
   // - features
@@ -96,7 +96,7 @@ block content
 
               div(class="grid grid-cols-1 md:grid-cols-8 gap-8 mt-32")
                 div(class="col-span-8 md:col-span-4 lg:col-span-3")
-                  div(class="relative bg-white border border-gray-100 rounded-xl transition shadow")
+                  div(class="relative bg-white border border-gray-100 rounded-md transition shadow")
                     img(src="/static/images/landing/me-bw-optimized.jpg" class="absolute -top-20 left-1/2 rounded-full w-32 h-32 shadow-2xl border-4 border-gray-500" style="transform: translateX(-50%);" alt="Borislav Grigorov")
                     div(class="mt-12 p-4 md:p-8")
                       p(class="mb-4 md:mb-8") Hey, there! 👋
@@ -104,14 +104,14 @@ block content
                       p Let me tell you about Haptic 👉
                       hr(class="mb-4 md:my-8 hidden")
                 div(class="col-span-8 md:col-span-4 lg:col-span-5")
-                  div(class="bg-white border border-gray-100 rounded-xl shadow p-4 pt-6 md:p-8 md:pt-8 mb-8 relative")
+                  div(class="bg-white border border-gray-100 rounded-md shadow p-4 pt-6 md:p-8 md:pt-8 mb-8 relative")
                     span(class="text-xs uppercase text-gray-600 font-medium bg-yellow-100 px-2 py-1 rounded mb-2 absolute -top-4 left-8 shadow border border-yellow-300") The problem
                     p(class="mb-4 md:mb-8") When I started to #BuildInPublic, I quickly realized that the general process is a mess.                
                     p(class="mb-4 md:mb-8") I was using countless platforms to share my ups, downs and learnings. The content creation tools were limited and sometimes constraining.
                     p(class="mb-4 md:mb-8") On top of that my posts were living in context of other personal sharings, unrelated to my #BuildInPublic journey.
-                    p(class="lg:absolute lg:-bottom-18 lg:-right-4 lg:bg-white lg:rounded-xl lg:shadow-lg lg:border lg:border-gray-100 lg:max-w-lg lg:p-4") I was unable to create tractable, coherent story around the product itself. Everything was swallowed in feeds and lost in the void.
+                    p(class="lg:absolute lg:-bottom-18 lg:-right-4 lg:bg-white lg:rounded-md lg:shadow-lg lg:border lg:border-gray-100 lg:max-w-lg lg:p-4") I was unable to create tractable, coherent story around the product itself. Everything was swallowed in feeds and lost in the void.
 
-                  div(class="flex-1 bg-white border border-gray-100 rounded-xl shadow p-4 pt-6 md:p-8 md:pt-8 relative lg:mt-32")
+                  div(class="flex-1 bg-white border border-gray-100 rounded-md shadow p-4 pt-6 md:p-8 md:pt-8 relative lg:mt-32")
                     span(class="text-xs uppercase text-gray-600 font-medium bg-yellow-100 px-2 py-1 rounded mb-2 absolute -top-4 left-8 shadow border border-yellow-300") The solution
                     p(class="mb-4 md:mb-8") Haptic aims to streamline the process. It provides a set of content creation tools which help you narrate a coherent story.
                     p(class="mb-4 md:mb-8") Think of Haptic as your product's public diary.
@@ -120,21 +120,21 @@ block content
       // - div(class="container p-4 mx-auto")
       // -   div(class="z-10 mb-32 mt-32")
       // -     div(class="relative z-10")
-      // -       div(class="md:grid md:grid-cols-10 gap-4 mb-16 bg-white border border-gray-100 hover:bg-white hover:shadow p-8 rounded-xl transition")
+      // -       div(class="md:grid md:grid-cols-10 gap-4 mb-16 bg-white border border-gray-100 hover:bg-white hover:shadow p-8 rounded-md transition")
       // -         +icon("anchor", { width: 42, height: 42 })(class="mb-8 sm:mb-0")
       // -         //- img(src="/static/images/landing/sun.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
       // -         div(class="md:mb-0 md:col-span-4")
       // -           h3(class="text-2xl font-bold mb-4") Ideas meet reality on Haptic
       // -         p(class="col-span-5").
       // -           Building in isolation is a lonely experience. More importantly, it's disconnected from reality, which makes it counterproductive. Join Haptic and reconnect by engaging with your audience and future customers.
-      // -       div(class="md:grid md:grid-cols-10 gap-4 mb-16 border border-gray-100 bg-white hover:bg-white hover:shadow p-8 rounded-xl transition")
+      // -       div(class="md:grid md:grid-cols-10 gap-4 mb-16 border border-gray-100 bg-white hover:bg-white hover:shadow p-8 rounded-md transition")
       // -         +icon("message-circle", { width: 42, height: 42 })(class="mb-8 sm:mb-0")
       // -         //- img(src="/static/images/landing/leaf.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
       // -         div(class="md:mb-0 md:col-span-4")
       // -           h3(class="text-2xl font-bold mb-4") Good stories always catch people's attention
       // -         p(class="col-span-5").
       // -           Social media is not meant for building a narative because of it's ephemeral nature. That's where haptic shines. We give you the playgroind and the tools to grow your idea from the seed in your consciousness to the story of your life.
-      // -       div(class="md:grid md:grid-cols-10 gap-4 mb-16 border border-gray-100 bg-white hover:bg-white hover:shadow p-8 rounded-xl transition")
+      // -       div(class="md:grid md:grid-cols-10 gap-4 mb-16 border border-gray-100 bg-white hover:bg-white hover:shadow p-8 rounded-md transition")
       // -         +icon("package", { width: 42, height: 42 })(class="mb-8 sm:mb-0")
       // -         //- img(src="/static/images/landing/product-lifecycle.svg" class="col-span-1 select-none mb-4 md:mb-0" style="max-width: 50px;")
       // -         div(class="md:mb-0 md:col-span-4")
@@ -210,7 +210,7 @@ block content
             +use-case("You", "heart", "shape-6") For You and your story. Whoever you are. Whatever your story.
 
           div(class="flex flex-col items-center justify-center")
-            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href=(isProd || isStage ? "/#top" : "/login")) Start sharing your story
+            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href=(isProd ? "/#top" : "/login")) Start sharing your story
             span(class="text-sm text-gray-600") FREE, no credit cards required!
 
       div(class="mb-32" id="pricing")
@@ -219,11 +219,12 @@ block content
           h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Pricing
 
           div(class="flex flex-col md:flex-row items-start")
-            div(class="flex-1 w-full bg-white border border-gray-100 rounded-xl p-4 md:p-8 mb-8 md:mb-0 md:mr-8 hover:shadow-md transition")
+            div(class="flex-1 w-full bg-white border border-gray-100 rounded-md p-4 md:p-8 mb-8 md:mb-0 md:mr-8 hover:shadow-md transition")
               div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") FREE
-              h2(class="text-xl md:text-2xl font-bold") Observer
+              h2(class="text-xl md:text-2xl font-bold") Creator Lite
               p(class="text-lg lg:text-xl text-gray-600 mb-4 md:mb-8") For the inspiration seekers.
               ul
+                li(class="p-4 border-b") One product page
                 li(class="p-4 border-b") Collect products
                 li(class="p-4 border-b") Boost products
                 li(class="p-4 border-b") Boost posts
@@ -234,11 +235,11 @@ block content
                   span Post comments
                   span(class="uppercase ml-2 bg-yellow-50 rounded px-2 py-1.5 text-xs") Soon
               div(class="mt-8")
-                if isProd || isStage
+                if isProd
                   button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
                 else
-                  a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as observer
-            div(class="flex-1 w-full bg-white shadow-lg border border-gray-100 rounded-xl p-4 md:p-8 hover:shadow-xl transition")
+                  a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200") Join as Creator Lite
+            div(class="flex-1 w-full bg-white shadow-lg border border-gray-100 rounded-md p-4 md:p-8 hover:shadow-xl transition")
               div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") 10$ / month
               h2(class="text-xl md:text-2xl font-bold") Creator
               p(class="text-xl text-gray-600 mb-8") For the doers.
@@ -246,15 +247,15 @@ block content
                 li(class="flex items-center p-4 border-b font-bold")
                   +icon("arrow-left")(class="mr-2")
                   span All from Observer
-                li(class="p-4 border-b") Create product pages
+                li(class="p-4 border-b") #[span(class="underline") Unlimited] product pages
                 li(class="p-4 pb-0") All of Haptic's content creation tools
               div(class="mt-8")
-                if isProd || isStage
+                if isProd 
                   button(class="w-full btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200" disabled) Soon
                 else
-                  a(href="/login" class="btn btn-primary lg:text-xl text-center py-3") Join as creator
+                  a(href="/login?creator=true" class="btn btn-primary lg:text-xl text-center py-3") Join as Creator
 
-      if isProd || isStage
+      if isProd
         div(class="mb-48 mt-16 text-center container mx-auto p-4")
           div(class="max-w-lg mx-auto")
             h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Join the waitlist

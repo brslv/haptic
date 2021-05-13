@@ -80,51 +80,6 @@ export default function contextMenu() {
   });
 }
 
-export function postContextMenu() {
-  function deletePost(postId, $el) {
-    req("/post/" + postId, {
-      method: "delete",
-      ok: function postDelResponse(response) {
-        // remove the post element
-        const $post = $('[data-post-id="' + postId + '"]');
-        if (!$post) {
-          console.warn("No post with post_id" + postId + " to remove.");
-          return;
-        }
-
-        $post.remove();
-        $(document).trigger("haptic:add-toast", {
-          content: "Post deleted successfully",
-          type: "success",
-        });
-      },
-    });
-  }
-
-  function onOpen(e, data) {
-    if (data.name === "delete-post") {
-      var ok = window.confirm(
-        "Deleting a post is irreversible. Delete post anyway?"
-      );
-      if (ok) deletePost(data.$el.data("post-id"));
-    }
-  }
-
-  function load() {
-    $(document).on("haptic:context-menu-action", onOpen);
-  }
-
-  function clear() {
-    $(document).off("haptic:context-menu-action", onOpen);
-  }
-
-  turbo.load(() => {
-    load();
-  });
-
-  turbo.beforeCache(clear);
-}
-
 export function collectionContextMenu() {
   function onOk($el) {
     const $parents = $el.parents("[data-collected-product-root]");
@@ -139,12 +94,17 @@ export function collectionContextMenu() {
 
   function deleteCollectedItem($el) {
     const slug = $el.data("product-slug");
+    const csrf = $('meta[name="csrf"]').attr("content");
 
-    req(`/p/${slug}/collect`, {
-      method: "delete",
-      ok: onOk.bind(null, $el),
-      fail: onFail,
-    });
+    req(
+      `/p/${slug}/collect`,
+      { data: { csrf } },
+      {
+        method: "delete",
+        ok: onOk.bind(null, $el),
+        fail: onFail,
+      }
+    );
   }
 
   function onAction(e, data) {

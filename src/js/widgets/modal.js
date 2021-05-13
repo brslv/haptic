@@ -3,9 +3,9 @@ import { $, turbo } from "../utils";
 export default function modal() {
   const triggerSelector = "[data-modal-trigger]";
 
-  function openModal($modal, modalName) {
+  function openModal($modal, modalName, $triggerEl) {
     $modal.removeClass("hidden");
-    $(document).trigger("haptic:modal-open", { $modal, modalName });
+    $(document).trigger("haptic:modal-open", { $modal, modalName, $triggerEl });
     $(document).one("haptic:close-modals", closeAllModals);
   }
 
@@ -27,7 +27,7 @@ export default function modal() {
     const $modal = $(`[data-modal-name="${trigger}"]`);
     const $close = $("[data-modal-close]", $modal);
 
-    openModal($modal, trigger);
+    openModal($modal, trigger, $triggerEl);
 
     // handle close
     $close.one("click", closeModal.bind(null, $modal, trigger));

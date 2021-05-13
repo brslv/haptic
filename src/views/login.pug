@@ -1,12 +1,25 @@
 extends layouts/base.layout.pug
 
+include partials/page-title.pug
+
 block content
-  div(class="h-screen w-screen flex items-center justify-center")
-    div
-      a(href="/" class="inline-block bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl px-2 py-1.5 font-medium mb-2") Home
-      div(class="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl")
-        h1(class="text-xl font-bold mb-4") Login
-        if isDev
-          a(href="/auth/twitter" class="block btn btn-twitter") Login with Twitter
-        else
-          p Soon
+  div(class="max-w-md absolute top-1/2 left-1/2" style="transform: translate(-50%, -50%)")
+    div(class="bg-white shadow-md rounded-md p-4" style="width: 280px;")
+      div
+        h1(class="text-xl font-bold mb-4 text-center") Login
+        a(href=(creator ? "/auth/twitter?creator=true" : "/auth/twitter") class="flex items-center justify-center btn btn-twitter")
+          +icon("twitter", { width: 18, height: 18, stroke: "white", fill: "white" })(class="mr-2")
+          span Login with Twitter
+    div(class="text-xs text-center mt-4 mx-auto text-gray-500" style="max-width: 24ch;")
+      p By using Haptic you agree to it's #[a(href="/terms-of-service" class="underline hover:no-underline") Terms of service] and #[a(href="/privacy-policy" class="underline hover:no-underline") Privacy policy].
+
+  // - block content
+  // -   div(class="h-screen w-screen flex items-center justify-center")
+  // -     div
+  // -       a(href="/" class="inline-block bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md px-2 py-1.5 font-medium mb-2") Home
+  // -       div(class="p-4 bg-gray-100 dark:bg-gray-700 rounded-md")
+  // -         h1(class="text-xl font-bold mb-4") Login
+  // -         if isDev
+  // -           a(href=(creator ? "/auth/twitter?creator=true" : "/auth/twitter") class="block btn btn-twitter") Login with Twitter
+  // -         else
+  // -           p Soon

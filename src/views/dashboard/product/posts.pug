@@ -7,6 +7,8 @@ include ../../partials/modal.pug
 include ../../partials/post.pug
 include ../../partials/icon.pug
 include ../../partials/require-module.pug
+include ../../partials/csrf.pug
+include ../../partials/short-update-form.pug
 
 mixin post-type-btn({trigger, icon, disabled, tooltip, text}, attr = {})
   div(
@@ -15,7 +17,7 @@ mixin post-type-btn({trigger, icon, disabled, tooltip, text}, attr = {})
     data-post-type-trigger=trigger
     data-disabled=disabled
     class={
-      "relative flex flex-col items-center p-3 rounded-xl outline-none select-none text-center": true,
+      "relative flex flex-col items-center p-3 rounded-md outline-none select-none text-center": true,
       "cursor-pointer bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 click-scale": !disabled,
       "text-gray-300": disabled
     }
@@ -41,41 +43,21 @@ block content
     div(class="flex flex-col md:flex-row items-start pt-4")
       div(class="w-full md:w-4/6 md:mr-4 mb-4")
         +page-title(class="mb-4") Publish new
-        div(class="bg-white p-2 mb-4 rounded-xl shadow-sm border-4 border-yellow-300" data-post-types-container)
+        div(class="bg-white p-2 mb-4 rounded-md shadow-sm border-4 border-yellow-300" data-post-types-container)
           div(class="gap-2 flex overflow-y-auto")
-            +post-type-btn({ trigger: "short-update", icon: "file-text", disabled: false, text: "Quick Update" })
+            +post-type-btn({ trigger: "short-update-create", icon: "file-text", disabled: false, text: "Quick Update" })
+            +post-type-btn({ trigger: "long-update", icon: "feather", disabled: true, tooltip: "Soon!", text: "Article" })
             +post-type-btn({ trigger: "youtube", icon: "youtube", disabled: true, tooltip: "Soon!", text: "YouTube video" }) 
             +post-type-btn({ trigger: "survey", icon: "check-circle", disabled: true, tooltip: "Soon!", text: "Survey" }) 
             +post-type-btn({ trigger: "milestone", icon: "smile", disabled: true, tooltip: "Soon!", text: "Milestone" }) 
             +post-type-btn({ trigger: "roadmap", icon: "map", disabled: true, tooltip: "Soon!", text: "Roadmap" }) 
 
-          div(data-post-type="short-update" class="hidden")
-            form
-              input(type="file" id="image-upload" data-upload-file class="hidden")
-              input(type="hidden" name="uploaded_image" value="" data-uploaded)
-              input(type="hidden" name="id" value=product.id)
-              div(class="border border-gray-300 p-1.5 rounded-xl relative mb-2" style="display: none;" data-upload-image-preview)
-              label
-                textarea(data-autoresize="3" rows="3" class="textarea w-full" placeholder="Share something great about your product..." data-text)
-                p(class="hidden text-red-500 font-medium text-sm mb-2" data-error)
-              div(class="flex flex-row-reverse items-center justify-between")
-                div(class="flex flex-row-reverse items-center")
-                  button(type="submit" class="btn btn-primary click-scale") Publish
-                  button(type="button" class="mr-2 btn btn-text flex items-center click-scale" data-upload-image-btn)
-                    span(class="mr-2")
-                      +icon('image', { width: '18', height: '18' })
-                    span Attach image
-                  span(data-image-upload-loader class="hidden mr-2")
-                    span(class="animate-spin icon-container opacity-75 my-0 block relative")
-                      +icon("refresh-cw")
-                button(data-post-type-cancel type="button" class="btn bg-gray-100 rounded-xl px-2 py-1.5 text-xs flex items-center click-scale")
-                  span Quick update
-                  +icon("x", { width: 18, height: 18 })(class="ml-2 bg-gray-200 rounded-full p-1")
-
+          div
+            +short-update-form({ mode: 'create', isHidden: true, showCancelButton: false, showCancelPill: true })
       
         div
           +page-title(class="mb-4") Posts
-          div(data-no-posts-msg class={"hidden": posts.length, "flex items-center justify-center bg-white shadow p-4 rounded-xl border border-gray-100": true} style="min-height: 300px")
+          div(data-no-posts-msg class={"hidden": posts.length, "flex items-center justify-center bg-white shadow p-4 rounded-md border border-gray-100": true} style="min-height: 300px")
             div(class="text-center flex flex-col items-center")
               span(class="mb-2 p-2 w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full")
                 +icon("activity", { stroke: "muted" })
@@ -93,6 +75,8 @@ block content
                   product_slug: product.slug,
                   product_name: product.name,
                   post_id: post.id,
+                  post_text_md: post.text_md,
+                  post_twitter_text: post.twitter_text,
                   img: post.user_twitter_profile_image_url,
                   img_url: post.image_url,
                   twitter_name: post.user_twitter_name,
@@ -104,16 +88,16 @@ block content
 
       div(class="w-full md:w-2/6 mb-4")
         +page-title(class="mb-4") Product details
-        // - div(class="relative p-4 bg-yellow-50 rounded-xl mb-4 border border-yellow-300")
+        // - div(class="relative p-4 bg-yellow-50 rounded-md mb-4 border border-yellow-300")
         // -   +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-4 cursor-pointer")
         // -   span(class="font-medium") Tip!
         // -   p Make sure to fill in the most important product details on the side of your product's page. This will help visitors grasp your product in a blink of an eye.
-        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-xl")
+        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-md")
           span(class="font-medium text-sm mb-4 block") Tools
           div(data-product-tools-root data-product-tools-product-slug=product.slug)
             div(class={"flex flex-wrap gap-2":true, "mb-2": tools.length} data-product-tools-container)
               each tool of tools
-                div(class="px-2 py-1 border border-gray-300 rounded-lg flex items-center justify-between" data-product-tool-id=tool.id)
+                div(class="px-2 py-1 border border-gray-300 rounded-md flex items-center justify-between" data-product-tool-id=tool.id)
                   span(class="pr-2")= tool.text
                   +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale" data-product-tools-remove-btn)
             button(class="flex items-center btn bg-white bg-yellow-100 hover:bg-yellow-300 btn-small click-scale" data-product-tools-add-btn)
@@ -126,21 +110,15 @@ block content
               input(class="input mb-2" placeholder="E.g. React" id="tools-input" data-product-tools-input)
               button(type="submit" class="hidden") Submit
 
-  template(data-post-tpl)
-    +post({
-      product_slug: product.slug,
-      product_name: product.name,
-      post_id: -1,
-      img: user.twitter_profile_image_url,
-      img_url: null,
-      twitter_name: user.twitter_name,
-      twitter_screen_name: user.twitter_screen_name,
-      date_str: 'Now',
-      disable_boost_btn: true,
-      boosts_count: 0
-    })
-
   template(data-product-tool-tpl)
-    div(class="px-2 py-1 border border-gray-300 rounded-lg flex items-center justify-between" data-product-tool-id="-1")
+    div(class="px-2 py-1 border border-gray-300 rounded-md flex items-center justify-between" data-product-tool-id="-1")
       span(class="pr-2" data-text-container)
       +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale" data-product-tools-remove-btn)
+
+block modals
+  +modal('edit-post', {}, {
+    class: 'mx-auto',
+    style: "width: 90%; min-width: 300px; max-width: 680px;"
+  })
+    div
+      +short-update-form({ mode: 'edit', isHidden: false, showCancelButton: true, showCancelPill: false })

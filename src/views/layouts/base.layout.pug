@@ -36,6 +36,12 @@ html(lang="en" id="html" class="")
     if meta.twitter && meta.twitter.image_alt
       meta(name="twitter:image:alt" content=`${meta.twitter.image_alt}`)
 
+    if meta.author
+      meta(name="author" content=meta.author)
+
+    if csrf
+      meta(name="csrf" content=csrf)
+
     link(rel="preconnect" href="https://fonts.gstatic.com")
 
     link(href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet")
@@ -68,7 +74,7 @@ html(lang="en" id="html" class="")
     block head
     body(class={"dark:bg-gray-800": true, "bg-white": isHomepage, "bg-gray-50": !isHomepage} id="body")
     div(class="text-gray-800 dark:text-gray-200" id="root")
-      div(class="z-20 border border-gray-100 hidden fixed bottom-0 right-0 m-8 p-4 rounded-xl bg-white shadow-2xl text-sm dark:bg-gray-800 dark:border-gray-700" id="cookies-consent")
+      div(class="z-20 border border-gray-100 hidden fixed bottom-0 right-0 m-8 p-4 rounded-md bg-white shadow-2xl text-sm dark:bg-gray-800 dark:border-gray-700" id="cookies-consent")
         p(class="w-60 mb-4").
           By using haptic.so, you agree to it's use of cookies. #[a(href="/cookie-policy" title="Cookie Policy") Learn more].
         

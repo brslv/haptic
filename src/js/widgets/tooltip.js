@@ -7,7 +7,7 @@ export default function tooltip() {
     instance = tippy("[data-tippy-content]", {
       arrow: false,
       animation: "fade",
-      delay: [150, 0],
+      delay: [0, 0],
       inlinePositioning: true,
       placement: "bottom",
       theme: "haptic",

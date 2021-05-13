@@ -1,44 +1,68 @@
 extends layouts/base.layout.pug
 
-include partials/top-bar.pug
 include partials/icon.pug
+include partials/top-bar.pug
 include partials/page-title.pug
 
+block append head
+  meta(name="turbo-visit-control" content="reload")
+
 block append head_scripts
-  script(src="https://js.stripe.com/v3/")
+  script(
+    id="fsc-api"
+    src="https://d1f8f9xcsvx3ha.cloudfront.net/sbl/0.8.5/fastspring-builder.min.js"
+    type="text/javascript"
+    data-storefront=fsStorefrontUrl
+    data-popup-webhook-received="onPopupWebhookReceived"
+  )
   script.
-    window.___spk___ = "!{stripePublishableKey}";
+    fastspring.builder.push({ paymentContact: { email: "!{user.email}" } });
+    fastspring.builder.tag('haptic-uid', !{user.id});
+    function onPopupWebhookReceived() {
+      var successEl = document.querySelector("[data-checkout-success]");
+      var plansEl = document.querySelector("[data-checkout-plans]");
+      plansEl.classList.add("hidden");
+      successEl.classList.remove("hidden");
+    }
 
 block content
   +top-bar
-  div(class="container mx-auto p-4")
+  div(class="container max-w-lg mx-auto p-4")
     +page-title Checkout
 
-    if !user.email
-      div(class="my-4")
-        form(data-create-customer-form action="/create-customer" method="POST" class="bg-white p-4 rounded-xl border border-gray-100 shadow")
-          +page-title(class="mb-4") Provide an email
-          label(class="block mb-4")
-            div(class="label pb-1 pl-1") Email
-            input(data-create-customer-email type="email" class="input" name="email")
-            p(class="mt-1 ml-1 text-sm text-gray-400") We will send your invoices there.
-          button(type="submit" class="btn btn-primary") Continue
-    else
-      div(class="my-4")
-        div(class="grid grid-cols-1 md:grid-cols-7 gap-4")
-          div(class="col-span-3 bg-white p-4 rounded-xl border border-gray-100 transition shadow")
-            span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded") Chosen plan
-            div(class="p-4 border border-dashed rounded-xl border-gray-300")
-              h2(class="font-black text-2xl") Creator
-              p(class="font-black text-4xl my-4 text-yellow-300") $10
-              p(class="text-gray-600") Per month
-              p(class="text-gray-600") Billed monthly
-          div(class="col-span-4")
-            div(class="bg-white p-4 rounded-xl border border-gray-100 transition shadow-lg hover:shadow-xl")
-              span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded") Payment details
-              div
-                form(id="payment-form")
-                  div(id="card-element")
-                    span(class="animate-pulse text-lg my-4") Loading...
-                  div(id="card-element-errors" class="text-red-500 text-xs mt-2" role="alert")
-                  button(type="submit" class="btn btn-primary text-lg w-full py-3 mt-2") Subscribe
+    if user.type === USER_TYPES.CREATOR
+      div(class="my-4 text-gray-500")
+        p You're already a Creator.
+        a(href="/dashboard" class="underline hover:no-underline") Go to Dashboard
+
+    div(class="my-4 hidden text-center" data-checkout-success)
+      div(class="p-4 bg-white shadow-md rounded-md")
+        +icon("check", { stroke: "white", width: 32, height: 32 })(class="bg-green-500 p-2 rounded-full w-16 h-16 mx-auto my-12")
+        h2(class="text-xl font-bold mb-4") Thank you for your purchase.
+        p(class="mb-4") An email with details about your order is waiting in your inbox already. It's sent from FastSpring, our payments provider.
+        p(class="mb-4") If you have any questions or comments, feel free to reach out - #[a(href="mailto:borislav@haptic.so" class="underline hover:no-underline") send me an email.] 
+
+        a(href="/dashboard" class="btn btn-primary text-center my-4 inline-block w-full") Go to Dashboard
+
+        hr(class="my-4")
+
+        p(class="text-gray-500 text-xs") It may take up to several minutes to process your payment and provision you with the premium features of your chosen plan.
+    // - You will get an email by FastSpring with:
+    // - Subscription details by FastSpring
+    // - Details on how to manage your subscriptions
+    // - Invoice
+
+    if user.type !== USER_TYPES.CREATOR
+      div(class="my-4" data-checkout-plans)
+        div(class="mb-4 md:mb-0")
+          // span(class="inline-block uppercase text-xs font-medium text-gray-600 mb-2 bg-gray-100 p-1 rounded") Chosen plan
+          div(class=" bg-white p-4 rounded-md border border-gray-100 transition shadow")
+            h2(class="font-black text-2xl") Creator
+            p(class="font-black text-4xl my-4 text-yellow-300") $10
+            p(class="text-gray-600") Per month
+            p(class="text-gray-600 mb-4") Billed monthly
+            a(href='#' data-fsc-action="Add,Checkout" data-fsc-item-path-value="creator" data-turbo="false" class="btn btn-primary text-center text-xl") Upgrade now
+          div(class="text-center text-xs mt-16 text-gray-500")
+            p Payments powered by #[a(href="https://fastspring.com" class="text-gray-600 underline hover:no-underline" target="_blank" rel="noreferrer noopener") FastSpring].
+            hr(class="my-4")
+            p Haptic is using FastSpring as a Merchant of Record #[a(href="https://fastspring.com/blog/what-is-a-merchant-of-record-and-why-you-should-care/" target="_blank" rel="noreferrer noopener" title="What is a MoR and why you should care article on FastSpring" class="underline hover:no-underline") (MOR)]. This means that FastSpring is authorized to process consumer credit card and debit card purchases on behalf of Haptic LTD. By clicking on "Upgrade now", you will be presented with a popup screen, where you must provide the information, needed by FastSpring in order to fulfill your purchase.
