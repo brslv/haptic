@@ -1,0 +1,9 @@
+mixin empty-list-message
+  div(data-no-posts-msg class="flex items-center justify-center bg-white shadow p-4 rounded-md border border-gray-100" style="min-height: 200px")
+    div(class="text-center flex flex-col items-center")
+      span(class="mb-2 p-2 w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full")
+        +icon("activity", { stroke: "muted" })
+      div(class="text-gray-500")
+        p(class="mb-2")
+          if block
+            block
