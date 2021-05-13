@@ -80,7 +80,7 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(user, done) {
-  if (!user) return done(null, user);
+  if (!user || !user.id) return done(null, user);
 
   // We need to refetch the user every time, in order to
   // get the latest user information from the db.
@@ -128,16 +128,14 @@ passport.use(
                 twitter_url: twitterData.url,
                 twitter_profile_image_url: twitterData.profile_image_url_https,
               })
-              .then(() => {
-                db.select()
-                  .table("users")
-                  .first()
-                  .then((result) => {
-                    done(null, result);
-                  })
-                  .catch((err) => done(err, null));
+              .returning("*")
+              .then((insertedUser) => {
+                done(null, insertedUser[0]);
               })
-              .catch((err) => done(err, null));
+              .catch((err) => {
+                console.error(err);
+                done(err, null);
+              });
           } else {
             // return the user
             done(null, result);
