@@ -221,7 +221,8 @@ function actions({ db, user }) {
               // so remove it from the db
               db.transacting(trx)
                 .table("images")
-                .del({ id: imageId })
+                .where({ post_id: postId, id: imageId })
+                .del()
                 .then((result) => {
                   trx.commit().then(() => res(true));
                 });
