@@ -15,6 +15,8 @@ export default function shortUpdateEdit() {
 
     shortUpdateUtils.registerForm({
       $form: $els.$form,
+      $text: $els.$text,
+      $symbolsCounter: $els.$symbolsCounter,
       $uploadImgBtn: $els.$uploadImgBtn,
       $fileUpload: $els.$fileUpload,
       onFormSubmit: shortUpdateUtils.onFormSubmit.bind(null, {
@@ -70,6 +72,8 @@ export default function shortUpdateEdit() {
   function clear($els) {
     shortUpdateUtils.unregisterForm({
       $form: $els.$form,
+      $text: $els.$text,
+      $symbolsCounter: $els.$symbolsCounter,
       $uploadImgBtn: $els.$uploadImgBtn,
       $fileUpload: $els.$fileUpload,
       imageUploadedEventName: "haptic:short-update:img-uploaded-edit",
@@ -86,6 +90,7 @@ export default function shortUpdateEdit() {
       $submit: $root.find(`button[type="submit"]`),
       $uploadImgBtn: $root.find(`[data-upload-image-btn]`),
       $text: $root.find("[data-text]"),
+      $symbolsCounter: $root.find("[data-short-update-edit-symbols-counter]"),
       $textError: $root.find("[data-error]"),
       $uploadedImg: $root.find("[data-uploaded]"),
       $loader: $root.find("[data-image-upload-loader]"),

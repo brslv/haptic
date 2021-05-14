@@ -23,6 +23,8 @@ export default function shortUpdateCreate() {
 
     shortUpdateUtils.registerForm({
       $form: $els.$form,
+      $text: $els.$text,
+      $symbolsCounter: $els.$symbolsCounter,
       $uploadImgBtn: $els.$uploadImgBtn,
       $fileUpload: $els.$fileUpload,
       onFormSubmit: shortUpdateUtils.onFormSubmit.bind(null, {
@@ -98,6 +100,8 @@ export default function shortUpdateCreate() {
     shortUpdateUtils.clearImagePreview($els);
     shortUpdateUtils.unregisterForm({
       $form: $els.$form,
+      $text: $els.$text,
+      $symbolsCounter: $els.$symbolsCounter,
       $uploadImgBtn: $els.$uploadImgBtn,
       $fileUpload: $els.$fileUpload,
       imageUploadedEventName: "haptic:short-update:img-uploaded-create",
@@ -124,6 +128,7 @@ export default function shortUpdateCreate() {
       $allTriggers,
       $postTypesContainer,
       $form: $root.find("form"),
+      $symbolsCounter: $root.find("[data-short-update-create-symbols-counter]"),
       $csrf: $root.find('input[name="csrf"]'),
       $submit: $root.find(`button[type="submit"]`),
       $uploadImgBtn: $root.find(`[data-upload-image-btn]`),

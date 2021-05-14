@@ -1,7 +1,11 @@
 import { $, req } from "../../utils";
 
+const MAX_SHORT_UPDATE_TEXT_LENGTH = 1000;
+
 export function registerForm({
   $form,
+  $text,
+  $symbolsCounter,
   $uploadImgBtn,
   $fileUpload,
   onFormSubmit,
@@ -10,6 +14,19 @@ export function registerForm({
   onImageUploaded,
   imageUploadedEventName,
 }) {
+  $text.on("input", function(e) {
+    const value = e.currentTarget.value;
+    const length = value.length;
+
+    if (length > MAX_SHORT_UPDATE_TEXT_LENGTH) {
+      $symbolsCounter.addClass("text-red-500");
+    } else {
+      $symbolsCounter.removeClass("text-red-500");
+    }
+
+    $symbolsCounter.text(`${length}/${MAX_SHORT_UPDATE_TEXT_LENGTH}`);
+  });
+  $text.trigger("input");
   $form.on("submit", function(e) {
     e.preventDefault();
     onFormSubmit();
@@ -23,6 +40,8 @@ export function registerForm({
 
 export function unregisterForm({
   $form,
+  $text,
+  $symbolsCounter,
   $uploadImgBtn,
   $fileUpload,
   imageUploadedEventName,
@@ -30,6 +49,8 @@ export function unregisterForm({
   $form.off("submit");
   $uploadImgBtn.off("click");
   $fileUpload.off("change");
+  $symbolsCounter.text(`0/${MAX_SHORT_UPDATE_TEXT_LENGTH}`);
+  $text.off("input");
   $(document).off(imageUploadedEventName);
 }
 
@@ -77,8 +98,8 @@ export function validateFormValues(formValues) {
   if (formValues.text.length < 2) {
     errors.text = "Post is too short";
   }
-  if (formValues.text.length > 300) {
-    errors.text = "Text is too long. Maximum symbols allowed: 300";
+  if (formValues.text.length > 1000) {
+    errors.text = "Text is too long. Maximum symbols allowed: 1000";
   }
   if (isNaN(formValues.productId)) {
     errors.productId = {
@@ -92,6 +113,7 @@ export function validateFormValues(formValues) {
 export function hideErrors($els) {
   $els.$text.removeClass("error-field");
   $els.$textError.addClass("hidden");
+  $els.$symbolsCounter.removeClass("bottom-6").addClass("bottom-2");
 }
 
 export function showErrors($els, errors) {
@@ -99,6 +121,7 @@ export function showErrors($els, errors) {
     $els.$text.addClass("error-field");
     $els.$textError.html(errors.text);
     $els.$textError.removeClass("hidden");
+    $els.$symbolsCounter.removeClass("bottom-2").addClass("bottom-6");
   }
 }
 
