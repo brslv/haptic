@@ -612,6 +612,7 @@ app.get("/p/:slug", (req, res, next) => {
     "products.updated_at as product_updated_at",
     "users.id as user_id",
     "users.bio as user_bio",
+    "users.type as user_type",
     "users.twitter_id as user_twitter_id",
     "users.twitter_name as user_twitter_name",
     "users.twitter_screen_name as user_twitter_screen_name",

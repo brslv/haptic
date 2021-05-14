@@ -45,6 +45,7 @@ block content
                 post_twitter_text: post.twitter_text,
                 img: post.user_twitter_profile_image_url,
                 img_url: post.image_url,
+                user_type: post.user_type,
                 twitter_name: post.user_twitter_name,
                 twitter_screen_name: post.user_twitter_screen_name,
                 date_str: post.created_at_formatted,
@@ -86,10 +87,10 @@ block content
           span(class="font-medium text-sm mb-4 block") Creator
           div
             div(class="flex items-start")
-              img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class="w-12 h-12 rounded-full border-2 border-yellow-300 mr-2")
+              img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": product.user_type === USER_TYPES.CREATOR})
               div
                 h2(class="font-bold")= product.user_twitter_name
-                a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
+                a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="underline hover:no-underline inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
             p(class="text-gray-600 dark:text-gray-400")= product.user_bio
 
 
