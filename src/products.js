@@ -21,7 +21,7 @@ function actions({ db, user }) {
         .where({ slug })
         .first()
         .then((result) => {
-          cache.set(cacheKeys.product(slug), result, ttl[60]);
+          cache.set(cacheKeys.product(slug), result, ttl[2]);
           res(result);
         });
     });
@@ -91,7 +91,7 @@ function actions({ db, user }) {
         .where({ "products.is_public": true, "products.is_listed": true })
         .orderBy(order)
         .then((result) => {
-          cache.set(cacheKey, result, ttl[60]);
+          cache.set(cacheKey, result, ttl[2]);
           return res(result);
         })
         .catch((err) => {
