@@ -1570,14 +1570,14 @@ app.get("*", function(req, res, next) {
 });
 
 // error handler
+app.use(rollbar.errorHandler());
 app.use((err, req, res, next) => {
-  console.log("An error occurred.", err);
   if (res.headersSent) return next(err);
   if (isAjaxCall(req))
     return res.status(500).json({
       ok: 0,
       err:
-        "Something went wrong. 😱 Sorry for the inconvenience. Please, write to me in twitter to resolve this issue for you.",
+        "Something went wrong. 😱 Please, use the feedback form or contact me on Twitter.",
       details: { err },
     });
   res.status(500);
