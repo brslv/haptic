@@ -1,0 +1,10 @@
+extend layouts/base.layout.pug
+
+include landing/partials/top-bar.pug
+
+block content
+  div(class="absolute top-0 left-0 w-screen h-screen gradient-bg")
+  div(class="relative")
+    +top-bar
+    div(class="container p-4 mx-auto")
+      div Browse page

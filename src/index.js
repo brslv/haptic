@@ -282,6 +282,10 @@ app.get("/", (req, res) => {
   res.render("index", { meta: defaultMetas, isHomepage: true });
 });
 
+app.get("/browse", (req, res) => {
+  res.render("browse", { meta: defaultMetas });
+});
+
 app.get("/terms-of-service", (req, res) => {
   res.render("legal/terms-of-service.pug", { meta: defaultMetas });
 });
