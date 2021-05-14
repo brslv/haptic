@@ -1,5 +1,13 @@
 const { cache, cacheKeys, ttl } = require("./cache");
 
+const BROWSABLE_ORDER = {
+  BOOSTS: [
+    { column: "boosts_count", order: "desc" },
+    { column: "products.created_at", order: "desc" },
+  ],
+  NEWEST: [{ column: "products.created_at", order: "desc" }],
+};
+
 function actions({ db, user }) {
   function getProductBySlug({ slug }) {
     return new Promise((res, rej) => {
@@ -13,7 +21,7 @@ function actions({ db, user }) {
         .where({ slug })
         .first()
         .then((result) => {
-          cache.set(cacheKeys.product(slug), result, ttl[5]);
+          cache.set(cacheKeys.product(slug), result, ttl[60]);
           res(result);
         });
     });
@@ -54,6 +62,44 @@ function actions({ db, user }) {
     });
   }
 
+  function getBrowsableProducts({ order = BROWSABLE_ORDER.BOOSTS } = {}) {
+    return new Promise((res, rej) => {
+      const cacheKey = cacheKeys.browse(JSON.stringify(order));
+
+      const cached = cache.get(cacheKey);
+
+      if (cached) {
+        return res(cached);
+      }
+
+      return db("products")
+        .select(
+          "products.name",
+          "products.slug",
+          "products.description",
+          "users.id as user_id",
+          "users.type as user_type",
+          "users.twitter_profile_image_url as user_twitter_profile_image_url",
+          "users.twitter_name as user_twitter_name",
+          "users.twitter_screen_name as user_twitter_screen_name",
+          db("product_boosts")
+            .count()
+            .whereRaw("product_id = products.id")
+            .as("boosts_count")
+        )
+        .leftJoin("users", "users.id", "products.user_id")
+        .where({ "products.is_public": true, "products.is_listed": true })
+        .orderBy(order)
+        .then((result) => {
+          cache.set(cacheKey, result, ttl[60]);
+          return res(result);
+        })
+        .catch((err) => {
+          return rej(err);
+        });
+    });
+  }
+
   function getMyProducts() {
     return new Promise((res) => {
       return db("products")
@@ -65,9 +111,16 @@ function actions({ db, user }) {
     });
   }
 
-  return { getProductBySlug, getMyProducts, updateProduct, delProduct };
+  return {
+    getProductBySlug,
+    getBrowsableProducts,
+    getMyProducts,
+    updateProduct,
+    delProduct,
+  };
 }
 
 module.exports = {
+  BROWSABLE_ORDER,
   actions,
 };

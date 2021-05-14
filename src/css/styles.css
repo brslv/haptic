@@ -41,6 +41,14 @@
     @apply px-2.5 py-1;
   }
 
+  .btn-active-ring {
+    @apply ring-2 ring-yellow-100;
+  }
+
+  .btn-plain {
+    @apply bg-white shadow-sm border border-gray-100 hover:shadow-md transition;
+  }
+
   .btn-default {
     @apply bg-gray-100 hover:bg-gray-200 text-gray-800 dark:text-white hover:text-gray-800 dark:hover:text-white dark:bg-gray-600 dark:hover:bg-gray-500;
   }

@@ -44,5 +44,7 @@ block content
       div(class={"hidden": collections.length > 0, "text-gray-500":true} data-collections-no-items-msg)
         +empty-list-message
           span No collected items
+          div
+            a(href="/browse" title="Browse products" class="underline hover:no-underline") Browse products on Haptic
         // - button(class="btn btn-primary click-scale") Browse products
 

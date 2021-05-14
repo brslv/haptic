@@ -7,6 +7,7 @@ const cacheKeys = {
   productPosts: (productId) => `product.posts.${productId}`,
   product: (slug) => `product.${slug}`,
   productsForUser: (userId) => `product.user.${userId}`,
+  browse: (order) => `browse.${order}`,
 };
 
 const min = 60;

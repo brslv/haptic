@@ -283,7 +283,33 @@ app.get("/", (req, res) => {
 });
 
 app.get("/browse", (req, res) => {
-  res.render("browse", { meta: defaultMetas });
+  const ord = req.query.ord;
+  const BROWSABLE_ORDER = products.BROWSABLE_ORDER;
+  const order =
+    ord === "newest" ? BROWSABLE_ORDER.NEWEST : BROWSABLE_ORDER.BOOSTS;
+  const productsActions = products.actions({ db, user: req.user });
+  productsActions
+    .getBrowsableProducts({
+      order,
+    })
+    .then((result) => {
+      res.render("browse", {
+        meta: {
+          ...defaultMetas,
+          title: "Browse | Haptic",
+          og: {
+            ...defaultMetas.og,
+            title: "Browse | Haptic",
+          },
+        },
+        products: result,
+        ord: ord === "newest" ? ord : "boosts",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
 });
 
 app.get("/terms-of-service", (req, res) => {
