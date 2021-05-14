@@ -26,6 +26,8 @@ block content
               h1(class="text-xl font-bold pb-4")= product.name
               if product.description
                 p(class="text-gray-500")= product.description
+              else
+                p(class="text-gray-500") No description
 
         div(class="cursor-pointer font-medium text-gray-600 dark:text-gray-200 click-scale" id="create-product-btn" data-tippy-content="New product" data-modal-trigger=(canCreateProducts ? "new-product" : "upgrade"))
           div(id="create-product" class="bg-white shadow-sm hover:shadow-md border border-gray-100 transition-all rounded-md h-full w-full md:w-auto p-4 flex items-center justify-center" style="min-height: 100px;")
