@@ -24,9 +24,7 @@ html(lang="en" id="html" class="")
 
     if meta.og && meta.og.image
       meta(property="og:image" content=`${meta.og.image}`)
-
-    if meta.twitter && meta.twitter.image
-      meta(name="twitter:image" content=`${meta.twitter.image}`)
+      meta(name="twitter:image" content=`${meta.og.image}`)
 
     if meta.twitter && meta.twitter.twitter_card
       meta(name="twitter:card" content=`${meta.twitter.twitter_card}`)

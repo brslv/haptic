@@ -50,7 +50,6 @@ const defaultMetas = {
     image: `${ROOT_URL}/static/images/landing/social-image.png`,
   },
   twitter: {
-    image: `${ROOT_URL}/static/images/landing/social-image.png`,
     image_alt: "Haptic.so social media sharing image",
   },
 };
