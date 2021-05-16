@@ -50,6 +50,10 @@ mixin top-bar(activePage)
                             +icon("grid")(class="mr-2")
                             span Browse
                         li(class="mb-4")
+                          a(href="/#pricing" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
+                            +icon("dollar-sign")(class="mr-2")
+                            span Pricing
+                        li(class="mb-4")
                           a(href="/login" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
                             +icon('log-in')(class="mr-2")
                             span Login
@@ -125,6 +129,13 @@ mixin top-bar(activePage)
                             li(class="flex items-center")
                               +icon("grid", { width:20, height: 20 })(class="mr-2")
                               span(class="font-medium") Browse
+                          a(
+                            href="/#pricing"
+                            class="h-full flex items-center hover:bg-gray-50 px-4"
+                          )
+                            li(class="flex items-center")
+                              +icon("dollar-sign", { width:20, height: 20 })(class="mr-2")
+                              span(class="font-medium") Pricing
                           a(href="/login" class="h-full flex items-center hover:bg-gray-50 px-4")
                               li(class="flex items-center")
                                   +icon('log-in', { width:20, height: 20 })(class="mr-2")
