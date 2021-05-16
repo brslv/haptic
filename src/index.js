@@ -278,6 +278,9 @@ const dateFmt = (dateStr, format = "DD MMM, HH:mm") => {
 
 // setup routes
 app.get("/", (req, res) => {
+  if (req.user) {
+    return res.redirect("/dashboard");
+  }
   res.render("index", { meta: defaultMetas, isHomepage: true });
 });
 

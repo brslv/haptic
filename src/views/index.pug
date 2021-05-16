@@ -1,6 +1,6 @@
 extend layouts/base.layout.pug
 
-include landing/partials/top-bar.pug
+include partials/top-bar.pug
 include partials/icon.pug
 
 mixin use-case(title, icon, shapeSrc)
@@ -36,7 +36,8 @@ mixin detail(title, isSoon = false)
       block
 
 block content
-  div(class="bg-yellow-50" id="top")
+  div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")
+  div(class="bg-transparent" id="top")
     div(class="mb-8 sm:mb-32")
       +top-bar
 

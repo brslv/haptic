@@ -10,14 +10,21 @@ mixin top-bar(activePage)
                         img(src="/static/images/logo/logo-main-light.svg" class="h-8 logo-light")
                 nav
                     div(class="flex md:hidden items-center justify-center")
-                      +icon("menu", { width: 24, height: 24 })(data-mobile-nav-open)
+                      +icon("menu", { width: 20, height: 20 })(data-mobile-nav-open)
+
+                    //- mobile
+
                     ul(class="hidden md:hidden text-lg absolute top-0 left-0 h-screen w-screen bg-white m-0 p-0 flex flex-col items-center justify-center z-20" data-mobile-nav)
-                      +icon("x", { width: 24, height: 24 })(class="absolute top-5 right-4" data-mobile-nav-close)
+                      +icon("x", { width: 20, height: 20 })(class="absolute top-5 right-4" data-mobile-nav-close)
                       if user
                         li(class="mb-4")
                           a(href="/dashboard" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
                             +icon("box")(class="mr-2")
                             span Dashboard
+                        li(class="mb-4")
+                          a(href="/browse" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
+                            +icon("grid")(class="mr-2")
+                            span Browse
                         li(class="mb-4")
                           a(href="/collections" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
                             +icon("bookmark")(class="mr-2")
@@ -39,9 +46,15 @@ mixin top-bar(activePage)
                             span Log out
                       else
                         li(class="mb-4")
+                          a(href="/browse" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
+                            +icon("grid")(class="mr-2")
+                            span Browse
+                        li(class="mb-4")
                           a(href="/login" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
                             +icon('log-in')(class="mr-2")
                             span Login
+
+                    //- desktop
 
                     ul(class="hidden md:flex items-center h-16 relative")
                         if user
@@ -54,7 +67,16 @@ mixin top-bar(activePage)
                               data-tippy-content="Dashboard"
                             )
                                 li
-                                    +icon('box')
+                                    +icon('box', { width:20, height: 20 })
+
+                            a(
+                              href="/browse"
+                              class={"h-full flex items-center hover:bg-gray-50 px-4": true,
+                                    "border-b-4 border-yellow-300": activePage === "browse"}
+                              data-tippy-content="Browse"
+                            )
+                              li
+                                +icon("grid", { width:20, height: 20 })
 
                             a(
                               href="/collections"
@@ -65,7 +87,7 @@ mixin top-bar(activePage)
                               data-tippy-content="Collections"
                             )
                                 li
-                                    +icon('bookmark')
+                                    +icon('bookmark', { width:20, height: 20 })
 
                             a(
                               href="/notifications"
@@ -76,7 +98,7 @@ mixin top-bar(activePage)
                               data-tippy-content=`Notifications (${notifications && notifications.unread && notifications.unread.length || 0})`
                             )
                                 li(class="relative")
-                                    +icon('mail')
+                                    +icon('mail', { width:20, height: 20 })
                                     if notifications && notifications.unread && notifications.unread.length > 0
                                         span(class="absolute -top-3 -right-3 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notifications.unread.length
 
@@ -93,8 +115,17 @@ mixin top-bar(activePage)
 
                             a(href="/logout" class="h-full flex items-center hover:bg-gray-50 px-4" data-tippy-content="Log out")
                                 li
-                                    +icon('log-out')
+                                    +icon('log-out', { width:20, height: 20 })
                         else
-                          a(href="/login" class="btn btn-icon click-scale" data-tippy-content="Log in")
-                              li
-                                  +icon('log-in')
+                          a(
+                            href="/browse"
+                            class={"h-full flex items-center hover:bg-gray-50 px-4": true,
+                                  "border-b-4 border-yellow-300": activePage === "browse"}
+                          )
+                            li(class="flex items-center")
+                              +icon("grid", { width:20, height: 20 })(class="mr-2")
+                              span(class="font-medium") Browse
+                          a(href="/login" class="h-full flex items-center hover:bg-gray-50 px-4")
+                              li(class="flex items-center")
+                                  +icon('log-in', { width:20, height: 20 })(class="mr-2")
+                                  span(class="font-medium") Login
