@@ -3,6 +3,7 @@ extend layouts/base.layout.pug
 include partials/top-bar.pug
 include partials/page-title.pug
 include partials/icon.pug
+include partials/product-card.pug
 
 block content
   div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")
@@ -19,35 +20,9 @@ block content
 
         div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4")
           each product in products
-
-            a(href=`/p/${product.slug}`)
-              div(class="relative")
-                div(class="relative border border-gray-100 bg-white shadow-sm rounded-md hover:shadow-md p-4 transition" style="height: 180px;")
-                  div(class="flex flex-col h-full")
-                    div(id="product-heading")
-                      div(class="flex items-start")
-                        h1(class="text-xl font-bold pb-4 flex-1 mr-2")= product.name
-                        div(class="bg-yellow-300 flex items-center justify-center px-4 py-1 font-medium text-gray-800 rounded-full text-xs uppercase" data-tippy-content=`${product.boosts_count} ${product.boosts_count === '1' ? 'person has' : 'people have'} boosted "${product.name}"`)
-                          span= product.boosts_count
-
-                    div(id="product-description" class="flex-1 relative overflow-hidden text-gray-500")
-                      div(class="absolute bottom-0 left-0 h-12 w-full gradient-white-fade")
-                      if product.description
-                        p= product.description
-                      else
-                        p No description
-                    
-                    //-
-                      hr(class="my-4 -mx-4 border-gray-100")
-
-                      +page-title(class="mb-2") Creator
-                      div(class={"flex items-start mb-4 bg-gray-50 border border-gray-100 rounded-md p-2": true, "border-yellow-300": product.user_type === USER_TYPES.CREATOR})
-                        div(class="")
-                          img(src=product.user_twitter_profile_image_url class={"w-8 h-8 rounded-full mr-4": true, "border-4 border-double border-yellow-300": product.user_type === USER_TYPES.CREATOR})
-                        div(class="flex-1 text-sm")
-                          div()= product.user_twitter_name
-                          //- div This is some very long twitter user name and i dont event know how to handle it
-                          a(class="mr-2 underline hover:no-underline" href=`https://twitter.com/${product.user_twitter_screen_name}` target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
-
-                      hr(class="my-4 -mx-4 border-gray-100")
-                    //
+            +product-card({
+              slug: product.slug,
+              name: product.name,
+              boosts_count: product.boosts_count,
+              description: product.description
+            })

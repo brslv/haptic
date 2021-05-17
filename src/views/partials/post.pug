@@ -5,11 +5,11 @@ mixin post({ product_name, product_slug, post_id, post_text_md, post_twitter_tex
   div(class="post p-4 rounded-md bg-white border border-gray-100 shadow-sm mb-4 transition hover:shadow-md" data-post-id=post_id)
     div(class="flex flex-col-reverse sm:flex-row sm:items-center justify-between mb-4")
       div(class="flex items-center mb-4 sm:mb-0")
-        img(src=img class={"w-12 h-12 rounded-full mr-4": true, "border-4 border-double border-yellow-300": user_type === USER_TYPES.CREATOR})
+        img(src=img class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": user_type === USER_TYPES.CREATOR})
         div(class="flex flex-col")
-          span(class="font-bold")= twitter_name
+          a(href=`/u/${twitter_screen_name}` class="underline hover:no-underline font-bold")= twitter_name
           div(class="flex items-center text-xs text-gray-600 dark:text-gray-400")
-            a(class="mr-2 underline hover:no-underline" href=`https://twitter.com/${twitter_screen_name}` target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${twitter_screen_name}`
+            div(class="mr-2")= `@${twitter_screen_name}`
             span(class="mr-2") &mdash;
             span(class="flex items-center")
               span(class="mr-2")
@@ -49,7 +49,7 @@ mixin post({ product_name, product_slug, post_id, post_text_md, post_twitter_tex
                     span Delete
           //
 
-    div(class="prose prose-yellow my-8")
+    div(class="prose prose-yellow my-4")
       div(class={"hidden":!img_url, "border rounded-md p-1.5 bg-white border-gray-300 w-full mb-4": true})
         img(data-image data-zoomable src=img_url class={"hidden": !img_url, "mx-auto cursor-pointer rounded-md": true} style="margin-top: 0; margin-bottom: 0;")
       div(data-content="data-content")
@@ -60,9 +60,9 @@ mixin post({ product_name, product_slug, post_id, post_text_md, post_twitter_tex
         tabindex="0"
         role="button"
         class={
-          "product-btn product-btn-small text-xs": true,
+          "shadow-sm product-btn product-btn-small text-xs": true,
           "cursor-pointer click-scale": !disable_boost_btn,
-          "cursor-pointer focus:ring-0 text-gray-500 hover:border-gray-300 hover:bg-transparent dark:hover:bg-transparent": disable_boost_btn
+          "cursor-pointer focus:ring-0 text-gray-500 hover:border-gray-200 hover:bg-transparent": disable_boost_btn
         }
         data-post-boost-btn
         data-post-id=post_id

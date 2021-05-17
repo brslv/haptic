@@ -62,9 +62,12 @@ function actions({ db, user }) {
     });
   }
 
-  function getBrowsableProducts({ order = BROWSABLE_ORDER.BOOSTS } = {}) {
+  function getBrowsableProducts({
+    order = BROWSABLE_ORDER.BOOSTS,
+    userId = null,
+  } = {}) {
     return new Promise((res, rej) => {
-      const cacheKey = cacheKeys.browse(JSON.stringify(order));
+      const cacheKey = cacheKeys.browse(JSON.stringify({ order, userId }));
 
       const cached = cache.get(cacheKey);
 
@@ -72,7 +75,7 @@ function actions({ db, user }) {
         return res(cached);
       }
 
-      return db("products")
+      const query = db("products")
         .select(
           "products.name",
           "products.slug",
@@ -88,7 +91,13 @@ function actions({ db, user }) {
             .as("boosts_count")
         )
         .leftJoin("users", "users.id", "products.user_id")
-        .where({ "products.is_public": true, "products.is_listed": true })
+        .where({ "products.is_public": true, "products.is_listed": true });
+
+      if (userId !== null) {
+        query.andWhere({ "products.user_id": userId });
+      }
+
+      query
         .orderBy(order)
         .then((result) => {
           cache.set(cacheKey, result, ttl[2]);

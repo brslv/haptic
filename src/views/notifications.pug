@@ -7,29 +7,35 @@ include partials/csrf.pug
 include partials/empty-list-message.pug
 
 mixin notif({ notif })
-  div(class="p-4 rounded-md bg-white shadow-sm mt-4" data-notification-id=notif.id)
-    div(class="flex items-center mb-2")
+  div(class="p-4 border border-gray-100 rounded-md bg-white shadow-sm mt-4" data-notification-id=notif.id)
+    div(class="flex items-center justify-between mb-4 border-b border-gray-100 px-4 py-2 -mt-4 -mx-4")
       div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
-      a(href=`/p/${notif.product_slug}` class="btn btn-small btn-plain" data-tippy-content="Open product page" title="Open product page")= `${notif.product_name}`
+      a(href=`/p/${notif.product_slug}` class="btn btn-small btn-plain" title="Open product page")= `${notif.product_name}`
     div(class="flex items-center")
       if icon
       if notif.type === 'post_boosts'
-        div(class={"w-8 h-8 rounded-full flex items-center justify-center mr-2": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
-          +icon("chevrons-up", { width: 18, height: 18 })
+        div(class="relative mr-4")
+          img(src=notif.origin_user_twitter_profile_image_url class="w-12 h-12 rounded-full")
+          div(class={"p-1 rounded-full flex items-center justify-center mr-2 absolute -top-2 -right-2 shadow-md": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
+            +icon("chevrons-up", { width: 14, height: 14 })
         p
-          | #[span(class="font-bold")= notif.origin_user_twitter_name] boosted your 
+          | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] boosted your 
           a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
           |.
       if notif.type === 'product_collections'
-        div(class={"w-8 h-8 rounded-full flex items-center justify-center mr-2": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
-          +icon("bookmark", { width: 18, height: 18 })
+        div(class="relative mr-4")
+          img(src=notif.origin_user_twitter_profile_image_url class="w-12 h-12 rounded-full")
+          div(class={"p-1 rounded-full flex items-center justify-center mr-2 absolute -top-2 -right-2 shadow-md": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
+            +icon("bookmark", { width: 14, height: 14 })
         p
-          | #[span(class="font-bold")= notif.origin_user_twitter_name] collected your product.
+          | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] collected your product.
       if notif.type === 'product_boosts'
-        div(class={"w-8 h-8 rounded-full flex items-center justify-center mr-2": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
-          +icon("chevrons-up", { width: 18, height: 18 })
+        div(class="relative mr-4")
+          img(src=notif.origin_user_twitter_profile_image_url class="w-12 h-12 rounded-full")
+          div(class={"p-1 rounded-full flex items-center justify-center mr-2 absolute -top-2 -right-2 shadow-md": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
+            +icon("chevrons-up", { width: 14, height: 14 })
         p
-          | #[span(class="font-bold")= notif.origin_user_twitter_name] boosted your product.
+          | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] boosted your product.
 
 block content
   +top-bar("notifications")

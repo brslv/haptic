@@ -1,0 +1,66 @@
+extends layouts/base.layout.pug
+
+include partials/top-bar.pug
+include partials/page-title.pug
+include partials/login-modal.pug
+include partials/icon.pug
+include partials/product-card.pug
+include partials/empty-list-message.pug
+
+block content
+  div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")
+  div(class="relative")
+    +top-bar
+  
+    div(class="container mx-auto p-4")
+      div(class="block sm:grid sm:grid-cols-8 sm:gap-4")
+        div(class="w-full sm:col-span-4 md:col-span-5 mb-4 sm:mb-0")
+          +page-title(class="mb-4") User profile
+          section(class="bg-white border border-gray-100 p-4 rounded-md shadow-sm")
+            div(class="flex items-start")
+              img(src=data.twitter_profile_image_url alt=`Photo of the creator of ${data.name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": data.type === USER_TYPES.CREATOR})
+              div
+                h2(class="font-bold")
+                  a(href="/u/" + data.twitter_screen_name)= data.twitter_name
+                a(href=`https://twitter.com/@${data.twitter_screen_name}` class="underline hover:no-underline inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${data.twitter_screen_name}`
+
+            p= data.bio
+
+        section(class="w-full sm:col-span-4 md:col-span-3")
+          +page-title(class="mb-4") Details
+          section(class="bg-white border border-gray-100 p-4 rounded-md shadow-sm")
+            ul(class="")
+              if data.website
+                div(class="mb-2")
+                  +page-title Website
+                  div
+                    a(href=data.website class="mr-2 underline hover:no-underline" rel="noreferrer noopener" target="_blank")= data.website
+                    +icon('external-link', { width: 13, height: 13 })(class="inline")
+
+              div(class="mb-2")
+                +page-title Been around since
+                p= data.created_at_formatted
+              
+              div(class="mb-2")
+                +page-title Account type
+                if data.type === USER_TYPES.CREATOR
+                  div(class="font-bold")
+                    p(class="border-b-4 border-yellow-300 inline-block") Creator
+                else
+                  div(class="font-bold")
+                    p(class="border-b-4 inline-block") Creator Lite
+          
+      section(class="mt-4")
+        +page-title(class="mb-4") Products
+
+        if products.length
+          div(class={"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4": true})
+            each product in products
+              +product-card({
+                slug: product.slug,
+                name: product.name,
+                boosts_count: product.boosts_count,
+                description: product.description,
+              })
+        else
+          +empty-list-message This user has no public products, yet

@@ -25,6 +25,7 @@ const notifications = require("./notifications");
 const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
 const removeMd = require("remove-markdown");
+const validateUrl = require("valid-url");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -118,6 +119,7 @@ passport.use(
             db("users")
               .insert({
                 bio: twitterData.description,
+                slug: twitterData.screen_name,
                 email: emails[0] ? emails[0].value : undefined,
                 twitter_id: twitterData.id,
                 twitter_name: twitterData.name,
@@ -506,11 +508,7 @@ app.post(
 
     // validate
     let errors = {};
-    if (
-      input.website.length &&
-      (!input.website.startsWith("http://") &&
-        !input.website.startsWith("https://"))
-    ) {
+    if (input.website.length && !validateUrl.isWebUri(input.website)) {
       errors.website = {
         msg: 'URL must start with "http://" or "https://"',
         val: input.website,
@@ -590,6 +588,8 @@ app.post(
 app.get("/dashboard/profile", authOnly, async (req, res, next) => {
   const flash = {
     success: await req.consumeFlash("success"),
+    error: await req.consumeFlash("error"),
+    data: await req.consumeFlash("data"),
   };
   return res.render("dashboard/profile", {
     meta: defaultMetas,
@@ -608,8 +608,21 @@ app.post(
     const data = req.body;
     const userId = req.user.id;
 
+    if (data.website !== "" && !validateUrl.isWebUri(data.website)) {
+      let errors = {
+        website: {
+          msg: 'URL must start with "http://" or "https://"',
+          val: data.website,
+        },
+      };
+
+      return req.flash("data", { errors }).then(() => {
+        res.set(`Location`, `/dashboard/profile`).sendStatus(303);
+      });
+    }
+
     db("users")
-      .update({ email: data.email, bio: data.bio })
+      .update({ email: data.email, bio: data.bio, website: data.website })
       .where({ id: userId })
       .then((result) => {
         if (result) {
@@ -626,6 +639,59 @@ app.post(
       });
   }
 );
+
+app.get("/u/:slug", (req, res, next) => {
+  const slug = req.params.slug;
+  const productsActions = products.actions({ db, user: req.user });
+  db("users")
+    .select(
+      "id",
+      "bio",
+      "type",
+      "website",
+      "twitter_name",
+      "twitter_screen_name",
+      "twitter_profile_image_url",
+      "created_at"
+    )
+    .where({ slug })
+    .first()
+    .then((userResult) => {
+      if (!userResult) {
+        return res.status(404).render("404", {
+          meta: {
+            ...defaultMetas,
+            title: "Page not found | Haptic",
+            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+          },
+        });
+      }
+
+      productsActions
+        .getBrowsableProducts({
+          order: products.BROWSABLE_ORDER.NEWEST,
+          userId: userResult.id,
+        })
+        .then((productsResult) => {
+          res.render("user", {
+            meta: defaultMetas,
+            data: {
+              ...userResult,
+              created_at_formatted: dateFmt(userResult.created_at),
+            },
+            products: productsResult,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        });
+    })
+    .catch((err) => {
+      console.log("err", err);
+      throw err;
+    });
+});
 
 app.get("/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
@@ -644,6 +710,7 @@ app.get("/p/:slug", (req, res, next) => {
     "products.updated_at as product_updated_at",
     "users.id as user_id",
     "users.bio as user_bio",
+    "users.slug as user_slug",
     "users.type as user_type",
     "users.twitter_id as user_twitter_id",
     "users.twitter_name as user_twitter_name",

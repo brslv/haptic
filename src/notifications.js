@@ -183,7 +183,8 @@ function actions({ db, user }) {
             "user.twitter_profile_image_url as user_twitter_profile_image_url",
             "origin_user.id as origin_user_id",
             "origin_user.twitter_name as origin_user_twitter_name",
-            "user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
+            "origin_user.slug as origin_user_slug",
+            "origin_user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
           )
           // .distinct()
           .from("notifications")

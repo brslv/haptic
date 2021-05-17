@@ -28,7 +28,9 @@ block content
         else
           div(class="font-medium text-xl text-gray-600") No product description, yet.
         if product.website
-          a(class="text-yellow-400 hover:text-yellow-500 font-medium mt-8" href=product.website target="_blank" rel="noreferrer noopener") Visit website
+          p(class="flex items-center mt-8")
+            a(class="text-yellow-400 underline hover:no-underline font-medium mr-2" href=product.website target="_blank" rel="noreferrer noopener") Visit website
+            +icon("external-link", { width: 16, height: 16, stroke: 'primaryDark' })
 
   div(class="container mx-auto p-4")
     div(class="flex flex-col-reverse md:flex-row items-start")
@@ -87,10 +89,12 @@ block content
           span(class="font-medium text-sm mb-4 block") Creator
           div
             div(class="flex items-start")
-              img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": product.user_type === USER_TYPES.CREATOR})
+              a(href=`/u/${product.user_slug}` title="View profile")
+                img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": product.user_type === USER_TYPES.CREATOR})
               div
-                h2(class="font-bold")= product.user_twitter_name
-                a(href=`https://twitter.com/@${product.user_twitter_screen_name}` class="underline hover:no-underline inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${product.user_twitter_screen_name}`
+                h2(class="font-bold")
+                  a(href=`/u/${product.user_slug}` class="underline hover:no-underline" title="View profile")= product.user_twitter_name
+                div(class="inline-block text-sm text-gray-500 mb-4 font-medium block" )= `@${product.user_twitter_screen_name}`
             p(class="text-gray-600 dark:text-gray-400")= product.user_bio
 
 
