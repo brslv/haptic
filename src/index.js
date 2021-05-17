@@ -674,7 +674,11 @@ app.get("/u/:slug", (req, res, next) => {
         })
         .then((productsResult) => {
           res.render("user", {
-            meta: defaultMetas,
+            meta: {
+              ...defaultMetas,
+              title: `${userResult.twitter_name} | Haptic`,
+              description: userResult.bio,
+            },
             data: {
               ...userResult,
               created_at_formatted: dateFmt(userResult.created_at),
