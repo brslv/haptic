@@ -9,7 +9,17 @@ mixin top-bar(activePage)
                         img(src="/static/images/logo/logo-main.svg" class="h-8 logo-dark")
                         img(src="/static/images/logo/logo-main-light.svg" class="h-8 logo-light")
                 nav
-                    div(class="flex md:hidden items-center justify-center")
+                    div(class="h-16 flex md:hidden items-center justify-center")
+                      if !user
+                        a(
+                          href="/browse"
+                          class={"h-full flex items-center hover:bg-gray-50 px-4 mr-4": true,
+                                "border-b-4 border-yellow-300": activePage === "browse"}
+                        )
+                          li(class="flex items-center")
+                            +icon("grid", { width:20, height: 20 })(class="mr-2")
+                            span(class="font-medium") Browse
+
                       +icon("menu", { width: 20, height: 20 })(data-mobile-nav-open)
 
                     //- mobile
@@ -19,20 +29,20 @@ mixin top-bar(activePage)
                       if user
                         li(class="mb-4")
                           a(href="/dashboard" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
-                            +icon("box")(class="mr-2")
+                            +icon("box", { width:20, height: 20 })(class="mr-2")
                             span Dashboard
                         li(class="mb-4")
                           a(href="/browse" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
-                            +icon("grid")(class="mr-2")
+                            +icon("grid", { width:20, height: 20 })(class="mr-2")
                             span Browse
                         li(class="mb-4")
                           a(href="/collections" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
-                            +icon("bookmark")(class="mr-2")
+                            +icon("bookmark", { width:20, height: 20 })(class="mr-2")
                             span Collections
                         li(class="mb-4")
                           a(href="/notifications" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
                             div(class="relative")
-                              +icon("mail")(class="mr-2")
+                              +icon("mail", { width:20, height: 20 })(class="mr-2")
                               if notifications && notifications.unread && notifications.unread.length > 0
                                 span(class="absolute -top-4 -left-4 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notifications.unread.length
                             span Notifications
@@ -42,20 +52,16 @@ mixin top-bar(activePage)
                             span Profile
                         li(class="mb-4")
                           a(href="/logout" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
-                            +icon('log-out')(class="mr-2")
+                            +icon('log-out', { width:20, height: 20 })(class="mr-2")
                             span Log out
                       else
                         li(class="mb-4")
-                          a(href="/browse" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
-                            +icon("grid")(class="mr-2")
-                            span Browse
-                        li(class="mb-4")
                           a(href="/#pricing" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
-                            +icon("dollar-sign")(class="mr-2")
+                            +icon("dollar-sign", { width:20, height: 20 })(class="mr-2")
                             span Pricing
                         li(class="mb-4")
                           a(href="/login" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
-                            +icon('log-in')(class="mr-2")
+                            +icon('log-in', { width:20, height: 20 })(class="mr-2")
                             span Login
 
                     //- desktop
