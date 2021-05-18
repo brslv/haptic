@@ -9,7 +9,14 @@ export default function collect() {
   function load($els) {
     // if (!$els.$contentTypePicker) return;
 
-    $els.$contentTypePicker.on("change", (e) => onTypePick(e, $els));
+    $els.$contentTypePicker.on("change", (e) =>
+      onTypePick(e.currentTarget.value, e, $els)
+    );
+    $els.$contentTypeProductsBtn.on("click", (e) =>
+      onTypePick("products", e, $els)
+    );
+    $els.$contentTypePostsBtn.on("click", (e) => onTypePick("posts", e, $els));
+
     $els.$boostsBtn.on("click", (e) => onBtnClick("boosts", e, $els));
     $els.$newestBtn.on("click", (e) => onBtnClick("newest", e, $els));
   }
@@ -26,8 +33,7 @@ export default function collect() {
     turbo.actions.visit(url);
   }
 
-  function onTypePick(e, $els) {
-    const value = e.currentTarget.value;
+  function onTypePick(value, e, $els) {
     const ord = getQueryParam("ord");
 
     let qs = `?ord=newest&type=posts`;
@@ -40,9 +46,9 @@ export default function collect() {
   }
 
   function clear($els) {
-    if ($els.$contentTypePicker) {
-      $els.$contentTypePicker.off("change");
-    }
+    $els.$contentTypePicker.off("change");
+    $els.$contentTypePostsBtn.off("click");
+    $els.$contentTypeProductsBtn.off("click");
 
     $els.$boostsBtn.off("click");
     $els.$newestBtn.off("click");
@@ -54,6 +60,8 @@ export default function collect() {
       $boostsBtn: $("[data-browse-ord-boosts]"),
       $newestBtn: $("[data-browse-ord-newest]"),
       $contentTypePicker: $("[data-browse-content-type-picker]"),
+      $contentTypePostsBtn: $("[data-browse-content-type-posts]"),
+      $contentTypeProductsBtn: $("[data-browse-content-type-products]"),
     };
 
     load($els);

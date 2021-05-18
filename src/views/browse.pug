@@ -8,15 +8,19 @@ include partials/post.pug
 include partials/login-modal.pug
 
 mixin controls
-  div(class="flex items-center mb-8")
+  div(class="flex items-center mb-4")
     div(class="w-full flex items-start sm:items-center flex-col sm:flex-row")
       +page-title(class="mb-4 sm:mr-4 sm:mb-0") Browse
       div(class="w-full flex items-center justify-between")
-        div(class="flex-1")
+        div(class="flex-1 sm:hidden")
           select(class="btn btn-plain btn-small mr-4" data-browse-content-type-picker)
             option(value="products" selected=(type === 'products')) Products
             option(value="posts" selected=(type === 'posts')) Posts
+        div(class="hidden sm:flex sm:items-center")
+          button(data-browse-content-type-products class={"btn btn-plain btn-small mr-2": true, "btn-active-ring": type === 'products'}) Products
+          button(data-browse-content-type-posts class={"btn btn-plain btn-small": true, "btn-active-ring": type === 'posts'}) Posts
         div(class="flex items-center")
+          +page-title(class="hidden sm:block mr-4") Filter
           button(data-browse-ord-boosts class={"btn btn-plain btn-small mr-2": true, "btn-active-ring": ord === 'boosts'}) Boosts
           button(data-browse-ord-newest class={"btn btn-plain btn-small": true, "btn-active-ring": ord === 'newest'}) Newest
 

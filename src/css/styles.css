@@ -65,7 +65,7 @@
   }
 
   .btn-active-ring {
-    @apply ring-2 ring-yellow-100;
+    @apply ring-2 ring-yellow-200;
   }
 
   .btn-plain {
