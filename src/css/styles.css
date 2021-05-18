@@ -8,6 +8,10 @@
     height: 5px;
   }
 
+  .prose a {
+    word-break: break-all;
+  }
+
   .link {
     @apply text-blue-500 hover:text-blue-600 underline;
   }

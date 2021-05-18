@@ -288,32 +288,87 @@ app.get("/", (req, res) => {
 
 app.get("/browse", (req, res) => {
   const ord = req.query.ord;
-  const BROWSABLE_ORDER = products.BROWSABLE_ORDER;
-  const order =
-    ord === "newest" ? BROWSABLE_ORDER.NEWEST : BROWSABLE_ORDER.BOOSTS;
-  const productsActions = products.actions({ db, user: req.user });
-  productsActions
-    .getBrowsableProducts({
-      order,
-    })
-    .then((result) => {
-      res.render("browse", {
-        meta: {
-          ...defaultMetas,
-          title: "Browse | Haptic",
-          og: {
-            ...defaultMetas.og,
+  const type = req.query.type || "products";
+  const PRODUCTS_BROWSABLE_ORDER = products.BROWSABLE_ORDER;
+  const POSTS_BROWSABLE_ORDER = posts.BROWSABLE_ORDER;
+
+  if (type === "products") {
+    const productsActions = products.actions({ db, user: req.user });
+    const order =
+      ord === "newest"
+        ? PRODUCTS_BROWSABLE_ORDER.NEWEST
+        : PRODUCTS_BROWSABLE_ORDER.BOOSTS;
+    productsActions
+      .getBrowsableProducts({
+        order,
+      })
+      .then((result) => {
+        console.log({ result });
+        res.render("browse", {
+          meta: {
+            ...defaultMetas,
             title: "Browse | Haptic",
+            og: {
+              ...defaultMetas.og,
+              title: "Browse | Haptic",
+            },
           },
-        },
-        products: result,
-        ord: ord === "newest" ? ord : "boosts",
+          products: result,
+          type: type === "posts" ? type : "products",
+          ord: ord === "newest" ? ord : "boosts",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        throw err;
       });
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
+  }
+
+  if (type === "posts") {
+    const postsActions = posts.actions({ db, user: req.user });
+    const order =
+      ord === "newest"
+        ? POSTS_BROWSABLE_ORDER.NEWEST
+        : POSTS_BROWSABLE_ORDER.BOOSTS;
+    postsActions
+      .getBrowsablePosts({
+        order,
+      })
+      .then((result) => {
+        res.render("browse", {
+          meta: {
+            ...defaultMetas,
+            title: "Browse | Haptic",
+            og: {
+              ...defaultMetas.og,
+              title: "Browse | Haptic",
+            },
+          },
+          posts: [
+            ...result.map((post) => {
+              const strippedMdText = removeMd(post.text);
+              const twitterText =
+                strippedMdText.length > 180
+                  ? strippedMdText.substring(0, 180) + "..."
+                  : strippedMdText;
+              return {
+                ...post,
+                text_md: post.text,
+                twitter_text: twitterText,
+                text: mdConverter.makeHtml(post.text),
+                created_at_formatted: dateFmt(post.created_at),
+              };
+            }),
+          ],
+          type: type === "posts" ? type : "products",
+          ord: ord === "newest" ? ord : "boosts",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        throw err;
+      });
+  }
 });
 
 app.get("/terms-of-service", (req, res) => {
@@ -1645,6 +1700,7 @@ app.get("*", function(req, res, next) {
 // error handler
 app.use(rollbar.errorHandler());
 app.use((err, req, res, next) => {
+  console.log(err);
   if (res.headersSent) return next(err);
   if (isAjaxCall(req))
     return res.status(500).json({

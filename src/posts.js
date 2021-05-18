@@ -4,6 +4,14 @@ const TEXT_TYPE = "text";
 
 const types = [TEXT_TYPE];
 
+const BROWSABLE_ORDER = {
+  BOOSTS: [
+    { column: "boosts_count", order: "desc" },
+    { column: "posts.created_at", order: "desc" },
+  ],
+  NEWEST: [{ column: "posts.created_at", order: "desc" }],
+};
+
 function actions({ db, user }) {
   function _publishText(product, text, image) {
     return new Promise((res, rej) => {
@@ -113,6 +121,57 @@ function actions({ db, user }) {
       });
   }
 
+  function getBrowsablePosts({ order = BROWSABLE_ORDER.BOOSTS }) {
+    return new Promise((res, rej) => {
+      const cachedPosts = cache.get(cacheKeys.browsablePosts(order));
+      if (cachedPosts) {
+        return res(cachedPosts);
+      }
+
+      db.transaction().then((trx) => {
+        db.transacting(trx)
+          .select(
+            "posts.id",
+            "posts.type",
+            "posts.created_at",
+            "posts.updated_at",
+            "posts_text.text",
+            "products.slug as product_slug",
+            "products.is_public",
+            "products.is_listed",
+            "users.type as user_type",
+            "users.twitter_name as user_twitter_name",
+            "users.twitter_profile_image_url as user_twitter_profile_image_url",
+            "users.twitter_screen_name as user_twitter_screen_name",
+            "images.id as image_id",
+            "images.url as image_url",
+            "images.created_at as image_created_at",
+            db("post_boosts")
+              .count()
+              .whereRaw("post_id = posts.id")
+              .as("boosts_count")
+          )
+          .table("posts_text")
+          .leftJoin("posts", "posts_text.post_id", "posts.id")
+          .leftJoin("products", "posts.product_id", "products.id")
+          .leftJoin("users", "posts.user_id", "users.id")
+          .leftJoin("images", "images.post_id", "posts.id")
+          .where({ "products.is_public": true, "products.is_listed": true })
+          .orderBy(order)
+          .limit(24)
+          .then((result) => {
+            trx.commit().then(() => {
+              cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
+              res(result);
+            });
+          })
+          .catch((err) => {
+            trx.rollback().then(() => rej(err));
+          });
+      });
+    });
+  }
+
   function getPost(type, { postId, userId }) {
     switch (type) {
       case "text": {
@@ -168,6 +227,8 @@ function actions({ db, user }) {
 
   function publish(type, product, data) {
     cache.del(cacheKeys.productPosts(product.id));
+    cache.del(cacheKeys.browsablePosts(BROWSABLE_ORDER.BOOSTS));
+    cache.del(cacheKeys.browsablePosts(BROWSABLE_ORDER.NEWEST));
     switch (type) {
       case "text": {
         return _publishText(product, data.text, data.image);
@@ -306,11 +367,19 @@ function actions({ db, user }) {
     });
   }
 
-  return { publish, getPost, updatePost, getAllPosts, removePost };
+  return {
+    publish,
+    getBrowsablePosts,
+    getPost,
+    updatePost,
+    getAllPosts,
+    removePost,
+  };
 }
 
 module.exports = {
   actions,
   types,
   TEXT_TYPE,
+  BROWSABLE_ORDER,
 };

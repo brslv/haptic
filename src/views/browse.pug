@@ -4,20 +4,29 @@ include partials/top-bar.pug
 include partials/page-title.pug
 include partials/icon.pug
 include partials/product-card.pug
+include partials/post.pug
+include partials/login-modal.pug
+
+mixin controls
+  div(class="flex items-center mb-8")
+    div(class="w-full flex items-start sm:items-center flex-col sm:flex-row")
+      +page-title(class="mb-4 sm:mr-4 sm:mb-0") Browse
+      div(class="w-full flex items-center justify-between")
+        div(class="flex-1")
+          select(class="btn btn-plain btn-small mr-4" data-browse-content-type-picker)
+            option(value="products" selected=(type === 'products')) Products
+            option(value="posts" selected=(type === 'posts')) Posts
+        div(class="flex items-center")
+          button(data-browse-ord-boosts class={"btn btn-plain btn-small mr-2": true, "btn-active-ring": ord === 'boosts'}) Boosts
+          button(data-browse-ord-newest class={"btn btn-plain btn-small": true, "btn-active-ring": ord === 'newest'}) Newest
 
 block content
   div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")
   div(class="relative")
     +top-bar("browse")
     div(class="container p-4 mx-auto")
-      div(class="flex items-center")
-        +page-title(class="mr-4") Browse
-        div(class="flex items-center")
-          a(href="/browse?ord=boosts" class={"btn btn-plain btn-small mr-2": true, "btn-active-ring": ord === 'boosts'}) Boosts count
-          a(href="/browse?ord=newest" class={"btn btn-plain btn-small": true, "btn-active-ring": ord === 'newest'}) Newest
-
-      div(class="mt-8")
-
+      if products && products.length
+        +controls
         div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4")
           each product in products
             +product-card({
@@ -26,3 +35,30 @@ block content
               boosts_count: product.boosts_count,
               description: product.description
             })
+      else if posts && posts.length
+        div(class="md:w-2/3 mx-auto")
+          +controls
+          each post in posts
+            +post({
+              product_slug: post.product_slug,
+              post_id: post.id,
+              post_text_md: post.text_md,
+              post_twitter_text: post.twitter_text,
+              img: post.user_twitter_profile_image_url,
+              img_url: post.image_url,
+              user_type: post.user_type,
+              twitter_name: post.user_twitter_name,
+              twitter_screen_name: post.user_twitter_screen_name,
+              date_str: post.created_at_formatted,
+              show_opts: false,
+              show_view_btn: true,
+              boosts_count: post.boosts_count,
+              disable_boost_btn: !user,
+              trigger_login_modal: !user,
+            }) !{post.text}
+
+          p(class="text-gray-500 text-center text-sm") Post listing is limited to 24 items only.
+
+block modals
+  if !user
+    +login-modal

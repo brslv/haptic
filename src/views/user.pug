@@ -21,10 +21,16 @@ block content
               img(src=data.twitter_profile_image_url alt=`Photo of the creator of ${data.twitter_name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": data.type === USER_TYPES.CREATOR})
               div
                 h2(class="font-bold")
-                  a(href="/u/" + data.twitter_screen_name)= data.twitter_name
-                a(href=`https://twitter.com/@${data.twitter_screen_name}` class="underline hover:no-underline inline-block text-sm text-gray-500 mb-4 font-medium block" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")= `@${data.twitter_screen_name}`
+                  a(href="/u/" + data.twitter_screen_name class="underline hover:no-underline")= data.twitter_name
+                p(class="inline-block text-sm text-gray-500 mb-4 font-medium block")= `@${data.twitter_screen_name}`
 
             p= data.bio
+
+            div(class="mt-4")
+              a(href=`https://twitter.com/${data.twitter_screen_name}` class="inline-block btn btn-small btn-twitter" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")
+                span(class="flex items-center")
+                  +icon("twitter", { width: 18, height: 18, stroke: "white", fill: "white" })(class="mr-2")
+                  span= `@${data.twitter_screen_name}`
 
         section(class="w-full sm:col-span-4 md:col-span-3")
           +page-title(class="mb-4") Details
