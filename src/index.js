@@ -175,7 +175,7 @@ app.use(
     sameSite: "lax",
     cookie: {
       secure: IS_PROD || IS_STAGE,
-      maxAge: HOUR_IN_MS * 24, // one day
+      maxAge: HOUR_IN_MS * 72, // three days
     },
   })
 );
