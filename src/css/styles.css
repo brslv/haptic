@@ -17,8 +17,8 @@
   }
 
   .prose h1,
-  h2,
-  h3 {
+  .prose h2,
+  .prose h3 {
     margin-top: 1.4em;
   }
 
