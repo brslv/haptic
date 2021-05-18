@@ -24,7 +24,7 @@ block content
                 +icon("info", { width: 12, height: 12 })(data-tippy-content="This product is private, which means that only you can see it. To make it public go to its settings and check the 'Public' checkbox.")
         h1(class="font-bold text-3xl sm:text-5xl mb-4")= product.name
         if product.description
-          h2(class="font-medium text-gray-600 text-xl sm:text-2xl text-center" style="max-width: 26ch;")= product.description
+          h2(class="font-medium text-gray-600 text-xl sm:text-2xl text-center" style="max-width: 42ch;")= product.description
         else
           div(class="font-medium text-xl text-gray-600") No product description, yet.
         if product.website
