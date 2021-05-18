@@ -6,8 +6,8 @@ mixin post({ product_slug, post_id, post_text_md, post_twitter_text, img, img_ur
     div(class="flex flex-col-reverse sm:flex-row sm:items-center justify-between mb-4")
       div(class="flex items-center mb-4 sm:mb-0")
         img(src=img class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": user_type === USER_TYPES.CREATOR})
-        div(class="flex flex-col")
-          a(href=`/u/${twitter_screen_name}` class="underline hover:no-underline font-bold")= twitter_name
+        div
+          a(href=`/u/${twitter_screen_name}` class="underline hover:no-underline font-bold inline-block")= twitter_name
           div(class="flex items-center text-xs text-gray-600 dark:text-gray-400")
             div(class="mr-2")= `@${twitter_screen_name}`
             span(class="mr-2") &mdash;

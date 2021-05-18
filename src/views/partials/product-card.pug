@@ -1,9 +1,18 @@
 include page-title.pug
 
-mixin product-card({ slug, name, boosts_count, description })
+mixin product-card({ slug, name, boosts_count, description, place = null })
   a(href=`/p/${slug}` class="block")
     div(class="relative")
-      div(class="relative border border-gray-100 bg-white shadow-sm rounded-md hover:shadow-md p-4 transition" style="height: 180px;")
+      div(
+        class={
+          "relative bg-white shadow-sm rounded-md hover:shadow-md p-4 transition": true,
+          "border border-gray-100": place === null,
+          "border-2 border-yellow-300": place === 0,
+          "border-2 border-yellow-700": place === 1,
+          "border-2 border-gray-500": place === 2,
+        }
+        style="height: 180px;"
+      )
         div(class="flex flex-col h-full")
           div(id="product-heading")
             div(class="flex items-start")

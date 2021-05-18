@@ -28,8 +28,9 @@ block content
       if products && products.length
         +controls
         div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4")
-          each product in products
+          each product, idx in products
             +product-card({
+              place: idx,
               slug: product.slug,
               name: product.name,
               boosts_count: product.boosts_count,

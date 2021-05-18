@@ -12,6 +12,16 @@
     word-break: break-all;
   }
 
+  .prose h1 {
+    font-size: 1.7em;
+  }
+
+  .prose h1,
+  h2,
+  h3 {
+    margin-top: 1.4em;
+  }
+
   .link {
     @apply text-blue-500 hover:text-blue-600 underline;
   }
