@@ -303,7 +303,6 @@ app.get("/browse", (req, res) => {
         order,
       })
       .then((result) => {
-        console.log({ result });
         res.render("browse", {
           meta: {
             ...defaultMetas,
