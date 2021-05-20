@@ -871,6 +871,7 @@ app.get("/p/:slug/:postId", (req, res, next) => {
     "products.created_at as product_created_at",
     "products.updated_at as product_updated_at",
     "users.id as user_id",
+    "users.slug as user_slug",
     "users.bio as user_bio",
     "users.twitter_id as user_twitter_id",
     "users.twitter_name as user_twitter_name",

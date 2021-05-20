@@ -22,7 +22,9 @@ block content
               div
                 h2(class="font-bold")
                   a(href="/u/" + data.twitter_screen_name class="underline hover:no-underline")= data.twitter_name
-                p(class="inline-block text-sm text-gray-500 mb-4 font-medium block")= `@${data.twitter_screen_name}`
+                div(class="flex items-center text-xs")
+                  +icon("twitter", { width: 10, height: 10, stroke:"twitter", fill: "twitter" })(class="mr-1")
+                  span(class="mr-2")= `@${data.twitter_screen_name}`
 
             p= data.bio
 
