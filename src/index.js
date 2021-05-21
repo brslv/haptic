@@ -284,23 +284,6 @@ const dateFmt = (dateStr, format = "DD MMM, HH:mm") => {
 // JOBS / QUEUES
 const notificationsQueue = queues.loadNotificationsQueue();
 const { router } = createBullBoard([new BullAdapter(notificationsQueue.queue)]);
-app.post("/foo", authOnly, async (req, res) => {
-  const data = req.body;
-
-  try {
-    await notificationsQueue.jobs.comment({
-      commentAuthorId: req.user.id,
-      postId: data.post_id,
-      content: data.content,
-    });
-    return res.send("ok");
-  } catch (err) {
-    console.log("err", err);
-  }
-});
-app.get("/foo", authOnly, (req, res) => {
-  return res.render("foo", { meta: defaultMetas });
-});
 app.use("/queues", authOnly, router); // @TODO: make admin only
 
 // setup routes
@@ -1058,6 +1041,31 @@ app.get("/logout", (req, res) => {
 });
 
 // ajax routes
+app.post(
+  "/comment",
+  authOnly,
+  ajaxOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const data = req.body;
+    const commentData = {
+      commentAuthorId: req.user.id,
+      postId: data.postId,
+      content: data.content,
+    };
+
+    notificationsQueue.jobs
+      .comment(commentData)
+      .then(() => {
+        return res.json({ ok: 1, err: null, details: commentData });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+);
+
 app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
   db("subs")
     .insert({
