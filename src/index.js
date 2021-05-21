@@ -26,6 +26,9 @@ const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
 const removeMd = require("remove-markdown");
 const validateUrl = require("valid-url");
+const queues = require("./queues");
+const { createBullBoard } = require("bull-board");
+const { BullAdapter } = require("bull-board/bullAdapter");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -277,6 +280,28 @@ app.use(injectEnv);
 const dateFmt = (dateStr, format = "DD MMM, HH:mm") => {
   return day(dateStr).format(format);
 };
+
+// JOBS / QUEUES
+const notificationsQueue = queues.loadNotificationsQueue();
+const { router } = createBullBoard([new BullAdapter(notificationsQueue.queue)]);
+app.post("/foo", authOnly, async (req, res) => {
+  const data = req.body;
+
+  try {
+    await notificationsQueue.jobs.comment({
+      commentAuthorId: req.user.id,
+      postId: data.post_id,
+      content: data.content,
+    });
+    return res.send("ok");
+  } catch (err) {
+    console.log("err", err);
+  }
+});
+app.get("/foo", authOnly, (req, res) => {
+  return res.render("foo", { meta: defaultMetas });
+});
+app.use("/queues", authOnly, router); // @TODO: make admin only
 
 // setup routes
 app.get("/", (req, res) => {
