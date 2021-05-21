@@ -26,7 +26,8 @@ export default function comments() {
     e.preventDefault();
     const $submittedForm = $(e.currentTarget);
     const csrf = $('meta[name="csrf"]').attr("content");
-    const content = $submittedForm.find("textarea").val();
+    const $content = $submittedForm.find("textarea");
+    const content = $content.val();
     const postId = $submittedForm.data("post-id");
     const authorName = $submittedForm.data("comment-author-name");
     const authorSlug = $submittedForm.data("comment-author-slug");
@@ -34,9 +35,6 @@ export default function comments() {
     const $commentsContainer = $(
       `[data-comments-container][data-post-id="${postId}"]`
     );
-    console.log($commentsContainer);
-
-    console.log("submitting comment", content, postId);
 
     req(
       "/comment",
@@ -46,8 +44,10 @@ export default function comments() {
         ok: function commentOk(response) {
           const data = response.data;
           const details = data.details;
+          const commentId = `comment_${details.id}`;
+          console.log("commentId", commentId);
           const $comment = $(`
-            <div class="flex items-start mt-4 -mb-4 -mx-4 p-4 border-t border-gray-200 bg-gray-50">
+            <div id="${commentId}" class="flex items-start mt-4 p-4 border border-gray-200 rounded-md border-dashed">
               <img src=${authorImage} class="w-10 h-10 rounded-full mr-2" />
 
               <div>
@@ -57,6 +57,14 @@ export default function comments() {
             </div>
           `);
           $commentsContainer.append($comment);
+          $content.val("");
+          $(document).trigger("haptic:add-toast", {
+            content: "Your comment has been published 🙌",
+            type: "success",
+          });
+          document
+            .getElementById(commentId)
+            .scrollIntoView({ behavior: "smooth" });
         },
         fail: function commentFail(response) {
           console.log("comment response fail", response);

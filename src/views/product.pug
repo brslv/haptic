@@ -40,7 +40,9 @@ block content
           if posts.length
             each post in posts
               - var post_text = post.text;
+              // - console.log(post)
               +post({
+                comments: post.comments,
                 product_slug: product.slug,
                 product_name: product.name,
                 post_id: post.id,

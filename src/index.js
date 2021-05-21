@@ -18,6 +18,7 @@ const day = require("dayjs");
 const posts = require("./posts");
 const boosts = require("./boosts");
 const products = require("./products");
+const comments = require("./comments");
 const upload = require("./img-upload");
 const singleUpload = upload.single("image");
 const showdown = require("showdown");
@@ -763,6 +764,7 @@ app.get("/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
   const postsActions = posts.actions({ db, user: req.user });
   const boostsActions = boosts.actions({ db });
+  const commentsActions = comments.actions({ db, user: req.user });
 
   db.select(
     "products.id",
@@ -816,36 +818,48 @@ app.get("/p/:slug", (req, res, next) => {
         return boostsActions
           .getProductBoosts(result.id)
           .then((boostsResult) => {
-            return db("product_tools")
-              .where({ product_id: result.id })
-              .then((productToolsResult) => {
-                res.render("product", {
-                  meta: {
-                    ...defaultMetas,
-                    title: `${result.name} | Haptic`,
-                    description: result.description,
-                    og: {
-                      ...defaultMetas.og,
+            /**
+             * GET COMMENTS ==============================================
+             */
+            let commentsPromises = [];
+            postsResult.forEach((post) => {
+              commentsPromises.push(commentsActions.getComments(post.id));
+            });
+            Promise.all(commentsPromises).then((commentsResult) => {
+              console.log({ commentsResult });
+              return db("product_tools")
+                .where({ product_id: result.id })
+                .then((productToolsResult) => {
+                  res.render("product", {
+                    meta: {
+                      ...defaultMetas,
                       title: `${result.name} | Haptic`,
+                      description: result.description,
+                      og: {
+                        ...defaultMetas.og,
+                        title: `${result.name} | Haptic`,
+                      },
                     },
-                  },
-                  product: { ...result },
-                  boosts: boostsResult,
-                  posts: [
-                    ...postsResult.map((post) => ({
-                      ...post,
-                      text: mdConverter.makeHtml(post.text),
-                      created_at_formatted: dateFmt(post.created_at),
-                    })),
-                  ],
-                  tools: productToolsResult,
-                  links: {
-                    posts: `/dashboard/product/${slug}/posts`,
-                    settings: `/dashboard/product/${slug}/settings`,
-                    url: `/p/${slug}`,
-                  },
+                    product: { ...result },
+                    boosts: boostsResult,
+                    posts: [
+                      ...postsResult.map((post, idx) => ({
+                        ...post,
+                        comments: commentsResult[idx],
+                        text: mdConverter.makeHtml(post.text),
+                        created_at_formatted: dateFmt(post.created_at),
+                      })),
+                    ],
+                    tools: productToolsResult,
+                    links: {
+                      posts: `/dashboard/product/${slug}/posts`,
+                      settings: `/dashboard/product/${slug}/settings`,
+                      url: `/p/${slug}`,
+                    },
+                  });
                 });
-              });
+            });
+            // ===========================================================
           });
       });
     })
@@ -1054,15 +1068,22 @@ app.post(
       postId: data.postId,
       content: data.content,
     };
+    const commentsActions = comments.actions({ user: req.user, db });
 
-    notificationsQueue.jobs
-      .comment(commentData)
-      .then(() => {
-        return res.json({ ok: 1, err: null, details: commentData });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    commentsActions.addComment(commentData).then((commentId) => {
+      notificationsQueue.jobs
+        .comment(commentData)
+        .then(() => {
+          return res.json({
+            ok: 1,
+            err: null,
+            details: { ...commentData, id: commentId },
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
   }
 );
 
