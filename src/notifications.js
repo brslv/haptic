@@ -367,6 +367,9 @@ function actions({ db, user }) {
           "notifications.user_id": user.id,
           is_read: false,
         })
+        .whereNot({
+          "notifications_post_boosts.post_id": null,
+        })
         .orderBy("notifications.created_at", "DESC")
         .then((result) => {
           const notifications = result.map((notif) => {
