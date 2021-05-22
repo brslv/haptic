@@ -262,6 +262,12 @@ const loadNotifications = (req, res, next) => {
     .getAll()
     .then((notificationsResult) => {
       res.locals.notifications = notificationsResult;
+      res.locals.notificationsCount = Object.values(notificationsResult).reduce(
+        (acc, curr) => {
+          return (acc += curr.length);
+        },
+        0
+      );
       next();
     })
     .catch((err) => {
@@ -283,7 +289,7 @@ const dateFmt = (dateStr, format = "DD MMM, HH:mm") => {
 };
 
 // JOBS / QUEUES
-const notificationsQueue = queues.loadNotificationsQueue();
+const notificationsQueue = queues.loadNotificationsQueue({ db });
 const { router } = createBullBoard([new BullAdapter(notificationsQueue.queue)]);
 app.use("/queues", authOnly, router); // @TODO: make admin only
 
@@ -826,7 +832,6 @@ app.get("/p/:slug", (req, res, next) => {
               commentsPromises.push(commentsActions.getComments(post.id));
             });
             Promise.all(commentsPromises).then((commentsResult) => {
-              console.log({ commentsResult });
               return db("product_tools")
                 .where({ product_id: result.id })
                 .then((productToolsResult) => {
@@ -1070,19 +1075,73 @@ app.post(
     };
     const commentsActions = comments.actions({ user: req.user, db });
 
+    function enqueueCommentNotification(_commentData) {
+      return notificationsQueue.jobs.commentNotification(
+        _commentData,
+        req.user
+      );
+    }
+
+    function enqueueCommentNotificationToPostAuthor(_commentData) {
+      if (_commentData.userId === _commentData.commentAuthorId) {
+        // post author is commenting on his own post, skip notification
+        return Promise.resolve(_commentData);
+      } else {
+        return enqueueCommentNotification(_commentData);
+      }
+    }
+
     commentsActions.addComment(commentData).then((commentId) => {
-      notificationsQueue.jobs
-        .comment(commentData)
-        .then(() => {
-          return res.json({
-            ok: 1,
-            err: null,
-            details: { ...commentData, id: commentId },
-          });
+      commentsActions.getComments(data.postId).then((allCommentsInPost) => {
+        let queued = [];
+
+        // set notifications for the author of the post
+        enqueueCommentNotificationToPostAuthor({
+          ...commentData,
+          commentId,
+          userId: data.postAuthorId,
         })
-        .catch((err) => {
-          console.log(err);
-        });
+          .then(() => {
+            return queued.push(data.postAuthorId);
+          })
+          .then(() => {
+            let commentsPromises = [];
+            // set notifications for all of the users participating in the comments of this post
+            allCommentsInPost.forEach((commentInPost) => {
+              if (
+                queued.indexOf(Number(commentInPost.user_id)) !== -1 ||
+                Number(commentData.commentAuthorId) ===
+                  Number(commentInPost.user_id)
+              )
+                return;
+
+              const commentAuthorId = commentInPost.user_id;
+              commentsPromises.push(
+                enqueueCommentNotification({
+                  ...commentData,
+                  commentId,
+                  userId: commentAuthorId,
+                })
+              );
+              queued.push(commentInPost.user_id);
+            });
+            return commentsPromises;
+          })
+          .then((comentsPromises) => {
+            return Promise.resolve(comentsPromises);
+          })
+          .then(() => {
+            return res.json({
+              ok: 1,
+              err: null,
+              details: { ...commentData, id: commentId },
+            });
+          })
+          .catch((err) => {
+            console.log("err", err);
+            throw err;
+          });
+      });
     });
   }
 );

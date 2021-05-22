@@ -24,6 +24,7 @@ function actions({ db, user }) {
           "comments.content",
           "comments.created_at",
           "comments.post_id",
+          "comments.user_id as user_id",
           "users.twitter_name as author_twitter_name",
           "users.type as author_type",
           "users.slug as author_slug",
@@ -34,7 +35,6 @@ function actions({ db, user }) {
         .where({ "comments.post_id": postId })
         .orderBy("comments.created_at", "asc")
         .then((result) => {
-          console.log(result);
           res(result);
         })
         .catch((err) => {

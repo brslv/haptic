@@ -7,12 +7,23 @@ include partials/csrf.pug
 include partials/empty-list-message.pug
 
 mixin notif({ notif })
-  div(class="p-4 border border-gray-100 rounded-md bg-white shadow-sm mt-4" data-notification-id=notif.id)
+  div(class="p-4 border border-gray-100 rounded-md bg-white shadow-sm mb-4" data-notification-id=notif.id)
     div(class="flex items-center justify-between mb-4 border-b border-gray-100 px-4 py-2 -mt-4 -mx-4")
       div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
       a(href=`/p/${notif.product_slug}` class="btn btn-small btn-plain" title="Open product page")= `${notif.product_name}`
-    div(class="flex items-center")
+    div(class="flex items-start")
       if icon
+      if notif.type === 'comment'
+        div(class="relative mr-4")
+          img(src=notif.origin_user_twitter_profile_image_url class="w-12 h-12 rounded-full")
+          div(class={"p-1 rounded-full flex items-center justify-center mr-2 absolute -top-2 -right-2 shadow-md": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
+            +icon("chevrons-up", { width: 14, height: 14 })
+        div
+          p(class="flex-1 mb-2")
+            | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] commented on 
+            a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
+            |.
+          p(class="text-sm border border-gray-200 border-dashed p-2 rounded-md")= notif.comment_content
       if notif.type === 'post_boosts'
         div(class="relative mr-4")
           img(src=notif.origin_user_twitter_profile_image_url class="w-12 h-12 rounded-full")
@@ -41,29 +52,48 @@ block content
   +top-bar("notifications")
   div(class="container p-4 mx-auto")
     div(class="md:w-2/3 mx-auto")
-      +page-title(class="mb-4") Notifications
-      +flash-msg(flash)
-
-      div(class="mb-8")
-        div(class="flex items-center mb-4")
-          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mr-4") Unread
-          if notifications && notifications.unread && notifications.unread.length
+      div(class="flex items-center mb-4")
+        +page-title(class="mr-4") Notifications
+        if notifications && (notifications.comments.length || notifications.postsBoosts.length || notifications.productBoosts.length || notifications.productCollections.length)
             form(action="/mark-notifications-read" method="POST")
               +csrf
               button(type="submit" class="btn btn-primary btn-small click-scale") Mark as read
-        if notifications && notifications.unread && notifications.unread.length
-          each notif in notifications.unread
-            +notif({notif})
-        else
-          +empty-list-message
-            span No notifications found
-
-      div(class="flex items-center justify-between mb-4")
-        +page-title(class="bg-gray-200 px-4 py-1 rounded-full") Read
-      if notifications && notifications.read && notifications.read.length
-        each notif in notifications.read
-          +notif({ notif })
-      else
+      +flash-msg(flash)
+      
+      if !notifications || (!notifications.comments.length && !notifications.postsBoosts.length && !notifications.productBoosts.length && !notifications.productCollections.length)
         +empty-list-message
           span No notifications found
+
+      if notifications && notifications.comments.length
+        div
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Comments
+          each notif in notifications.comments
+            +notif({notif})
+
+      if notifications && notifications.postsBoosts.length
+        div(class="mt-8")
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Post boosts
+          each notif in notifications.postsBoosts
+            +notif({notif})
+
+      if notifications && notifications.productBoosts.length
+        div(class="mt-8")
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Product boosts
+          each notif in notifications.productBoosts
+            +notif({notif})
+
+      if notifications && notifications.productCollections.length
+        div(class="mt-8")
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Product collections
+          each notif in notifications.productCollections
+            +notif({notif})
+
+      // div(class="flex items-center justify-between mb-4")
+      //   +page-title(class="bg-gray-200 px-4 py-1 rounded-full") Read
+      // if notifications && notifications.read && notifications.read.length
+      //   each notif in notifications.read
+      //     +notif({ notif })
+      // else
+      //   +empty-list-message
+      //     span No notifications found
         // p(class="text-gray-500") No notifications here

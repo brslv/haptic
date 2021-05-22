@@ -195,6 +195,7 @@ function actions({ db, user }) {
             "posts.created_at",
             "posts.updated_at",
             "posts_text.text",
+            "users.id as user_id",
             "users.type as user_type",
             "users.slug as user_slug",
             "users.twitter_name as user_twitter_name",

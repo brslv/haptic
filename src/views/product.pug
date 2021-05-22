@@ -42,6 +42,7 @@ block content
               - var post_text = post.text;
               // - console.log(post)
               +post({
+                author_id: post.user_id,
                 comments: post.comments,
                 product_slug: product.slug,
                 product_name: product.name,

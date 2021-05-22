@@ -32,13 +32,14 @@ export default function comments() {
     const authorName = $submittedForm.data("comment-author-name");
     const authorSlug = $submittedForm.data("comment-author-slug");
     const authorImage = $submittedForm.data("comment-author-img");
+    const postAuthorId = $submittedForm.data("post-author-id");
     const $commentsContainer = $(
       `[data-comments-container][data-post-id="${postId}"]`
     );
 
     req(
       "/comment",
-      { csrf, content, postId },
+      { csrf, postAuthorId, content, postId },
       {
         method: "post",
         ok: function commentOk(response) {

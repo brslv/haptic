@@ -43,8 +43,8 @@ mixin top-bar(activePage)
                           a(href="/notifications" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
                             div(class="relative")
                               +icon("mail", { width:20, height: 20 })(class="mr-2")
-                              if notifications && notifications.unread && notifications.unread.length > 0
-                                span(class="absolute -top-4 -left-4 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notifications.unread.length
+                              if notificationsCount > 0
+                                span(class="absolute -top-4 -left-4 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notificationsCount
                             span Notifications
                         li(class="mb-4")
                           a(href="/dashboard/profile" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2")
@@ -105,12 +105,12 @@ mixin top-bar(activePage)
                                 "h-full flex items-center hover:bg-gray-50 px-4": true,
                                 "border-b-4 border-yellow-300": activePage === "notifications"
                               }
-                              data-tippy-content=`Notifications (${notifications && notifications.unread && notifications.unread.length || 0})`
+                              data-tippy-content=`Notifications (${notificationsCount || 0})`
                             )
                                 li(class="relative")
                                     +icon('mail', { width:20, height: 20 })
-                                    if notifications && notifications.unread && notifications.unread.length > 0
-                                        span(class="absolute -top-3 -right-3 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notifications.unread.length
+                                    if notificationsCount > 0
+                                        span(class="absolute -top-3 -right-3 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notificationsCount
 
                             a(
                               href="/dashboard/profile"

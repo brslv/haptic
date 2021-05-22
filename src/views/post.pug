@@ -19,6 +19,7 @@ block content
           +icon("arrow-left", { width: 16, height: 16 })(class="mr-2")
           span= `Go to ${product.name}`
       +post({
+        author_id: post.user_id,
         product_slug: product.slug,
         product_name: product.name,
         post_id: post.id,

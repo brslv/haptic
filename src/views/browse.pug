@@ -45,6 +45,7 @@ block content
           +controls
           each post in posts
             +post({
+              author_id: post.user_id,
               product_slug: post.product_slug,
               post_id: post.id,
               post_text_md: post.text_md,

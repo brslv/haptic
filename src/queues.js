@@ -1,25 +1,21 @@
 const Queue = require("bull");
+const notifications = require("./notifications");
 
-function loadNotificationsQueue() {
+function loadNotificationsQueue({ db }) {
   const queue = new Queue("notifications-queue", process.env.REDIS_URL); // @TODO
 
   // consumer
   queue.process(async function processJob(job) {
-    console.log({ job });
-
     const data = job.data;
     const type = data.type;
+    const user = data.user;
     const details = data.details;
 
     switch (type) {
       case "comment": {
-        const postId = details.postId;
-        const commentAuthorId = details.commentAuthorId;
-        const content = details.content;
-
         // add notifications to the database
         // for every user that's in the thread of comments
-        console.log("processing comment", { postId, commentAuthorId, content });
+        notifications.actions({ db, user }).add("comment", details);
 
         return { ok: 1 };
       }
@@ -28,26 +24,27 @@ function loadNotificationsQueue() {
     }
   });
 
-  queue.on("completed", function completedJob(job, result) {
-    console.log("job completed", { job, result });
-  });
-
   // producers
-  async function _comment({ postId, commentAuthorId, content }) {
+  async function _commentNotification(
+    { userId, postId, commentAuthorId, content, commentId },
+    user
+  ) {
     const jobData = {
       type: "comment",
+      user,
       details: {
+        userId,
         postId,
         commentAuthorId,
         content,
+        commentId,
       },
     };
-    console.log("producing comment job", jobData);
     await queue.add(jobData);
   }
 
   const jobs = {
-    comment: _comment,
+    commentNotification: _commentNotification,
   };
 
   return {

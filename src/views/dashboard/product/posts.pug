@@ -72,6 +72,7 @@ block content
               each post in posts
                 - var post_text = post.text
                 +post({
+                  author_id: post.user_id,
                   product_slug: product.slug,
                   product_name: product.name,
                   post_id: post.id,
