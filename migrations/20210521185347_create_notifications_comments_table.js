@@ -19,19 +19,19 @@ exports.up = function(knex) {
 
           t.integer("post_id")
             .unsigned()
-            .notNullable();
+            .nullable();
           t.foreign("post_id")
             .references("id")
             .inTable("posts")
-            .onDelete("CASCADE");
+            .onDelete("SET NULL");
 
           t.integer("comment_id")
             .unsigned()
-            .notNullable();
+            .nullable();
           t.foreign("comment_id")
             .references("id")
             .inTable("comments")
-            .onDelete("CASCADE");
+            .onDelete("SET NULL");
 
           t.timestamp("created_at")
             .notNullable()

@@ -1400,6 +1400,7 @@ app.delete(
         }
       })
       .catch((err) => {
+        console.log(err);
         next(err);
       });
   }

@@ -354,13 +354,18 @@ function actions({ db, user }) {
             return true;
           })
           .then(() => {
-            db.transacting(trx)
+            return db
+              .transacting(trx)
               .table("posts")
               .select()
               .where({ id: postId })
               .del()
               .then((postDelResult) => {
                 trx.commit().then(() => res(postDelResult));
+              })
+              .catch((err) => {
+                console.log(err);
+                trx.rollback().then(() => rej(err));
               });
           })
           .catch((err) => {
