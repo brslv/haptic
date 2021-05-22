@@ -14,7 +14,6 @@ const KnexSessionStore = require("connect-session-knex")(expressSession);
 const slugify = require("slugify");
 const { nanoid } = require("nanoid");
 const { flash } = require("express-flash-message");
-const day = require("dayjs");
 const posts = require("./posts");
 const boosts = require("./boosts");
 const products = require("./products");
@@ -30,6 +29,7 @@ const validateUrl = require("valid-url");
 const queues = require("./queues");
 const { createBullBoard } = require("bull-board");
 const { BullAdapter } = require("bull-board/bullAdapter");
+const { dateFmt } = require("./utils");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -284,10 +284,6 @@ const injectEnv = (req, res, next) => {
 };
 app.use(injectEnv);
 
-const dateFmt = (dateStr, format = "DD MMM, HH:mm") => {
-  return day(dateStr).format(format);
-};
-
 // JOBS / QUEUES
 const notificationsQueue = queues.loadNotificationsQueue({ db });
 const { router } = createBullBoard([new BullAdapter(notificationsQueue.queue)]);
@@ -464,8 +460,9 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
 
       return posts
         .actions({ db, user: req.user })
-        .getAllPosts(productResult.id)
+        .getAllPosts(productResult.id, { withComments: true })
         .then((postsResult) => {
+          console.log(postsResult);
           return db("product_tools")
             .where({ product_id: productResult.id })
             .then((toolsResult) => {
@@ -770,7 +767,6 @@ app.get("/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
   const postsActions = posts.actions({ db, user: req.user });
   const boostsActions = boosts.actions({ db });
-  const commentsActions = comments.actions({ db, user: req.user });
 
   db.select(
     "products.id",
@@ -820,18 +816,12 @@ app.get("/p/:slug", (req, res, next) => {
         });
       }
 
-      return postsActions.getAllPosts(result.id).then((postsResult) => {
-        return boostsActions
-          .getProductBoosts(result.id)
-          .then((boostsResult) => {
-            /**
-             * GET COMMENTS ==============================================
-             */
-            let commentsPromises = [];
-            postsResult.forEach((post) => {
-              commentsPromises.push(commentsActions.getComments(post.id));
-            });
-            Promise.all(commentsPromises).then((commentsResult) => {
+      return postsActions
+        .getAllPosts(result.id, { withComments: true })
+        .then((postsResult) => {
+          return boostsActions
+            .getProductBoosts(result.id)
+            .then((boostsResult) => {
               return db("product_tools")
                 .where({ product_id: result.id })
                 .then((productToolsResult) => {
@@ -850,7 +840,6 @@ app.get("/p/:slug", (req, res, next) => {
                     posts: [
                       ...postsResult.map((post, idx) => ({
                         ...post,
-                        comments: commentsResult[idx],
                         text: mdConverter.makeHtml(post.text),
                         created_at_formatted: dateFmt(post.created_at),
                       })),
@@ -863,10 +852,9 @@ app.get("/p/:slug", (req, res, next) => {
                     },
                   });
                 });
+              // ===========================================================
             });
-            // ===========================================================
-          });
-      });
+        });
     })
     .catch((err) => {
       next(err);
@@ -938,7 +926,7 @@ app.get("/p/:slug/:postId", (req, res, next) => {
       }
 
       return postsActions
-        .getPost("text", { postId })
+        .getPost("text", { postId }, { withComments: true })
         .then((result) => {
           if (!result) {
             return res.status(404).render("404", {

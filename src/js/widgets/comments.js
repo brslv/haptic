@@ -46,7 +46,6 @@ export default function comments() {
           const data = response.data;
           const details = data.details;
           const commentId = `comment_${details.id}`;
-          console.log("commentId", commentId);
           const $comment = $(`
             <div id="${commentId}" class="flex items-start mt-4 p-4 border border-gray-200 rounded-md border-dashed">
               <img src=${authorImage} class="w-10 h-10 rounded-full mr-2" />
@@ -68,7 +67,10 @@ export default function comments() {
             .scrollIntoView({ behavior: "smooth" });
         },
         fail: function commentFail(response) {
-          console.log("comment response fail", response);
+          $(document).trigger("haptic:add-toast", {
+            content: "We had a problem publishing your comment. Please, retry.",
+            type: "error",
+          });
         },
       }
     );

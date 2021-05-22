@@ -1,4 +1,5 @@
 const { cache, cacheKeys, ttl } = require("./cache");
+const { dateFmt } = require("./utils");
 
 function actions({ db, user }) {
   function _addComment({ commentAuthorId, content, postId }) {
@@ -35,7 +36,12 @@ function actions({ db, user }) {
         .where({ "comments.post_id": postId })
         .orderBy("comments.created_at", "asc")
         .then((result) => {
-          res(result);
+          res([
+            ...result.map((comment) => ({
+              ...comment,
+              created_at_formatted: dateFmt(comment.created_at),
+            })),
+          ]);
         })
         .catch((err) => {
           console.log(err);
