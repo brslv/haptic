@@ -824,11 +824,20 @@ app.get("/p/:slug", (req, res, next) => {
                   product: { ...result },
                   boosts: boostsResult,
                   posts: [
-                    ...postsResult.map((post) => ({
-                      ...post,
-                      text: mdConverter.makeHtml(post.text),
-                      created_at_formatted: dateFmt(post.created_at),
-                    })),
+                    ...postsResult.map((post) => {
+                      const strippedMdText = removeMd(post.text);
+                      const twitterText =
+                        strippedMdText.length > 180
+                          ? strippedMdText.substring(0, 180) + "..."
+                          : strippedMdText;
+                      return {
+                        ...post,
+                        text_md: post.text,
+                        twitter_text: twitterText,
+                        text: mdConverter.makeHtml(post.text),
+                        created_at_formatted: dateFmt(post.created_at),
+                      };
+                    }),
                   ],
                   tools: productToolsResult,
                   links: {
