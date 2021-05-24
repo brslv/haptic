@@ -462,7 +462,6 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
         .actions({ db, user: req.user })
         .getAllPosts(productResult.id, { withComments: true })
         .then((postsResult) => {
-          console.log(postsResult);
           return db("product_tools")
             .where({ product_id: productResult.id })
             .then((toolsResult) => {
@@ -578,6 +577,13 @@ app.post(
       errors.website = {
         msg: 'URL must start with "http://" or "https://"',
         val: input.website,
+      };
+    }
+
+    if (input.description && input.description.length > 280) {
+      errors.description = {
+        msg: "Description is too long (280 symbols max)",
+        val: input.description,
       };
     }
 

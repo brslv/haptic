@@ -34,8 +34,11 @@ block content
               div(class="pb-8")
                 label
                   div(class="label pb-1 pl-1") Description
-                  textarea(class="textarea w-full" placeholder="E.g. Haptic.so helps entrepreneurs build their products in public by setting up their on #BuildInPublic space" name="description" id="product-description")= product.description
+                  textarea(class={"textarea w-full": true,  "border-red-500": formErrors.description} placeholder="E.g. Haptic.so helps entrepreneurs build their products in public by setting up their on #BuildInPublic space" name="description" id="product-description")= formErrors.description && formErrors.description.val || product.description
+
                 span(class="text-sm text-gray-500") Briefly describe your product
+                if formErrors.description
+                  p(class="text-xs text-red-500 mt-1")= formErrors.description.msg
 
               div(class="pb-8")
                 label
