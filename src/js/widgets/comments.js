@@ -25,17 +25,35 @@ export default function comments() {
   function onFormSubmit($els, e) {
     e.preventDefault();
     const $submittedForm = $(e.currentTarget);
+    const $errorsContainer = $submittedForm.find("[data-comment-errors]");
     const csrf = $('meta[name="csrf"]').attr("content");
     const $content = $submittedForm.find("textarea");
     const content = $content.val();
     const postId = $submittedForm.data("post-id");
     const authorName = $submittedForm.data("comment-author-name");
+    const authorTwitterScreenName = $submittedForm.data(
+      "comment-author-twitter-screen-name"
+    );
     const authorSlug = $submittedForm.data("comment-author-slug");
     const authorImage = $submittedForm.data("comment-author-img");
     const postAuthorId = $submittedForm.data("post-author-id");
     const $commentsContainer = $(
       `[data-comments-container][data-post-id="${postId}"]`
     );
+    const $comment = $($els.$commentTpl.html());
+
+    $content.removeClass("border border-red-500");
+    $errorsContainer.addClass("hidden");
+    $errorsContainer.html("");
+    if (content.length < 1) {
+      $content.addClass("border border-red-500");
+      $errorsContainer.removeClass("hidden");
+      const $error = $(
+        '<p class="text-red-500 text-xs mb-2">Comment is too short</p>'
+      );
+      $errorsContainer.append($error);
+      return;
+    }
 
     req(
       "/comment",
@@ -46,17 +64,20 @@ export default function comments() {
           const data = response.data;
           const details = data.details;
           const commentId = `comment_${details.id}`;
-          const $comment = $(`
-            <div id="${commentId}" class="flex items-start mt-4 p-4 border border-gray-200 rounded-md border-dashed">
-              <img src=${authorImage} class="w-10 h-10 rounded-full mr-2" />
 
-              <div>
-                <a href="/u/${authorSlug}" class="font-bold mb-2 underline hover:no-underline">${authorName}</a>
-                <p>${details.content}</p>
-              </div>
-            </div>
-          `);
+          $comment.attr("id", commentId);
+          $comment.find("[data-comment-author-img]").attr("src", authorImage);
+          $comment
+            .find("[data-comment-author-link]")
+            .attr("href", `/u/${authorSlug}`)
+            .text(authorName);
+          $comment
+            .find("[data-comment-author-twitter-screen-name]")
+            .text(authorTwitterScreenName);
+          $comment.find("[data-comment-created-at]").text("Now");
+          $comment.find("[data-comment-content]").text(details.content);
           $commentsContainer.append($comment);
+
           $content.val("");
           $(document).trigger("haptic:add-toast", {
             content: "Your comment has been published 🙌",
@@ -81,6 +102,7 @@ export default function comments() {
     $els = {
       $commentBtn: $("[data-comment-btn]"),
       $form: $("[data-comment-form]"),
+      $commentTpl: $("[data-comment-tpl]"),
     };
 
     load($els);
