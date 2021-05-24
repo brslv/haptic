@@ -146,7 +146,11 @@ function actions({ db, user }) {
       });
   }
 
-  function getBrowsablePosts({ order = BROWSABLE_ORDER.BOOSTS }) {
+  function getBrowsablePosts({
+    order = BROWSABLE_ORDER.BOOSTS,
+    withComments = true,
+  }) {
+    const commentsActions = comments.actions({ db, user });
     return new Promise((res, rej) => {
       const cachedPosts = cache.get(cacheKeys.browsablePosts(order));
       if (cachedPosts) {
@@ -186,6 +190,29 @@ function actions({ db, user }) {
           .where({ "products.is_public": true, "products.is_listed": true })
           .orderBy(order)
           .limit(24)
+          .then((result) => {
+            if (withComments) {
+              let commentsPromises = [];
+              result.forEach((post) => {
+                commentsPromises.push(commentsActions.getComments(post.id));
+              });
+              return Promise.all(commentsPromises)
+                .then((commentsResult) => {
+                  return [
+                    ...result.map((post, idx) => ({
+                      ...post,
+                      comments: commentsResult[idx],
+                    })),
+                  ];
+                })
+                .catch((err) => {
+                  console.log(err);
+                  throw err;
+                });
+            } else {
+              return result;
+            }
+          })
           .then((result) => {
             trx.commit().then(() => {
               cache.set(cacheKeys.browsablePosts(order), result, ttl[1]);
