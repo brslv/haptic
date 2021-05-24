@@ -238,6 +238,19 @@ const ajaxOnly = (req, res, next) => {
   if (isAjaxCall(req)) next();
   else res.status(400).end("400 Bad Request");
 };
+const adminOnly = (req, res, next) => {
+  if (req.user && req.user.twitter_screen_name === "Brslv") {
+    next();
+  } else {
+    if (isAjaxCall(req)) {
+      return res
+        .status(405)
+        .json({ ok: 0, err: "Not allowed.", details: null });
+    }
+
+    res.status(405).render("not-allowed", { meta: defaultMetas });
+  }
+};
 const authOnly = (req, res, next) => {
   if (req.user) {
     next();
@@ -287,7 +300,7 @@ app.use(injectEnv);
 // JOBS / QUEUES
 const notificationsQueue = queues.loadNotificationsQueue({ db });
 const { router } = createBullBoard([new BullAdapter(notificationsQueue.queue)]);
-app.use("/queues", authOnly, router); // @TODO: make admin only
+app.use("/queues", authOnly, adminOnly, router); // @TODO: make admin only
 
 // setup routes
 app.get("/", (req, res) => {
