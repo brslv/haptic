@@ -4,12 +4,19 @@ const { cache, cacheKeys, ttl } = require("./cache");
 const POST_BOOSTS_TYPE = "post_boosts";
 const PRODUCT_COLLECTIONS_TYPE = "product_collections";
 const PRODUCT_BOOSTS_TYPE = "product_boosts";
+const COMMENT = "comment";
 
-const types = [POST_BOOSTS_TYPE, PRODUCT_COLLECTIONS_TYPE, PRODUCT_BOOSTS_TYPE];
+const types = [
+  POST_BOOSTS_TYPE,
+  PRODUCT_COLLECTIONS_TYPE,
+  PRODUCT_BOOSTS_TYPE,
+  COMMENT,
+];
 const typesMap = {
   POST_BOOSTS_TYPE: POST_BOOSTS_TYPE,
   PRODUCT_COLLECTIONS_TYPE: PRODUCT_COLLECTIONS_TYPE,
   PRODUCT_BOOSTS_TYPE: PRODUCT_BOOSTS_TYPE,
+  COMMENT: COMMENT,
 };
 
 const dateFmt = (dateStr) => {
@@ -149,6 +156,53 @@ function actions({ db, user }) {
     });
   }
 
+  function _addComment({
+    userId,
+    postId,
+    commentAuthorId,
+    content,
+    commentId,
+  }) {
+    return new Promise((res, rej) => {
+      return db.transaction((trx) => {
+        return db
+          .transacting(trx)
+          .table("notifications")
+          .insert({
+            user_id: userId,
+            type: COMMENT,
+            origin_user_id: commentAuthorId,
+          })
+          .returning("id")
+          .then(([notificationId]) => {
+            return db
+              .transacting(trx)
+              .table("notifications_comments")
+              .insert({
+                notification_id: notificationId,
+                post_id: postId,
+                comment_id: commentId,
+              })
+              .then((notificationsCommentsResult) => {
+                trx.commit().then(
+                  res({
+                    id: notificationId,
+                  })
+                );
+              })
+              .catch((err) => {
+                console.log(err);
+                trx.rollback().then(rej(err));
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+            trx.rollback().then(rej(err));
+          });
+      });
+    });
+  }
+
   function add(type, data) {
     switch (type) {
       case POST_BOOSTS_TYPE:
@@ -157,119 +211,351 @@ function actions({ db, user }) {
         return _addProductCollection(data);
       case PRODUCT_BOOSTS_TYPE:
         return _addProductBoost(data);
+      case COMMENT:
+        return _addComment(data);
     }
 
     throw Error("Invalid notification type: ", type);
   }
 
+  function getProductCollections() {
+    return new Promise((res, rej) => {
+      db.select(
+        "notifications.id",
+        "notifications.type",
+        "notifications.is_read",
+        "notifications.created_at",
+        "products.slug as product_slug",
+        "products.name as product_name",
+        "user.id as user_id",
+        "user.twitter_name as user_twitter_name",
+        "user.twitter_profile_image_url as user_twitter_profile_image_url",
+        "origin_user.id as origin_user_id",
+        "origin_user.twitter_name as origin_user_twitter_name",
+        "origin_user.slug as origin_user_slug",
+        "origin_user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
+      )
+        .from("notifications")
+        .leftJoin(
+          "notifications_product_collections",
+          "notifications_product_collections.notification_id",
+          "notifications.id"
+        )
+        .leftJoin(
+          "products",
+          "notifications_product_collections.product_id",
+          "products.id"
+        )
+        .leftJoin("users as user", "notifications.user_id", "user.id")
+        .leftJoin(
+          "users as origin_user",
+          "notifications.origin_user_id",
+          "origin_user.id"
+        )
+        .where({
+          "notifications.type": "product_collections",
+          "notifications.user_id": user.id,
+          is_read: false,
+        })
+        .orderBy("notifications.created_at", "DESC")
+        .then((result) => {
+          const notifications = result.map((notif) => {
+            notif.created_at_formatted = dateFmt(notif.created_at);
+            return notif;
+          });
+
+          // cache.set(cacheKeys.notifications(user.id), notifications, ttl[1]);
+          res(notifications);
+        })
+        .catch((err) => {
+          console.log(err);
+          rej(err);
+        });
+    });
+  }
+
+  function getProductBoosts() {
+    return new Promise((res, rej) => {
+      db.select(
+        "notifications.id",
+        "notifications.type",
+        "notifications.is_read",
+        "notifications.created_at",
+        "products.slug as product_slug",
+        "products.name as product_name",
+        "user.id as user_id",
+        "user.twitter_name as user_twitter_name",
+        "user.twitter_profile_image_url as user_twitter_profile_image_url",
+        "origin_user.id as origin_user_id",
+        "origin_user.twitter_name as origin_user_twitter_name",
+        "origin_user.slug as origin_user_slug",
+        "origin_user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
+      )
+        .from("notifications")
+        .leftJoin(
+          "notifications_product_boosts",
+          "notifications_product_boosts.notification_id",
+          "notifications.id"
+        )
+        .leftJoin(
+          "products",
+          "notifications_product_boosts.product_id",
+          "products.id"
+        )
+        .leftJoin("users as user", "notifications.user_id", "user.id")
+        .leftJoin(
+          "users as origin_user",
+          "notifications.origin_user_id",
+          "origin_user.id"
+        )
+        .where({
+          "notifications.type": "product_boosts",
+          "notifications.user_id": user.id,
+          is_read: false,
+        })
+        .orderBy("notifications.created_at", "DESC")
+        .then((result) => {
+          const notifications = result.map((notif) => {
+            notif.created_at_formatted = dateFmt(notif.created_at);
+            return notif;
+          });
+
+          // cache.set(cacheKeys.notifications(user.id), notifications, ttl[1]);
+          res(notifications);
+        })
+        .catch((err) => {
+          console.log(err);
+          rej(err);
+        });
+    });
+  }
+
+  function getPostsBoosts() {
+    return new Promise((res, rej) => {
+      db.select(
+        "notifications.id",
+        "notifications.type",
+        "notifications.is_read",
+        "notifications.created_at",
+        "products.slug as product_slug",
+        "products.name as product_name",
+        "posts.id as post_id",
+        "user.id as user_id",
+        "user.twitter_name as user_twitter_name",
+        "user.twitter_profile_image_url as user_twitter_profile_image_url",
+        "origin_user.id as origin_user_id",
+        "origin_user.twitter_name as origin_user_twitter_name",
+        "origin_user.slug as origin_user_slug",
+        "origin_user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
+      )
+        .from("notifications")
+        .leftJoin(
+          "notifications_post_boosts",
+          "notifications_post_boosts.notification_id",
+          "notifications.id"
+        )
+        .leftJoin("posts", "notifications_post_boosts.post_id", "posts.id")
+        .leftJoin("users as user", "notifications.user_id", "user.id")
+        .leftJoin(
+          "users as origin_user",
+          "notifications.origin_user_id",
+          "origin_user.id"
+        )
+        .leftJoin("products", "posts.product_id", "products.id")
+        .where({
+          "notifications.type": "post_boosts",
+          "notifications.user_id": user.id,
+          is_read: false,
+        })
+        .whereNot({
+          "notifications_post_boosts.post_id": null,
+        })
+        .orderBy("notifications.created_at", "DESC")
+        .then((result) => {
+          const notifications = result.map((notif) => {
+            notif.created_at_formatted = dateFmt(notif.created_at);
+            return notif;
+          });
+
+          // cache.set(cacheKeys.notifications(user.id), notifications, ttl[1]);
+          res(notifications);
+        })
+        .catch((err) => {
+          console.log(err);
+          rej(err);
+        });
+    });
+  }
+
+  function getComments() {
+    return new Promise((res, rej) => {
+      db.select(
+        "notifications.id",
+        "notifications.type",
+        "notifications.is_read",
+        "notifications.created_at",
+        "comments.content as comment_content",
+        "products.slug as product_slug",
+        "products.name as product_name",
+        "posts.id as post_id",
+        "user.id as user_id",
+        "user.twitter_name as user_twitter_name",
+        "user.twitter_profile_image_url as user_twitter_profile_image_url",
+        "origin_user.id as origin_user_id",
+        "origin_user.twitter_name as origin_user_twitter_name",
+        "origin_user.slug as origin_user_slug",
+        "origin_user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
+      )
+        .from("notifications")
+        .leftJoin(
+          "notifications_comments",
+          "notifications_comments.notification_id",
+          "notifications.id"
+        )
+        .leftJoin(
+          "comments",
+          "notifications_comments.comment_id",
+          "comments.id"
+        )
+        .leftJoin("posts", "notifications_comments.post_id", "posts.id")
+        .leftJoin("users as user", "notifications.user_id", "user.id")
+        .leftJoin(
+          "users as origin_user",
+          "notifications.origin_user_id",
+          "origin_user.id"
+        )
+        .leftJoin("products", "posts.product_id", "products.id")
+        .where({
+          "notifications.type": "comment",
+          "notifications.user_id": user.id,
+          is_read: false,
+        })
+        .whereNot({
+          "notifications_comments.post_id": null,
+          "notifications_comments.comment_id": null,
+        })
+        .orderBy("notifications.created_at", "DESC")
+        .then((result) => {
+          const notifications = result.map((notif) => {
+            notif.created_at_formatted = dateFmt(notif.created_at);
+            return notif;
+          });
+
+          // cache.set(cacheKeys.notifications(user.id), notifications, ttl[1]);
+          res(notifications);
+        })
+        .catch((err) => {
+          console.log(err);
+          rej(err);
+        });
+    });
+  }
+
   function getAll() {
     return new Promise((res, rej) => {
-      const cached = cache.get(cacheKeys.notifications(user.id));
-      if (cached) {
-        return res(cached);
-      }
-      return (
-        db
-          .select(
-            "notifications.id",
-            "notifications.type",
-            "notifications.is_read",
-            "notifications.created_at",
-            "posts.id as post_id",
-            "products.slug as product_slug",
-            "products.name as product_name",
-            "user.id as user_id",
-            "user.twitter_name as user_twitter_name",
-            "user.twitter_profile_image_url as user_twitter_profile_image_url",
-            "origin_user.id as origin_user_id",
-            "origin_user.twitter_name as origin_user_twitter_name",
-            "origin_user.slug as origin_user_slug",
-            "origin_user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
-          )
-          // .distinct()
-          .from("notifications")
-          // .join(function () {
-          //   this.on(function () {
-          //     db.select('*').from('notifications_product_collections').union()
-          //   })
-          // })
+      const promises = [
+        getProductCollections(),
+        getProductBoosts(),
+        getPostsBoosts(),
+        getComments(),
+      ];
+      Promise.all(promises)
+        .then(([productCollections, productBoosts, postsBoosts, comments]) => {
+          res({
+            productCollections,
+            productBoosts,
+            postsBoosts,
+            comments,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        });
 
-          // .leftOuterJoin("notifications_product_collections", function() {
-          //   this.on(
-          //     "notifications_product_collections.notification_id",
-          //     "=",
-          //     "notifications.id"
-          //   ).andOnVal("notifications.type", "=", PRODUCT_COLLECTIONS_TYPE);
-          // })
-          // .leftOuterJoin("notifications_post_boosts", function() {
-          //   this.on(
-          //     "notifications_post_boosts.notification_id",
-          //     "=",
-          //     "notifications.id"
-          //   ).andOnVal("notifications.type", "=", POST_BOOSTS_TYPE);
-          // })
+      // const cached = cache.get(cacheKeys.notifications(user.id));
+      // if (cached) {
+      //   return res(cached);
+      // }
 
-          .leftOuterJoin(
-            "notifications_product_collections",
-            "notifications_product_collections.notification_id",
-            "notifications.id"
-          )
-          .leftOuterJoin(
-            "notifications_product_boosts",
-            "notifications_product_boosts.notification_id",
-            "notifications.id"
-          )
-          .leftOuterJoin(
-            "notifications_post_boosts",
-            "notifications_post_boosts.notification_id",
-            "notifications.id"
-          )
-          .leftOuterJoin(
-            "posts",
-            "notifications_post_boosts.post_id",
-            "posts.id"
-          )
-          .leftOuterJoin("users as user", "notifications.user_id", "user.id")
-          .leftOuterJoin(
-            "users as origin_user",
-            "notifications.origin_user_id",
-            "origin_user.id"
-          )
-          .leftOuterJoin("products", function() {
-            this.on("posts.product_id", "products.id")
-              .orOn(
-                "notifications_product_collections.product_id",
-                "products.id"
-              )
-              .orOn("notifications_product_boosts.product_id", "products.id");
-          })
-          .where({ "notifications.user_id": user.id })
-          .orderBy("notifications.created_at", "DESC")
-          .then((result) => {
-            const notifications = result.reduce(
-              (acc, notif) => {
-                if (!notif.product_slug) {
-                  return acc;
-                }
+      // return db
+      //   .select(
+      //     "notifications.id",
+      //     "notifications.type",
+      //     "notifications.is_read",
+      //     "notifications.created_at",
+      //     "notifications_comments.content as comment_content",
+      //     "posts.id as post_id",
+      //     "products.slug as product_slug",
+      //     "products.name as product_name",
+      //     "user.id as user_id",
+      //     "user.twitter_name as user_twitter_name",
+      //     "user.twitter_profile_image_url as user_twitter_profile_image_url",
+      //     "origin_user.id as origin_user_id",
+      //     "origin_user.twitter_name as origin_user_twitter_name",
+      //     "origin_user.slug as origin_user_slug",
+      //     "origin_user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
+      //   )
+      //   .from("notifications")
+      //   .leftOuterJoin(
+      //     "notifications_product_collections",
+      //     "notifications_product_collections.notification_id",
+      //     "notifications.id"
+      //   )
+      //   .leftOuterJoin(
+      //     "notifications_product_boosts",
+      //     "notifications_product_boosts.notification_id",
+      //     "notifications.id"
+      //   )
+      //   .leftOuterJoin(
+      //     "notifications_post_boosts",
+      //     "notifications_post_boosts.notification_id",
+      //     "notifications.id"
+      //   )
+      //   .leftOuterJoin("posts", "notifications_post_boosts.post_id", "posts.id")
+      //   .leftOuterJoin("users as user", "notifications.user_id", "user.id")
+      //   .leftOuterJoin(
+      //     "users as origin_user",
+      //     "notifications.origin_user_id",
+      //     "origin_user.id"
+      //   )
+      //   .leftOuterJoin(
+      //     "notifications_comments",
+      //     "notifications_comments.notification_id",
+      //     "notifications.id"
+      //   )
+      //   .leftOuterJoin("products", function() {
+      //     this.on("posts.product_id", "products.id")
+      //       .orOn("notifications_product_collections.product_id", "products.id")
+      //       .orOn("notifications_product_boosts.product_id", "products.id");
+      //   })
+      //   .where({ "notifications.user_id": user.id })
+      //   .orderBy("notifications.created_at", "DESC")
+      //   .then((result) => {
+      //     console.log("notifications result", { result });
+      //     const notifications = result.reduce(
+      //       (acc, notif) => {
+      //         if (!notif.product_slug) {
+      //           return acc;
+      //         }
 
-                notif.created_at_formatted = dateFmt(notif.created_at);
-                if (notif.is_read) {
-                  acc.read.push(notif);
-                } else {
-                  acc.unread.push(notif);
-                }
-                return acc;
-              },
-              { read: [], unread: [] }
-            );
+      //         notif.created_at_formatted = dateFmt(notif.created_at);
+      //         if (notif.is_read) {
+      //           acc.read.push(notif);
+      //         } else {
+      //           acc.unread.push(notif);
+      //         }
+      //         return acc;
+      //       },
+      //       { read: [], unread: [] }
+      //     );
 
-            cache.set(cacheKeys.notifications(user.id), notifications, ttl[1]);
-            res(notifications);
-          })
-          .catch((err) => {
-            rej(err);
-          })
-      );
+      //     cache.set(cacheKeys.notifications(user.id), notifications, ttl[1]);
+      //     res(notifications);
+      //   })
+      //   .catch((err) => {
+      //     rej(err);
+      //   });
     });
   }
 

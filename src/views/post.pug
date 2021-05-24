@@ -19,6 +19,7 @@ block content
           +icon("arrow-left", { width: 16, height: 16 })(class="mr-2")
           span= `Go to ${product.name}`
       +post({
+        author_id: post.user_id,
         product_slug: product.slug,
         product_name: product.name,
         post_id: post.id,
@@ -35,6 +36,7 @@ block content
         boosts_count: post.boosts_count,
         disable_boost_btn: !user,
         trigger_login_modal: !user,
+        comments: post.comments
       }) !{post_text}
 
 block modals

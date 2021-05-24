@@ -22,6 +22,7 @@ import waitlistForm from "./widgets/waitlist-form";
 import mobileNav from "./widgets/mobile-nav";
 import postActions from "./widgets/post-actions";
 import browse from "./widgets/browse";
+import comments from "./widgets/comments";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -47,3 +48,4 @@ waitlistForm();
 mobileNav();
 postActions();
 browse();
+comments();

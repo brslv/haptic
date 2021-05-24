@@ -14,10 +14,10 @@ const KnexSessionStore = require("connect-session-knex")(expressSession);
 const slugify = require("slugify");
 const { nanoid } = require("nanoid");
 const { flash } = require("express-flash-message");
-const day = require("dayjs");
 const posts = require("./posts");
 const boosts = require("./boosts");
 const products = require("./products");
+const comments = require("./comments");
 const upload = require("./img-upload");
 const singleUpload = upload.single("image");
 const showdown = require("showdown");
@@ -26,6 +26,10 @@ const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
 const removeMd = require("remove-markdown");
 const validateUrl = require("valid-url");
+const queues = require("./queues");
+const { createBullBoard } = require("bull-board");
+const { BullAdapter } = require("bull-board/bullAdapter");
+const { dateFmt } = require("./utils");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -234,6 +238,19 @@ const ajaxOnly = (req, res, next) => {
   if (isAjaxCall(req)) next();
   else res.status(400).end("400 Bad Request");
 };
+const adminOnly = (req, res, next) => {
+  if (req.user && req.user.twitter_screen_name === "Brslv") {
+    next();
+  } else {
+    if (isAjaxCall(req)) {
+      return res
+        .status(405)
+        .json({ ok: 0, err: "Not allowed.", details: null });
+    }
+
+    res.status(405).render("not-allowed", { meta: defaultMetas });
+  }
+};
 const authOnly = (req, res, next) => {
   if (req.user) {
     next();
@@ -258,6 +275,12 @@ const loadNotifications = (req, res, next) => {
     .getAll()
     .then((notificationsResult) => {
       res.locals.notifications = notificationsResult;
+      res.locals.notificationsCount = Object.values(notificationsResult).reduce(
+        (acc, curr) => {
+          return (acc += curr.length);
+        },
+        0
+      );
       next();
     })
     .catch((err) => {
@@ -274,9 +297,10 @@ const injectEnv = (req, res, next) => {
 };
 app.use(injectEnv);
 
-const dateFmt = (dateStr, format = "DD MMM, HH:mm") => {
-  return day(dateStr).format(format);
-};
+// JOBS / QUEUES
+const notificationsQueue = queues.loadNotificationsQueue({ db });
+const { router } = createBullBoard([new BullAdapter(notificationsQueue.queue)]);
+app.use("/queues", authOnly, adminOnly, router); // @TODO: make admin only
 
 // setup routes
 app.get("/", (req, res) => {
@@ -449,7 +473,7 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
 
       return posts
         .actions({ db, user: req.user })
-        .getAllPosts(productResult.id)
+        .getAllPosts(productResult.id, { withComments: true })
         .then((postsResult) => {
           return db("product_tools")
             .where({ product_id: productResult.id })
@@ -566,6 +590,13 @@ app.post(
       errors.website = {
         msg: 'URL must start with "http://" or "https://"',
         val: input.website,
+      };
+    }
+
+    if (input.description && input.description.length > 280) {
+      errors.description = {
+        msg: "Description is too long (280 symbols max)",
+        val: input.description,
       };
     }
 
@@ -804,51 +835,53 @@ app.get("/p/:slug", (req, res, next) => {
         });
       }
 
-      return postsActions.getAllPosts(result.id).then((postsResult) => {
-        return boostsActions
-          .getProductBoosts(result.id)
-          .then((boostsResult) => {
-            return db("product_tools")
-              .where({ product_id: result.id })
-              .then((productToolsResult) => {
-                res.render("product", {
-                  meta: {
-                    ...defaultMetas,
-                    title: `${result.name} | Haptic`,
-                    description: result.description,
-                    og: {
-                      ...defaultMetas.og,
+      return postsActions
+        .getAllPosts(result.id, { withComments: true })
+        .then((postsResult) => {
+          return boostsActions
+            .getProductBoosts(result.id)
+            .then((boostsResult) => {
+              return db("product_tools")
+                .where({ product_id: result.id })
+                .then((productToolsResult) => {
+                  res.render("product", {
+                    meta: {
+                      ...defaultMetas,
                       title: `${result.name} | Haptic`,
+                      description: result.description,
+                      og: {
+                        ...defaultMetas.og,
+                        title: `${result.name} | Haptic`,
+                      },
                     },
-                  },
-                  product: { ...result },
-                  boosts: boostsResult,
-                  posts: [
-                    ...postsResult.map((post) => {
-                      const strippedMdText = removeMd(post.text);
-                      const twitterText =
-                        strippedMdText.length > 180
-                          ? strippedMdText.substring(0, 180) + "..."
-                          : strippedMdText;
-                      return {
-                        ...post,
-                        text_md: post.text,
-                        twitter_text: twitterText,
-                        text: mdConverter.makeHtml(post.text),
-                        created_at_formatted: dateFmt(post.created_at),
-                      };
-                    }),
-                  ],
-                  tools: productToolsResult,
-                  links: {
-                    posts: `/dashboard/product/${slug}/posts`,
-                    settings: `/dashboard/product/${slug}/settings`,
-                    url: `/p/${slug}`,
-                  },
+                    product: { ...result },
+                    boosts: boostsResult,
+                    posts: [
+                      ...postsResult.map((post) => {
+                        const strippedMdText = removeMd(post.text);
+                        const twitterText =
+                          strippedMdText.length > 180
+                            ? strippedMdText.substring(0, 180) + "..."
+                            : strippedMdText;
+                        return {
+                          ...post,
+                          text_md: post.text,
+                          twitter_text: twitterText,
+                          text: mdConverter.makeHtml(post.text),
+                          created_at_formatted: dateFmt(post.created_at),
+                        };
+                      }),
+                    ],
+                    tools: productToolsResult,
+                    links: {
+                      posts: `/dashboard/product/${slug}/posts`,
+                      settings: `/dashboard/product/${slug}/settings`,
+                      url: `/p/${slug}`,
+                    },
+                  });
                 });
-              });
-          });
-      });
+            });
+        });
     })
     .catch((err) => {
       next(err);
@@ -920,7 +953,7 @@ app.get("/p/:slug/:postId", (req, res, next) => {
       }
 
       return postsActions
-        .getPost("text", { postId })
+        .getPost("text", { postId }, { withComments: true })
         .then((result) => {
           if (!result) {
             return res.status(404).render("404", {
@@ -1042,6 +1075,92 @@ app.get("/logout", (req, res) => {
 });
 
 // ajax routes
+app.post(
+  "/comment",
+  authOnly,
+  ajaxOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const data = req.body;
+    const commentData = {
+      commentAuthorId: req.user.id,
+      postId: data.postId,
+      content: data.content,
+    };
+    const commentsActions = comments.actions({ user: req.user, db });
+
+    function enqueueCommentNotification(_commentData) {
+      return notificationsQueue.jobs.commentNotification(
+        _commentData,
+        req.user
+      );
+    }
+
+    function enqueueCommentNotificationToPostAuthor(_commentData) {
+      if (_commentData.userId === _commentData.commentAuthorId) {
+        // post author is commenting on his own post, skip notification
+        return Promise.resolve(_commentData);
+      } else {
+        return enqueueCommentNotification(_commentData);
+      }
+    }
+
+    commentsActions.addComment(commentData).then((commentId) => {
+      commentsActions.getComments(data.postId).then((allCommentsInPost) => {
+        let queued = [];
+
+        // set notifications for the author of the post
+        enqueueCommentNotificationToPostAuthor({
+          ...commentData,
+          commentId,
+          userId: data.postAuthorId,
+        })
+          .then(() => {
+            return queued.push(data.postAuthorId);
+          })
+          .then(() => {
+            let commentsPromises = [];
+            // set notifications for all of the users participating in the comments of this post
+            allCommentsInPost.forEach((commentInPost) => {
+              if (
+                queued.indexOf(Number(commentInPost.user_id)) !== -1 ||
+                Number(commentData.commentAuthorId) ===
+                  Number(commentInPost.user_id)
+              )
+                return;
+
+              const commentAuthorId = commentInPost.user_id;
+              commentsPromises.push(
+                enqueueCommentNotification({
+                  ...commentData,
+                  commentId,
+                  userId: commentAuthorId,
+                })
+              );
+              queued.push(commentInPost.user_id);
+            });
+            return commentsPromises;
+          })
+          .then((comentsPromises) => {
+            return Promise.resolve(comentsPromises);
+          })
+          .then(() => {
+            return res.json({
+              ok: 1,
+              err: null,
+              details: { ...commentData, id: commentId },
+            });
+          })
+          .catch((err) => {
+            console.log("err", err);
+            throw err;
+          });
+      });
+    });
+  }
+);
+
 app.post("/sub", ajaxOnly, express.json(), (req, res, next) => {
   db("subs")
     .insert({
@@ -1296,6 +1415,7 @@ app.delete(
         }
       })
       .catch((err) => {
+        console.log(err);
         next(err);
       });
   }
@@ -1452,8 +1572,8 @@ app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
       return res.status(400).json({
         ok: 0,
         err:
-          "Files greater than 500kb in size are not allowed. Please, optimize your image.",
-        details: { max: "500kb" },
+          "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+        details: { max: "2MB" },
       });
     }
 
