@@ -21,7 +21,7 @@ module.exports = {
       database: process.env.DBNAME,
     },
     pool: {
-      min: 2,
+      min: 0,
       max: 10,
     },
     migrations: {
@@ -39,7 +39,7 @@ module.exports = {
       database: process.env.DBNAME,
     },
     pool: {
-      min: 2,
+      min: 0,
       max: 10,
     },
     migrations: {
@@ -57,7 +57,7 @@ module.exports = {
       database: process.env.DBNAME,
     },
     pool: {
-      min: 2,
+      min: 0,
       max: 10,
     },
     migrations: {
