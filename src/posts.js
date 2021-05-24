@@ -188,7 +188,7 @@ function actions({ db, user }) {
           .limit(24)
           .then((result) => {
             trx.commit().then(() => {
-              cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
+              cache.set(cacheKeys.browsablePosts(order), result, ttl[1]);
               res(result);
             });
           })
@@ -269,7 +269,7 @@ function actions({ db, user }) {
           }
         })
         .then((result) => {
-          cache.set(cacheKeys.productPosts(productId), result, ttl[5]);
+          cache.set(cacheKeys.productPosts(productId), result, ttl[1]);
           res(result);
         })
         .catch((err) => {

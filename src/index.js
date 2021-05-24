@@ -1551,8 +1551,8 @@ app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
       return res.status(400).json({
         ok: 0,
         err:
-          "Files greater than 500kb in size are not allowed. Please, optimize your image.",
-        details: { max: "500kb" },
+          "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+        details: { max: "2MB" },
       });
     }
 
