@@ -97,6 +97,7 @@ function actions({ db, user }) {
         "posts.user_id as user_id",
         "posts_text.text",
         "users.type as user_type",
+        "users.slug as user_slug",
         "users.twitter_name as user_twitter_name",
         "users.twitter_profile_image_url as user_twitter_profile_image_url",
         "users.twitter_screen_name as user_twitter_screen_name",

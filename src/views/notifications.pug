@@ -18,8 +18,8 @@ mixin notif({ notif })
           img(src=notif.origin_user_twitter_profile_image_url class="w-12 h-12 rounded-full")
           div(class={"p-1 rounded-full flex items-center justify-center mr-2 absolute -top-2 -right-2 shadow-md": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
             +icon("chevrons-up", { width: 14, height: 14 })
-        div
-          p(class="flex-1 mb-2")
+        div(class="flex-1")
+          p(class="mb-2")
             | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] commented on 
             a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
             |.
