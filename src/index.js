@@ -143,7 +143,18 @@ passport.use(
               });
           } else {
             // return the user
-            done(null, result);
+            db("users")
+              .update({
+                twitter_profile_image_url: twitterData.profile_image_url_https,
+              })
+              .where({ id: result.id })
+              .returning("twitter_profile_image_url")
+              .then((updateResult) => {
+                done(null, {
+                  ...result,
+                  twitter_profile_image_url: updateResult[0],
+                });
+              });
           }
         })
         .catch((err) => {
