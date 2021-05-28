@@ -194,7 +194,7 @@ Here are some guidelines:
 - Make sure you're not spammy. This is not your typical marketing channel, where more means more.
 - Have fun. If you're not having fun, better don't do it. People will notice it sooner or later.
 
-## Platforms - where do i publish
+## Platforms - where do I publish
 
 Provisioned with a strategy, you're ready to go into the wild. 😅
 
