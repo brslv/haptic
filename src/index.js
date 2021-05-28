@@ -29,7 +29,7 @@ const validateUrl = require("valid-url");
 const queues = require("./queues");
 const { createBullBoard } = require("bull-board");
 const { BullAdapter } = require("bull-board/bullAdapter");
-const { dateFmt } = require("./utils");
+const { dateFmt, loadArticleFile } = require("./utils");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -312,6 +312,35 @@ app.use(injectEnv);
 const notificationsQueue = queues.loadNotificationsQueue({ db });
 const { router } = createBullBoard([new BullAdapter(notificationsQueue.queue)]);
 app.use("/queues", authOnly, adminOnly, router); // @TODO: make admin only
+
+// articles
+app.get("/how-to-build-in-public", async (req, res) => {
+  const title = "How to build in public";
+  loadArticleFile("how-to-build-in-public.md")
+    .then((content) => {
+      return res.render("article", {
+        meta: { ...defaultMetas, title: `${title} | Haptic` },
+        title,
+        description:
+          "A mental framework for building products in public and engaging with your audience.",
+        content: mdConverter.makeHtml(content),
+        sideSectionTitle: "Insights",
+        sideSectionContent: mdConverter.makeHtml(`
+- Make sure you have a clear and strong purpose.
+- Pick the right audiences.
+- Diversify your audiences based on your purpose.
+- Be authentic.
+- Share learnings, stats, milestones, plans, etc.
+- Be active, but don't stress it too much.
+- Choose a platform.
+- <a href="/login">Use Haptic to narrate a coherent and tractable story.</a>
+        `),
+      });
+    })
+    .catch((err) => {
+      throw err;
+    });
+});
 
 // setup routes
 app.get("/", (req, res) => {

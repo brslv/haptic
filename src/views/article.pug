@@ -1,0 +1,20 @@
+extends ./layouts/base.layout.pug
+
+include ./partials/page-title.pug
+include ./partials/top-bar.pug
+
+block content
+  +top-bar
+  article(class="article -mt-8")
+    div(class="bg-white border-b border-gray-100 py-16 mb-8")
+      div(class="container mx-auto p-4")
+        h1(class="font-black text-3xl md:text-4xl" style="max-width: 42ch")= title
+        if description
+          h2(class="text-xl text-gray-600 mt-4")= description
+    div(class="container p-4 mx-auto flex flex-col-reverse md:flex-row items-start")
+      div(class="w-full md:w-4/6 md:mr-4")
+        div(class="prose prose-yellow text-lg") !{content}
+      aside(class="w-full md:w-2/6 mb-12")
+        +page-title(class="mb-4")= sideSectionTitle
+        div(class="bg-white p-4 rounded-md shadow-sm border border-gray-100") 
+          div(class="prose prose-yellow") !{sideSectionContent}
