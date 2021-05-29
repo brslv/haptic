@@ -16,13 +16,12 @@ export default function twitter() {
         })
         .then(function(el) {
           el.style.float = "initial";
-          el.style.maxWidth = "100%";
         });
     });
 
     function replaceLoaderWithWidget($link, tweetId) {
       const $div = $(
-        `<div id="tweet_embed_${tweetId}" class="block my-4 w-full"></div>`
+        `<div data-tweet-embed-container id="tweet_embed_${tweetId}" class="w-full"></div>`
       );
       $link.replaceWith($div);
       return $div;
@@ -49,7 +48,7 @@ export default function twitter() {
       link.$link.replaceWith(
         `<div data-twitter-widget-loader="${link.$link.attr(
           "href"
-        )}" class="w-full bg-gray-100 rounded-md animate-pulse" style="height: 200px"></div>`
+        )}" class="flex items-center justify-center text-xs text-gray-500 w-full flex items-center justify-center bg-gray-100 border border-gray-100 animate-pulse" style="height: 200px">Loading twitter widget...</div>`
       );
     });
   }
@@ -61,7 +60,6 @@ export default function twitter() {
 
     if (twttr && twitterLinks && twitterLinks.length) {
       twttr.ready(function() {
-        console.log("loading twitter widgets...");
         twttr.widgets.load();
         turnTwitterLinksIntoEmbeds($els, twitterLinks);
       });
