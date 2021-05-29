@@ -23,6 +23,7 @@ import mobileNav from "./widgets/mobile-nav";
 import postActions from "./widgets/post-actions";
 import browse from "./widgets/browse";
 import comments from "./widgets/comments";
+import twitter from "./widgets/twitter";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -49,3 +50,4 @@ mobileNav();
 postActions();
 browse();
 comments();
+twitter();

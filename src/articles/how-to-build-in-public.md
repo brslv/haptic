@@ -236,7 +236,7 @@ The major problem with this type of content is that it requires way more time co
 
 Did you know that there are platforms, specifically crafted to make your build in public experience much more pleasant?
 
-(https://haptic.so)[Haptic] is such a platform.
+[Haptic](https://haptic.so) is such a platform.
 
 The main advantage of using it is that it combines the good traits of blogs and those of social media, providing the best experience possible for creators like you and me.
 
