@@ -351,87 +351,104 @@ app.get("/", (req, res) => {
 });
 
 app.get("/browse", (req, res) => {
+  const productsActions = products.actions({ db, user: req.user });
+  const postsActions = posts.actions({ db, user: req.user });
+  const order = posts.BROWSABLE_ORDER.NEWEST;
+  postsActions
+    .getBrowsablePosts({
+      order,
+    })
+    .then((postsResult) => {
+      productsActions
+        .getBrowsableProducts({
+          order: products.BROWSABLE_ORDER.NEWEST,
+          limit: 5,
+        })
+        .then((newestProductsResult) => {
+          productsActions
+            .getBrowsableProducts({
+              order: products.BROWSABLE_ORDER.BOOSTS,
+              limit: 5,
+            })
+            .then((mostBoostedProductsResult) => {
+              res.render("browse", {
+                meta: {
+                  ...defaultMetas,
+                  title: "Browse | Haptic",
+                  og: {
+                    ...defaultMetas.og,
+                    title: "Browse | Haptic",
+                  },
+                },
+                newestProducts: newestProductsResult,
+                mostBoostedProducts: mostBoostedProductsResult,
+                posts: [
+                  ...postsResult.map((post) => {
+                    const strippedMdText = removeMd(post.text);
+                    const twitterText =
+                      strippedMdText.length > 180
+                        ? strippedMdText.substring(0, 180) + "..."
+                        : strippedMdText;
+                    return {
+                      ...post,
+                      text_md: post.text,
+                      twitter_text: twitterText,
+                      text: mdConverter.makeHtml(post.text),
+                      created_at_formatted: dateFmt(post.created_at),
+                    };
+                  }),
+                ],
+                // ord: ord === "newest" ? ord : "boosts",
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+              throw err;
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
+});
+
+app.get("/products", (req, res) => {
   const ord = req.query.ord;
-  const type = req.query.type || "products";
   const PRODUCTS_BROWSABLE_ORDER = products.BROWSABLE_ORDER;
-  const POSTS_BROWSABLE_ORDER = posts.BROWSABLE_ORDER;
 
-  if (type === "products") {
-    const productsActions = products.actions({ db, user: req.user });
-    const order =
-      ord === "newest"
-        ? PRODUCTS_BROWSABLE_ORDER.NEWEST
-        : PRODUCTS_BROWSABLE_ORDER.BOOSTS;
-    productsActions
-      .getBrowsableProducts({
-        order,
-      })
-      .then((result) => {
-        res.render("browse", {
-          meta: {
-            ...defaultMetas,
-            title: "Browse | Haptic",
-            og: {
-              ...defaultMetas.og,
-              title: "Browse | Haptic",
-            },
+  const productsActions = products.actions({ db, user: req.user });
+  const order =
+    ord === "newest"
+      ? PRODUCTS_BROWSABLE_ORDER.NEWEST
+      : PRODUCTS_BROWSABLE_ORDER.BOOSTS;
+  productsActions
+    .getBrowsableProducts({
+      order,
+    })
+    .then((result) => {
+      res.render("products", {
+        meta: {
+          ...defaultMetas,
+          title: "Products | Haptic",
+          og: {
+            ...defaultMetas.og,
+            title: "Products | Haptic",
           },
-          products: result,
-          type: type === "posts" ? type : "products",
-          ord: ord === "newest" ? ord : "boosts",
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        throw err;
+        },
+        products: result,
+        type: "products",
+        ord: ord === "newest" ? ord : "boosts",
       });
-  }
-
-  if (type === "posts") {
-    const postsActions = posts.actions({ db, user: req.user });
-    const order =
-      ord === "newest"
-        ? POSTS_BROWSABLE_ORDER.NEWEST
-        : POSTS_BROWSABLE_ORDER.BOOSTS;
-    postsActions
-      .getBrowsablePosts({
-        order,
-      })
-      .then((result) => {
-        res.render("browse", {
-          meta: {
-            ...defaultMetas,
-            title: "Browse | Haptic",
-            og: {
-              ...defaultMetas.og,
-              title: "Browse | Haptic",
-            },
-          },
-          posts: [
-            ...result.map((post) => {
-              const strippedMdText = removeMd(post.text);
-              const twitterText =
-                strippedMdText.length > 180
-                  ? strippedMdText.substring(0, 180) + "..."
-                  : strippedMdText;
-              return {
-                ...post,
-                text_md: post.text,
-                twitter_text: twitterText,
-                text: mdConverter.makeHtml(post.text),
-                created_at_formatted: dateFmt(post.created_at),
-              };
-            }),
-          ],
-          type: type === "posts" ? type : "products",
-          ord: ord === "newest" ? ord : "boosts",
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        throw err;
-      });
-  }
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
 });
 
 app.get("/terms-of-service", (req, res) => {

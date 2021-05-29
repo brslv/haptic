@@ -21,9 +21,10 @@ import cookieConsent from "./widgets/cookie-consent";
 import waitlistForm from "./widgets/waitlist-form";
 import mobileNav from "./widgets/mobile-nav";
 import postActions from "./widgets/post-actions";
-import browse from "./widgets/browse";
+// import browse from "./widgets/browse";
 import comments from "./widgets/comments";
 import twitter from "./widgets/twitter";
+import products from "./widgets/products";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -48,6 +49,7 @@ cookieConsent();
 waitlistForm();
 mobileNav();
 postActions();
-browse();
+// browse();
 comments();
 twitter();
+products();

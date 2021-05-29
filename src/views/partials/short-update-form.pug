@@ -16,19 +16,14 @@ mixin short-update-form({ mode, isHidden, showCancelPill, showCancelButton, text
           div(class="px-2 py-1 rounded-full absolute bottom-2 right-1 flex items-center justify-center font-medium" style="font-size: 8px;" data-short-update-create-symbols-counter=(mode === 'create') data-short-update-edit-symbols-counter=(mode === 'edit')) 0/1000
           textarea(data-autoresize="3" rows="3" class="textarea w-full" placeholder="Share something great about your product..." data-text)
           p(class="hidden text-red-500 text-xs mb-2" data-error)
-      div(class="flex flex-row-reverse items-center justify-between")
+      div(class="flex flex-row-reverse items-center justify-between mt-2")
         div(class="flex flex-row-reverse items-center")
           button(type="submit" class="btn btn-primary click-scale") Publish
-          button(type="button" class="mr-2 btn btn-text flex items-center click-scale" data-upload-image-btn)
-            span(class="mr-2")
-              +icon('image', { width: '21', height: '21' })
-            span(class="hidden md:block") Attach image
+          button(type="button" class="mr-2 btn btn-text bg-gray-100 hover:bg-gray-200 click-scale" data-upload-image-btn) Attach image
           span(data-image-upload-loader class="hidden mr-2")
             span(class="animate-spin icon-container opacity-75 my-0 block relative")
               +icon("refresh-cw")
         if showCancelButton
           button(data-modal-close type="button" class="btn btn-default click-scale") Cancel
         if showCancelPill
-          button(data-post-type-cancel type="button" class="btn bg-gray-100 rounded-md px-2 py-1.5 text-xs flex items-center click-scale")
-            span Quick update
-            +icon("x", { width: 18, height: 18 })(class="ml-2 bg-gray-200 rounded-full p-1")
+          button(data-post-type-cancel type="button" class="btn btn-text border border-gray-200 hover:border-gray-100 bg-transparent hover:bg-gray-200 click-scale") Close

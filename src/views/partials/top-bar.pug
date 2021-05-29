@@ -1,15 +1,15 @@
 include ./icon.pug
 
 mixin top-bar(activePage)
-    div(class="relative w-full bg-white shadow-sm border-b border-gray-100 mb-8")
+    div(class="relative w-full bg-white shadow-sm border-b border-gray-100 mb-4")
         div(class="container px-4 mx-auto")
-            div(class="flex h-16 items-center justify-between")
+            div(class="flex h-14 items-center justify-between")
                 a(href="/")
                     div(class="flex items-center")
                         img(src="/static/images/logo/logo-main.svg" class="h-8 logo-dark")
                         img(src="/static/images/logo/logo-main-light.svg" class="h-8 logo-light")
                 nav
-                    div(class="h-16 flex md:hidden items-center justify-center")
+                    div(class="h-14 flex md:hidden items-center justify-center")
                       if !user
                         a(
                           href="/browse"
@@ -66,7 +66,7 @@ mixin top-bar(activePage)
 
                     //- desktop
 
-                    ul(class="hidden md:flex items-center h-16 relative")
+                    ul(class="hidden md:flex items-center h-14 relative")
                         if user
                             a(
                               href="/dashboard"
