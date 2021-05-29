@@ -316,13 +316,23 @@ app.use("/queues", authOnly, adminOnly, router); // @TODO: make admin only
 // articles
 app.get("/how-to-build-in-public", async (req, res) => {
   const title = "How to build in public";
+  const description =
+    "A framework for building products in public and engaging with your audience.";
   loadArticleFile("how-to-build-in-public.md")
     .then((content) => {
       return res.render("article", {
-        meta: { ...defaultMetas, title: `${title} | Haptic` },
+        meta: {
+          ...defaultMetas,
+          title: `${title} | Haptic`,
+          description,
+          og: {
+            ...defaultMetas.og,
+            image: `${ROOT_URL}/static/images/articles/how-to-build-in-public/social-image.png`,
+            description,
+          },
+        },
         title,
-        description:
-          "A mental framework for building products in public and engaging with your audience.",
+        description,
         content: mdConverter.makeHtml(content),
         sideSectionTitle: "Insights",
         sideSectionContent: mdConverter.makeHtml(`
