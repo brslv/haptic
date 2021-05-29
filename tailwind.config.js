@@ -21,7 +21,7 @@ module.exports = {
         ...defaultTheme.scale,
       },
       fontFamily: {
-        sans: ["Montserrat", ...defaultTheme.fontFamily.sans],
+        sans: ["Open Sans", ...defaultTheme.fontFamily.sans],
       },
       backgroundColor: {
         twitter: "#1DA1F2",
