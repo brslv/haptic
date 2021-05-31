@@ -5,25 +5,41 @@ mixin short-update-form({ mode, isHidden, showCancelPill, showCancelButton, text
 
   div(data-post-type=`short-update-${mode}` class={ "hidden": isHidden })
     form(class="relative")
+      
       +csrf
       input(type="file" id="image-upload" data-upload-file class="hidden")
       input(type="hidden" name="uploaded_image" value="" data-uploaded)
       input(type="hidden" name="id" value=product.id)
       div(class="border border-gray-300 p-1.5 rounded-md relative mb-2" style="display: none;" data-upload-image-preview)
-      label
-        div(class="relative")
-          div(class="bg-yellow-100 px-2 py-1 rounded-full absolute top-1 right-1 flex items-center justify-center font-medium cursor-help" style="font-size: 8px;" data-tippy-content="Markdown supported") MD
-          div(class="px-2 py-1 rounded-full absolute bottom-2 right-1 flex items-center justify-center font-medium" style="font-size: 8px;" data-short-update-create-symbols-counter=(mode === 'create') data-short-update-edit-symbols-counter=(mode === 'edit')) 0/1000
-          textarea(data-autoresize="3" rows="3" class="textarea w-full" placeholder="Share something great about your product..." data-text)
-          p(class="hidden text-red-500 text-xs mb-2" data-error)
-      div(class="flex flex-row-reverse items-center justify-between mt-2")
+      div(data-form-contents)
+        label
+          div(class="relative")
+            div(class="bg-yellow-100 px-2 py-1 rounded-full absolute top-1 right-1 flex items-center justify-center font-medium cursor-help" style="font-size: 8px;" data-tippy-content="Markdown supported") MD
+            div(class="px-2 py-1 rounded-full absolute bottom-2 right-1 flex items-center justify-center font-medium" style="font-size: 8px;" data-short-update-create-symbols-counter=(mode === 'create') data-short-update-edit-symbols-counter=(mode === 'edit')) 0/1000
+            textarea(data-autoresize="3" rows="3" class="textarea w-full" placeholder="Share something great about your product..." data-text)
+            p(class="hidden text-red-500 text-xs mb-2" data-error)
+      
+      // - preview 
+      div(data-preview class="hidden prose prose-yellow")
+      
+      // - controls
+      div(class="flex flex-row-reverse items-center justify-between -m-4 mt-4 bg-gray-50 px-4 py-2 border-t border-gray-200 rounded-b-md")
         div(class="flex flex-row-reverse items-center")
-          button(type="submit" class="btn btn-primary click-scale") Publish
-          button(type="button" class="mr-2 btn btn-text bg-gray-100 hover:bg-gray-200 click-scale" data-upload-image-btn) Attach image
+          button(type="submit" class="text-sm py-1.5 btn btn-primary border border-yellow-300 hover:border-yellow-400 rounded-md click-scale") Publish
+
+          div(class="text-xs mx-4 text-gray-400") &mdash;
+
+          button(type="button" class="text-sm px-2 py-2 bg-white hover:bg-gray-100 border border-l-0 rounded-r-md click-scale" data-preview-btn data-tippy-content="Preview")
+            +icon("eye", { width: 16, height: 16 })
+          button(type="button" class="hidden text-sm px-2 py-2 bg-blue-50 hover:bg-blue-100 border border-l-0 rounded-r-md click-scale" data-continue-editing-btn data-tippy-content="Continue editing")
+            +icon("eye-off", { width: 16, height: 16 })
+
+          button(type="button" class="text-sm px-2 py-2 bg-white rounded-l-md hover:bg-gray-100 border click-scale" data-upload-image-btn data-tippy-content="Attach image")
+            +icon("image", { width: 16, height: 16 })
+
           span(data-image-upload-loader class="hidden mr-2")
             span(class="animate-spin icon-container opacity-75 my-0 block relative")
-              +icon("refresh-cw")
+              +icon("refresh-cw", { width: 14, height: 14 })
         if showCancelButton
-          button(data-modal-close type="button" class="btn btn-default click-scale") Cancel
-        if showCancelPill
-          button(data-post-type-cancel type="button" class="btn btn-text border border-gray-200 hover:border-gray-100 bg-transparent hover:bg-gray-200 click-scale") Close
+          button(data-modal-close data-post-type-cancel type="button" class="btn px-2 py-2 border border-gray-200 bg-white hover:bg-gray-100 click-scale" data-tippy-content="Cancel quick update")
+            +icon("x", { width: 16, height: 16 })

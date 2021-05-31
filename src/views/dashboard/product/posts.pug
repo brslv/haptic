@@ -53,7 +53,7 @@ block content
             +post-type-btn({ trigger: "roadmap", icon: "map", disabled: true, tooltip: "Soon!", text: "Roadmap" }) 
 
           div
-            +short-update-form({ mode: 'create', isHidden: true, showCancelButton: false, showCancelPill: true })
+            +short-update-form({ mode: 'create', isHidden: true, showCancelButton: true })
       
         div
           +page-title(class="mb-4") Posts
@@ -122,7 +122,7 @@ block content
 block modals
   +modal('edit-post', {}, {
     class: 'mx-auto',
-    style: "width: 90%; min-width: 300px; max-width: 680px;"
+    style: "width: 90%; min-width: 300px; max-width: 570px;"
   })
     div
-      +short-update-form({ mode: 'edit', isHidden: false, showCancelButton: true, showCancelPill: false })
+      +short-update-form({ mode: 'edit', isHidden: false, showCancelButton: true })

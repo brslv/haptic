@@ -1,6 +1,19 @@
 import { $, turbo } from "../utils";
 
 export default function twitter() {
+  function load() {
+    const $els = { $links: $(".prose a") };
+    const twitterLinks = getTwitterLinks($els);
+    setTwitterLinksToLoadingState(twitterLinks);
+
+    if (twttr && twitterLinks && twitterLinks.length) {
+      twttr.ready(function() {
+        twttr.widgets.load();
+        turnTwitterLinksIntoEmbeds($els, twitterLinks);
+      });
+    }
+  }
+
   function turnTwitterLinksIntoEmbeds($els, twitterLinks) {
     const $allLinksOnPage = $els.$links;
 
@@ -54,15 +67,11 @@ export default function twitter() {
   }
 
   turbo.load(() => {
-    const $els = { $links: $(".prose a") };
-    const twitterLinks = getTwitterLinks($els);
-    setTwitterLinksToLoadingState(twitterLinks);
+    load();
+    $(document).on("haptic:post-preview", () => load());
+  });
 
-    if (twttr && twitterLinks && twitterLinks.length) {
-      twttr.ready(function() {
-        twttr.widgets.load();
-        turnTwitterLinksIntoEmbeds($els, twitterLinks);
-      });
-    }
+  turbo.beforeCache(() => {
+    $(document).off("haptic:post-preview", () => load());
   });
 }

@@ -6,13 +6,18 @@ export function registerForm({
   $form,
   $text,
   $symbolsCounter,
+  $previewBtn,
+  $continueEditingBtn,
   $uploadImgBtn,
   $fileUpload,
   onFormSubmit,
   onUploadImageBtnClick,
   onFileSelected,
   onImageUploaded,
+  onPreview,
+  onContinueEditing,
   imageUploadedEventName,
+  formValuesExtractorFn,
 }) {
   $text.on("input", function(e) {
     const value = e.currentTarget.value;
@@ -26,6 +31,8 @@ export function registerForm({
 
     $symbolsCounter.text(`${length}/${MAX_SHORT_UPDATE_TEXT_LENGTH}`);
   });
+  $previewBtn.on("click", () => onPreview());
+  $continueEditingBtn.on("click", () => onContinueEditing());
   $text.trigger("input");
   $form.on("submit", function(e) {
     e.preventDefault();
@@ -39,6 +46,8 @@ export function registerForm({
 }
 
 export function unregisterForm({
+  $previewBtn,
+  $continueEditingBtn,
   $form,
   $text,
   $symbolsCounter,
@@ -51,7 +60,48 @@ export function unregisterForm({
   $fileUpload.off("change");
   $symbolsCounter.text(`0/${MAX_SHORT_UPDATE_TEXT_LENGTH}`);
   $text.off("input");
+  $previewBtn.off("click");
+  $continueEditingBtn.off("click");
   $(document).off(imageUploadedEventName);
+}
+
+export function onPreview({
+  $previewBtn,
+  $continueEditingBtn,
+  formValuesExtractorFn,
+  $previewPost,
+  $formContents,
+}) {
+  // go to preview
+  $previewBtn.addClass("hidden");
+  $continueEditingBtn.removeClass("hidden");
+
+  const formValues = formValuesExtractorFn();
+  const converter = new window.showdown.Converter({
+    noHeaderId: true,
+    simplifiedAutoLink: true,
+    tasklists: true,
+    openLinksInNewWindow: true,
+    emoji: true,
+  });
+  const html = converter.makeHtml(formValues.text);
+  $previewPost.html(html || `<div class="text-gray-500">...</div>`);
+  $previewPost.removeClass("hidden");
+  $formContents.addClass("hidden");
+
+  $(document).trigger("haptic:post-preview");
+}
+
+export function onContinueEditing({
+  $previewBtn,
+  $continueEditingBtn,
+  $previewPost,
+  $formContents,
+}) {
+  $previewBtn.removeClass("hidden");
+  $continueEditingBtn.addClass("hidden");
+  $previewPost.addClass("hidden");
+  $formContents.removeClass("hidden");
 }
 
 export function onFormSubmit({

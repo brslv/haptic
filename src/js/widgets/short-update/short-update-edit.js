@@ -13,19 +13,23 @@ export default function shortUpdateEdit() {
     if (img) shortUpdateUtils.previewImage(img, $els);
     else shortUpdateUtils.clearImagePreview($els);
 
+    const extractorFn = shortUpdateUtils.extractFormValues.bind(null, {
+      $text: $els.$text,
+      $uploadedImg: $els.$uploadedImg,
+      $productIdInput: $els.$productIdInput,
+      $csrf: $els.$csrf,
+    });
+
     shortUpdateUtils.registerForm({
       $form: $els.$form,
       $text: $els.$text,
       $symbolsCounter: $els.$symbolsCounter,
       $uploadImgBtn: $els.$uploadImgBtn,
+      $previewBtn: $els.$previewBtn,
+      $continueEditingBtn: $els.$continueEditingBtn,
       $fileUpload: $els.$fileUpload,
       onFormSubmit: shortUpdateUtils.onFormSubmit.bind(null, {
-        formValuesExtractorFn: shortUpdateUtils.extractFormValues.bind(null, {
-          $text: $els.$text,
-          $uploadedImg: $els.$uploadedImg,
-          $productIdInput: $els.$productIdInput,
-          $csrf: $els.$csrf,
-        }),
+        formValuesExtractorFn: extractorFn,
         validatorFn: shortUpdateUtils.validateFormValues,
         hideErrorsFn: shortUpdateUtils.hideErrors.bind(null, $els),
         showErrorsFn: shortUpdateUtils.showErrors.bind(null, $els),
@@ -57,6 +61,20 @@ export default function shortUpdateEdit() {
       ),
       onFileSelected: shortUpdateUtils.onFileSelected.bind(null, $els),
       onImageUploaded: shortUpdateUtils.onImageUploaded.bind(null, $els),
+      onPreview: shortUpdateUtils.onPreview.bind(null, {
+        $continueEditingBtn: $els.$continueEditingBtn,
+        $previewBtn: $els.$previewBtn,
+        formValuesExtractorFn: extractorFn,
+        $previewPost: $els.$previewPost,
+        $formContents: $els.$formContents,
+      }),
+      onContinueEditing: shortUpdateUtils.onContinueEditing.bind(null, {
+        $previewBtn: $els.$previewBtn,
+        $continueEditingBtn: $els.$continueEditingBtn,
+        formValuesExtractorFn: extractorFn,
+        $previewPost: $els.$previewPost,
+        $formContents: $els.$formContents,
+      }),
       imageUploadedEventName: "haptic:short-update:img-uploaded-edit",
     });
   }
@@ -71,6 +89,8 @@ export default function shortUpdateEdit() {
 
   function clear($els) {
     shortUpdateUtils.unregisterForm({
+      $previewBtn: $els.$previewBtn,
+      $continueEditingBtn: $els.$continueEditingBtn,
       $form: $els.$form,
       $text: $els.$text,
       $symbolsCounter: $els.$symbolsCounter,
@@ -89,6 +109,10 @@ export default function shortUpdateEdit() {
       $csrf: $root.find('input[name="csrf"]'),
       $submit: $root.find(`button[type="submit"]`),
       $uploadImgBtn: $root.find(`[data-upload-image-btn]`),
+      $previewBtn: $root.find(`[data-preview-btn]`),
+      $continueEditingBtn: $root.find(`[data-continue-editing-btn]`),
+      $previewPost: $root.find(`[data-preview]`),
+      $formContents: $root.find(`[data-form-contents]`),
       $text: $root.find("[data-text]"),
       $symbolsCounter: $root.find("[data-short-update-edit-symbols-counter]"),
       $textError: $root.find("[data-error]"),

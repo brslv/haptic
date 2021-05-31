@@ -11,8 +11,8 @@ export default function shortUpdateCreate() {
 
   function open($els) {
     $els.$postTypesContainer
-      .removeClass("p-2 border-yellow-300")
-      .addClass("p-4 border-gray-100 shadow-lg");
+      .removeClass("p-2 border-4 border-yellow-300")
+      .addClass("p-4 border-4 border-gray-100 shadow-lg");
     $els.$root.removeClass("hidden");
     $els.$text.trigger("focus");
     $els.$allTriggers.each(function(i, btn) {
@@ -21,19 +21,23 @@ export default function shortUpdateCreate() {
       $btn.addClass("hidden");
     });
 
+    const extractorFn = shortUpdateUtils.extractFormValues.bind(null, {
+      $text: $els.$text,
+      $uploadedImg: $els.$uploadedImg,
+      $productIdInput: $els.$productIdInput,
+      $csrf: $els.$csrf,
+    });
+
     shortUpdateUtils.registerForm({
       $form: $els.$form,
       $text: $els.$text,
+      $previewBtn: $els.$previewBtn,
+      $continueEditingBtn: $els.$continueEditingBtn,
       $symbolsCounter: $els.$symbolsCounter,
       $uploadImgBtn: $els.$uploadImgBtn,
       $fileUpload: $els.$fileUpload,
       onFormSubmit: shortUpdateUtils.onFormSubmit.bind(null, {
-        formValuesExtractorFn: shortUpdateUtils.extractFormValues.bind(null, {
-          $text: $els.$text,
-          $uploadedImg: $els.$uploadedImg,
-          $productIdInput: $els.$productIdInput,
-          $csrf: $els.$csrf,
-        }),
+        formValuesExtractorFn: extractorFn,
         validatorFn: shortUpdateUtils.validateFormValues,
         hideErrorsFn: shortUpdateUtils.hideErrors.bind(null, $els),
         showErrorsFn: shortUpdateUtils.showErrors.bind(null, $els),
@@ -70,6 +74,20 @@ export default function shortUpdateCreate() {
       ),
       onFileSelected: shortUpdateUtils.onFileSelected.bind(null, $els),
       onImageUploaded: shortUpdateUtils.onImageUploaded.bind(null, $els),
+      onPreview: shortUpdateUtils.onPreview.bind(null, {
+        $previewBtn: $els.$previewBtn,
+        $continueEditingBtn: $els.$continueEditingBtn,
+        formValuesExtractorFn: extractorFn,
+        $previewPost: $els.$previewPost,
+        $formContents: $els.$formContents,
+      }),
+      onContinueEditing: shortUpdateUtils.onContinueEditing.bind(null, {
+        $previewBtn: $els.$previewBtn,
+        $continueEditingBtn: $els.$continueEditingBtn,
+        formValuesExtractorFn: extractorFn,
+        $previewPost: $els.$previewPost,
+        $formContents: $els.$formContents,
+      }),
       imageUploadedEventName: "haptic:short-update:img-uploaded-create",
     });
   }
@@ -84,8 +102,8 @@ export default function shortUpdateCreate() {
   function close($els) {
     // el hidden
     $els.$postTypesContainer
-      .removeClass("p-4 border-gray-100 shadow-lg")
-      .addClass("p-2 border-yellow-300");
+      .removeClass("p-4 border-4 border-gray-100 shadow-lg")
+      .addClass("p-2 border-4 border-yellow-300");
     $els.$trigger.removeClass("bg-gray-100");
     $els.$allTriggers.removeClass("hidden");
     $els.$root.addClass("hidden");
@@ -99,6 +117,8 @@ export default function shortUpdateCreate() {
     $els.$text.val("");
     shortUpdateUtils.clearImagePreview($els);
     shortUpdateUtils.unregisterForm({
+      $previewBtn: $els.$previewBtn,
+      $continueEditingBtn: $els.$continueEditingBtn,
       $form: $els.$form,
       $text: $els.$text,
       $symbolsCounter: $els.$symbolsCounter,
@@ -132,6 +152,10 @@ export default function shortUpdateCreate() {
       $csrf: $root.find('input[name="csrf"]'),
       $submit: $root.find(`button[type="submit"]`),
       $uploadImgBtn: $root.find(`[data-upload-image-btn]`),
+      $previewBtn: $root.find(`[data-preview-btn]`),
+      $continueEditingBtn: $root.find(`[data-continue-editing-btn]`),
+      $previewPost: $root.find(`[data-preview]`),
+      $formContents: $root.find(`[data-form-contents]`),
       $cancelBtn: $root.find(`[data-post-type-cancel]`),
       $text: $root.find("[data-text]"),
       $textError: $root.find("[data-error]"),

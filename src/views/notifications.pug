@@ -31,7 +31,7 @@ mixin notif({ notif })
             +icon("chevrons-up", { width: 14, height: 14 })
         p(class="flex-1")
           | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] boosted your 
-          a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
+          a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold underline hover:no-underline") post
           |.
       if notif.type === 'product_collections'
         div(class="relative mr-4")
