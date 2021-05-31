@@ -32,6 +32,7 @@ const upload = multer({
     acl: "public-read",
     s3,
     bucket: process.env.S3_IMG_UPLOADS_BUCKET,
+    cacheControl: "max-age=31536000",
     metadata: function(req, file, cb) {
       cb(null, { fieldName: "TESTING_METADATA" });
     },
