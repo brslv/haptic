@@ -17,7 +17,13 @@ mixin comment({ img, slug, twitter_name, twitter_screen_name, created_at, conten
           span(data-comment-created-at)= created_at
       p(data-comment-content)= content
 
-mixin post({ product_slug, post_id, post_text_md, post_twitter_text, img, img_url, author_id, user_type, user_slug, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false, comments = [] })
+mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_text, img, img_url, author_id, user_type, user_slug, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false, comments = [], show_posted_in_tag = false })
+
+  if show_posted_in_tag && product_slug && product_name
+    div(class="relative mx-4 text-sm")
+      div(class="absolute w-6 h-4 bottom-0 left-0 border-t border-l rounded-tl-md border-gray-300")
+      p(class="ml-8 pb-1") Posted in #[a(href=`/p/${product_slug}` class="underline hover:no-underline")= product_name]
+      
   div(class="post p-4 rounded-md bg-white border border-gray-100 shadow-sm mb-4 transition hover:shadow-md" data-post-id=post_id)
     div(class="flex flex-col-reverse sm:flex-row sm:items-center justify-between mb-4")
       div(class="flex items-center mb-4 sm:mb-0")

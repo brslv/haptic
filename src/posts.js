@@ -168,6 +168,7 @@ function actions({ db, user }) {
             "posts.user_id as user_id",
             "posts_text.text",
             "products.slug as product_slug",
+            "products.name as product_name",
             "products.is_public",
             "products.is_listed",
             "users.type as user_type",

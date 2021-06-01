@@ -38,32 +38,6 @@ block content
               boosts_count: product.boosts_count,
               description: product.description
             })
-      else if posts && posts.length
-        div(class="md:w-2/3 mx-auto")
-          +controls
-          each post in posts
-            +post({
-              author_id: post.user_id,
-              product_slug: post.product_slug,
-              post_id: post.id,
-              post_text_md: post.text_md,
-              post_twitter_text: post.twitter_text,
-              img: post.user_twitter_profile_image_url,
-              img_url: post.image_url,
-              user_type: post.user_type,
-              user_slug: post.user_slug,
-              twitter_name: post.user_twitter_name,
-              twitter_screen_name: post.user_twitter_screen_name,
-              date_str: post.created_at_formatted,
-              show_opts: false,
-              show_view_btn: true,
-              boosts_count: post.boosts_count,
-              disable_boost_btn: !user,
-              trigger_login_modal: !user,
-              comments: post.comments,
-            }) !{post.text}
-
-          p(class="text-gray-500 text-center text-sm") Post listing is limited to 24 items only.
 
 block modals
   if !user

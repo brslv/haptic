@@ -19,6 +19,7 @@ block content
             +post({
               author_id: post.user_id,
               product_slug: post.product_slug,
+              product_name: post.product_name,
               post_id: post.id,
               post_text_md: post.text_md,
               post_twitter_text: post.twitter_text,
@@ -35,6 +36,7 @@ block content
               disable_boost_btn: !user,
               trigger_login_modal: !user,
               comments: post.comments,
+              show_posted_in_tag: true,
             }) !{post.text}
           p(class="text-gray-500 text-center text-sm") Post listing is limited to 24 items only.
 

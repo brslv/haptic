@@ -372,13 +372,13 @@ app.get("/browse", (req, res) => {
       productsActions
         .getBrowsableProducts({
           order: products.BROWSABLE_ORDER.NEWEST,
-          limit: 5,
+          limit: 8,
         })
         .then((newestProductsResult) => {
           productsActions
             .getBrowsableProducts({
               order: products.BROWSABLE_ORDER.BOOSTS,
-              limit: 5,
+              limit: 8,
             })
             .then((mostBoostedProductsResult) => {
               res.render("browse", {
