@@ -1,4 +1,4 @@
-import { $, turbo, req } from "../utils";
+import { $, turbo, req, mdConverter } from "../utils";
 
 export default function comments() {
   function load($els) {
@@ -75,7 +75,9 @@ export default function comments() {
             .find("[data-comment-author-twitter-screen-name]")
             .text(authorTwitterScreenName);
           $comment.find("[data-comment-created-at]").text("Now");
-          $comment.find("[data-comment-content]").text(details.content);
+          $comment
+            .find("[data-comment-content]")
+            .html(mdConverter.makeHtml(details.content));
           $commentsContainer.append($comment);
 
           $content.val("");

@@ -20,7 +20,6 @@ const products = require("./products");
 const comments = require("./comments");
 const upload = require("./img-upload");
 const singleUpload = upload.single("image");
-const showdown = require("showdown");
 const notifications = require("./notifications");
 const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
@@ -29,7 +28,7 @@ const validateUrl = require("valid-url");
 const queues = require("./queues");
 const { createBullBoard } = require("bull-board");
 const { BullAdapter } = require("bull-board/bullAdapter");
-const { dateFmt, loadArticleFile } = require("./utils");
+const { dateFmt, loadArticleFile, mdConverter } = require("./utils");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -236,13 +235,6 @@ const csrfProtected = (req, res, next) => {
 
   next();
 };
-const mdConverter = new showdown.Converter({
-  noHeaderId: true,
-  simplifiedAutoLink: true,
-  tasklists: true,
-  openLinksInNewWindow: true,
-  emoji: true,
-});
 const isAjaxCall = (req) =>
   req.headers["accept"] && req.headers["accept"].includes("application/json");
 const ajaxOnly = (req, res, next) => {

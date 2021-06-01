@@ -1,6 +1,14 @@
 import * as Turbo from "@hotwired/turbo";
 import $ from "cash-dom";
 
+const mdConverter = new window.showdown.Converter({
+  noHeaderId: true,
+  simplifiedAutoLink: true,
+  tasklists: true,
+  openLinksInNewWindow: true,
+  emoji: true,
+});
+
 const turbo = {
   actions: {
     visit(...data) {
@@ -41,4 +49,4 @@ function req(url, data, opts) {
     });
 }
 
-export { $, turbo, req };
+export { $, turbo, req, mdConverter };

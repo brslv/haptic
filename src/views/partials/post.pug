@@ -15,7 +15,7 @@ mixin comment({ img, slug, twitter_name, twitter_screen_name, created_at, conten
           span(class="mr-2")
             +icon("clock", { width: '12', height: '12' })
           span(data-comment-created-at)= created_at
-      p(data-comment-content)= content
+      div(class="comment prose prose-sm prose-yellow" data-comment-content) !{content}
 
 mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_text, img, img_url, author_id, user_type, user_slug, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false, comments = [], show_posted_in_tag = false })
 

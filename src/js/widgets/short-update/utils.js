@@ -1,4 +1,4 @@
-import { $, req } from "../../utils";
+import { $, req, mdConverter } from "../../utils";
 
 const MAX_SHORT_UPDATE_TEXT_LENGTH = 1000;
 
@@ -77,13 +77,7 @@ export function onPreview({
   $continueEditingBtn.removeClass("hidden");
 
   const formValues = formValuesExtractorFn();
-  const converter = new window.showdown.Converter({
-    noHeaderId: true,
-    simplifiedAutoLink: true,
-    tasklists: true,
-    openLinksInNewWindow: true,
-    emoji: true,
-  });
+  const converter = mdConverter;
   const html = converter.makeHtml(formValues.text);
   $previewPost.html(html || `<div class="text-gray-500">...</div>`);
   $previewPost.removeClass("hidden");

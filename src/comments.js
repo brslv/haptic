@@ -1,5 +1,5 @@
 const { cache, cacheKeys, ttl } = require("./cache");
-const { dateFmt } = require("./utils");
+const { dateFmt, mdConverter } = require("./utils");
 
 function actions({ db, user }) {
   function _addComment({ commentAuthorId, content, postId }) {
@@ -37,10 +37,15 @@ function actions({ db, user }) {
         .orderBy("comments.created_at", "asc")
         .then((result) => {
           res([
-            ...result.map((comment) => ({
-              ...comment,
-              created_at_formatted: dateFmt(comment.created_at),
-            })),
+            ...result.map((comment) => {
+              const content = mdConverter.makeHtml(comment.content);
+              return {
+                ...comment,
+                content_md: comment.content,
+                content,
+                created_at_formatted: dateFmt(comment.created_at),
+              };
+            }),
           ]);
         })
         .catch((err) => {
