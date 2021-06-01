@@ -1,5 +1,6 @@
 const day = require("dayjs");
 const { cache, cacheKeys, ttl } = require("./cache");
+const { mdConverter } = require("./utils");
 
 const POST_BOOSTS_TYPE = "post_boosts";
 const PRODUCT_COLLECTIONS_TYPE = "product_collections";
@@ -437,6 +438,8 @@ function actions({ db, user }) {
         .orderBy("notifications.created_at", "DESC")
         .then((result) => {
           const notifications = result.map((notif) => {
+            notif.comment_content_md = notif.content;
+            notif.comment_content = mdConverter.makeHtml(notif.comment_content);
             notif.created_at_formatted = dateFmt(notif.created_at);
             return notif;
           });
