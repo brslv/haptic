@@ -9,7 +9,7 @@ const BROWSABLE_ORDER = {
 };
 
 function actions({ db, user }) {
-  function getProductBySlug({ slug }) {
+  function getProductBySlug({ slug, user_id }) {
     return new Promise((res, rej) => {
       const cached = cache.get(cacheKeys.product(slug));
       if (cached) {
@@ -18,7 +18,7 @@ function actions({ db, user }) {
       return db
         .select()
         .table("products")
-        .where({ slug })
+        .where({ slug, user_id })
         .first()
         .then((result) => {
           cache.set(cacheKeys.product(slug), result, ttl[2]);

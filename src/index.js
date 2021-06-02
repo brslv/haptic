@@ -518,7 +518,7 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
   const slug = req.params.slug;
   const productsActions = products.actions({ db, user: req.user });
   productsActions
-    .getProductBySlug({ slug })
+    .getProductBySlug({ slug, user_id: req.user.id })
     .then((productResult) => {
       if (!productResult) {
         return res.status(404).render("404", {
@@ -591,7 +591,7 @@ app.get(
     const productsActions = products.actions({ db, user: req.user });
 
     productsActions
-      .getProductBySlug({ slug })
+      .getProductBySlug({ slug, user_id: req.user.id })
       .then((result) => {
         if (!result) {
           return res.status(404).render("404", {
