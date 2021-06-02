@@ -36,6 +36,7 @@ export default function comments() {
     );
     const authorSlug = $submittedForm.data("comment-author-slug");
     const authorImage = $submittedForm.data("comment-author-img");
+    const authorType = $submittedForm.data("comment-author-type");
     const postAuthorId = $submittedForm.data("post-author-id");
     const $commentsContainer = $(
       `[data-comments-container][data-post-id="${postId}"]`
@@ -66,7 +67,12 @@ export default function comments() {
           const commentId = `comment_${details.id}`;
 
           $comment.attr("id", commentId);
-          $comment.find("[data-comment-author-img]").attr("src", authorImage);
+          $comment
+            .find("[data-comment-author-img]")
+            .attr("src", authorImage)
+            .addClass(
+              authorType === 1 ? "border-4 border-double border-yellow-300" : ""
+            );
           $comment
             .find("[data-comment-author-link]")
             .attr("href", `/u/${authorSlug}`)

@@ -1,9 +1,9 @@
 include ./page-title.pug
 include ./icon.pug
 
-mixin comment({ img, slug, twitter_name, twitter_screen_name, created_at, content })
+mixin comment({ img, type, slug, twitter_name, twitter_screen_name, created_at, content })
   div(class="flex items-start mt-4 p-4 border border-gray-200 rounded-md border-dashed")
-    img(src=img class="w-10 h-10 rounded-full mr-2" data-comment-author-img)
+    img(src=img class={"w-10 h-10 rounded-full mr-2": true, "border-4 border-double border-yellow-300": type === USER_TYPES.CREATOR} data-comment-author-img)
     div
       a(href=`/u/${slug}` class="font-bold mb-2 underline hover:no-underline" data-comment-author-link)= twitter_name
       div(class="flex items-center text-xs text-gray-600 dark:text-gray-400 mb-2")
@@ -121,6 +121,7 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
           data-comment-form
           data-post-id=post_id
           data-comment-author-name=user.twitter_name
+          data-comment-author-type=user.type
           data-comment-author-twitter-screen-name=user.twitter_screen_name
           data-comment-author-img=user.twitter_profile_image_url
           data-comment-author-slug=user.slug
@@ -134,6 +135,7 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
       each comment in comments
         +comment({
           img: comment.author_twitter_profile_image_url,
+          type: comment.author_type,
           slug: comment.author_slug,
           twitter_name: comment.author_twitter_name,
           twitter_screen_name: comment.author_twitter_screen_name,
@@ -144,6 +146,7 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
     template(data-comment-tpl)
       +comment({
         img: '',
+        type: USER_TYPES.CREATOR_LITE,
         slug: '',
         twitter_name: '',
         twitter_screen_name: '',
