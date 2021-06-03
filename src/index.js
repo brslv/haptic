@@ -693,6 +693,8 @@ app.post(
           });
         }
 
+        delete input.csrf;
+
         productsActions
           .updateProduct({ slug, input })
           .then((result) => {
@@ -1713,7 +1715,6 @@ app.post(
             input: { cover_image_url: url },
           })
           .then((result) => {
-            console.log("update result", result);
             res.json({ ok: 1, err: null, details: null });
           })
           .catch((err) => {
