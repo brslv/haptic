@@ -44,15 +44,15 @@ function actions({ db, user }) {
   }
 
   function updateProduct({ slug, input }) {
+    const data = { ...input, updated_at: new Date() };
+    if (input.is_public) data.is_public = input.is_public === "on";
+    if (input.is_listed) data.is_listed = input.is_listed === "on";
+
     return new Promise((res, rej) => {
       db("products")
         .where({ slug, user_id: user.id })
         .update({
-          name: input.name,
-          description: input.description,
-          website: input.website,
-          is_public: input.is_public === "on",
-          is_listed: input.is_listed === "on",
+          ...data,
         })
         .then((result) => {
           cache.del(cacheKeys.product(slug));
@@ -83,6 +83,7 @@ function actions({ db, user }) {
           "products.name",
           "products.slug",
           "products.description",
+          "products.cover_image_url",
           "users.id as user_id",
           "users.type as user_type",
           "users.slug as user_slug",

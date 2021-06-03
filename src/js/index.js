@@ -25,6 +25,7 @@ import postActions from "./widgets/post-actions";
 import comments from "./widgets/comments";
 import twitter from "./widgets/twitter";
 import products from "./widgets/products";
+import coverImage from "./widgets/cover-image";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -53,3 +54,4 @@ postActions();
 comments();
 twitter();
 products();
+coverImage();

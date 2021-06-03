@@ -18,8 +18,7 @@ const posts = require("./posts");
 const boosts = require("./boosts");
 const products = require("./products");
 const comments = require("./comments");
-const upload = require("./img-upload");
-const singleUpload = upload.single("image");
+const { upload, uploadCover } = require("./img-upload");
 const notifications = require("./notifications");
 const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
@@ -29,6 +28,9 @@ const queues = require("./queues");
 const { createBullBoard } = require("bull-board");
 const { BullAdapter } = require("bull-board/bullAdapter");
 const { dateFmt, loadArticleFile, mdConverter } = require("./utils");
+
+const singleUpload = upload.single("image");
+const singleCoverUpload = uploadCover.single("image");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -207,6 +209,12 @@ app.use((req, res, next) => {
 app.use(flash({ sessionKeyName: SID }));
 
 // helpers / middlewares
+const predefinedCovers = [
+  "https://hpt-assets.s3.eu-central-1.amazonaws.com/cover-1.jpg",
+  "https://hpt-assets.s3.eu-central-1.amazonaws.com/cover-2.jpg",
+  "https://hpt-assets.s3.eu-central-1.amazonaws.com/cover-3.jpg",
+  "https://hpt-assets.s3.eu-central-1.amazonaws.com/cover-4.jpg",
+];
 const setupCsrf = (req, res, next) => {
   if (req.session.csrf === undefined) {
     req.session.csrf = randomBytes(100).toString("base64"); // convert random data to a string
@@ -624,6 +632,7 @@ app.get(
               action: `/dashboard/product/${slug}/delete`,
             },
           },
+          predefinedCovers,
           flash,
         });
       })
@@ -854,6 +863,7 @@ app.get("/p/:slug", (req, res, next) => {
     "products.website",
     "products.is_public",
     "products.is_listed",
+    "products.cover_image_url",
     "products.created_at as product_created_at",
     "products.updated_at as product_updated_at",
     "users.id as user_id",
@@ -913,6 +923,7 @@ app.get("/p/:slug", (req, res, next) => {
                         title: `${result.name} | Haptic`,
                       },
                     },
+                    predefinedCovers,
                     product: { ...result },
                     boosts: boostsResult,
                     posts: [
@@ -1644,6 +1655,74 @@ app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
     res.json({ ok: 1, err: null, details: { url: req.file.location } });
   });
 });
+
+app.post(
+  "/upload-cover",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  (req, res, next) => {
+    singleCoverUpload(req, res, function handleUpload(err) {
+      if (err && err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({
+          ok: 0,
+          err:
+            "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+          details: { max: "2MB" },
+        });
+      }
+
+      if (err) {
+        next(err);
+        return;
+      }
+
+      const productsActions = products.actions({ db, user: req.user });
+      const slug = req.body.slug;
+
+      productsActions
+        .updateProduct({ slug, input: { cover_image_url: req.file.location } })
+        .then((result) => {
+          res.json({ ok: 1, err: null, details: { url: req.file.location } });
+        })
+        .catch((err) => {
+          console.log(err);
+          next(err);
+        });
+    });
+  }
+);
+
+app.post(
+  "/choose-predefined-cover",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  (req, res, next) => {
+    const url = req.body.url;
+    const slug = req.body.slug;
+    const productsActions = products.actions({ db, user: req.user });
+
+    productsActions
+      .getProductBySlug({ slug, user_id: req.user.id })
+      .then((product) => {
+        console.log(product);
+        productsActions
+          .updateProduct({
+            slug,
+            input: { cover_image_url: url },
+          })
+          .then((result) => {
+            console.log("update result", result);
+            res.json({ ok: 1, err: null, details: null });
+          })
+          .catch((err) => {
+            console.log(err);
+            throw err;
+          });
+      });
+  }
+);
 
 app.post(
   "/product/:slug/tool",

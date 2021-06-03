@@ -10,9 +10,16 @@ block append scripts
   +require-module('product')
 
 block content
+  - var cover = product.cover_image_url || predefinedCovers[0];
   +top-bar
-  div(class="bg-white py-32 pb-56 -mt-8 -mb-24")
-    div(class="container mx-auto p-4")
+  div(class="bg-white h-96 -mt-8 -mb-24 border-b border-gray-100" style=`background-image: url("${cover}"); background-size: cover; background-position: center;`)
+
+  div(class="container mx-auto p-4")
+
+    // - header
+    div(class="container mx-auto px-4 py-8 rounded-md shadow-sm mb-4 bg-white ring-8 ring-yellow-50 ring-opacity-40 border border-gray-100 relative")
+      //- div(class="bg-white rounded-md shadow-lg overflow-hidden w-24 h-24 absolute -top-12 left-1/2 border-4 border-white flex items-center justify-center" style=`transform: translateX(-50%); background-image: url("${"/static/images/logo/haptic-twitter-avatar.png"}"); background-position: center; background-size: cover;`)
+      // - use mt-10
       div(class="flex flex-col items-center justify-center" data-product-slug=product.slug data-product-boosts-count=boosts.length)
         if !product.is_public
           div(class="mb-8")
@@ -27,12 +34,8 @@ block content
           h2(class="font-light text-gray-600 text-xl sm:text-2xl text-center" style="max-width: 42ch;")= product.description
         else
           div(class="font-medium text-xl text-gray-600") No product description, yet.
-        //- if product.website
-        //-   p(class="flex items-center mt-8")
-        //-     a(class="text-yellow-400 underline hover:no-underline font-medium mr-2" href=product.website target="_blank" rel="noreferrer noopener") Visit website
-        //-     +icon("external-link", { width: 16, height: 16, stroke: 'primaryDark' })
 
-  div(class="container mx-auto p-4")
+    // - content
     div(class="flex flex-col-reverse md:flex-row items-start")
 
       main(id="product-main" class="mr-0 w-full md:w-4/6 md:mr-4")

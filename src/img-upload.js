@@ -33,13 +33,24 @@ const upload = multer({
     s3,
     bucket: process.env.S3_IMG_UPLOADS_BUCKET,
     cacheControl: "max-age=31536000",
-    metadata: function(req, file, cb) {
-      cb(null, { fieldName: "TESTING_METADATA" });
-    },
     key: function(req, file, cb) {
       cb(null, Date.now().toString());
     },
   }),
 });
 
-module.exports = upload;
+const uploadCover = multer({
+  fileFilter,
+  limits: { fileSize: maxSize },
+  storage: multerS3({
+    acl: "public-read",
+    s3,
+    bucket: process.env.S3_COVER_IMG_UPLOADS_BUCKET,
+    cacheControl: "max-age=31536000",
+    key: function(req, file, cb) {
+      cb(null, Date.now().toString());
+    },
+  }),
+});
+
+module.exports = { upload, uploadCover };
