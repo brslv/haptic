@@ -1708,7 +1708,6 @@ app.post(
     productsActions
       .getProductBySlug({ slug, user_id: req.user.id })
       .then((product) => {
-        console.log(product);
         productsActions
           .updateProduct({
             slug,
