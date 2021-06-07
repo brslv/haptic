@@ -20,7 +20,7 @@ block content
     div(class="container mx-auto px-4 py-8 rounded-md shadow-sm mb-4 bg-white border border-gray-100 relative")
       if product.logo_url
         a(href=`/p/${product.slug}`)
-          div(class="bg-white rounded-xl shadow-lg overflow-hidden w-20 h-20 absolute -top-10 left-1/2 flex items-center justify-center" style=`transform: translateX(-50%); background-image: url("${product.logo_url}"); background-position: center; background-size: cover;`)
+          div(class="bg-white rounded-xl shadow-lg overflow-hidden w-20 h-20 absolute -top-10 left-1/2 flex items-center justify-center" style=`transform: translateX(-50%); background-image: url("${product.logo_url}"); background-position: center; background-size: contain;`)
       // - use mt-10
       div(class={"flex flex-col items-center justify-center": true, "mt-8": product.logo_url} data-product-slug=product.slug data-product-boosts-count=boosts.length)
         if !product.is_public
