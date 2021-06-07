@@ -84,6 +84,7 @@ function actions({ db, user }) {
           "products.slug",
           "products.description",
           "products.cover_image_url",
+          "products.logo_url",
           "users.id as user_id",
           "users.type as user_type",
           "users.slug as user_slug",

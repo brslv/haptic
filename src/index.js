@@ -18,7 +18,7 @@ const posts = require("./posts");
 const boosts = require("./boosts");
 const products = require("./products");
 const comments = require("./comments");
-const { upload, uploadCover } = require("./img-upload");
+const { upload, uploadCover, uploadLogo } = require("./img-upload");
 const notifications = require("./notifications");
 const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
@@ -31,6 +31,7 @@ const { dateFmt, loadArticleFile, mdConverter } = require("./utils");
 
 const singleUpload = upload.single("image");
 const singleCoverUpload = uploadCover.single("image");
+const singleLogoUpload = uploadLogo.single("image");
 
 console.log({ env: process.env.NODE_ENV });
 
@@ -304,6 +305,7 @@ const injectEnv = (req, res, next) => {
   res.locals.isDev = IS_DEV;
   res.locals.isProd = IS_PROD;
   res.locals.isStage = IS_STAGE;
+  res.locals.predefinedCovers = predefinedCovers;
   next();
 };
 app.use(injectEnv);
@@ -866,6 +868,7 @@ app.get("/p/:slug", (req, res, next) => {
     "products.is_public",
     "products.is_listed",
     "products.cover_image_url",
+    "products.logo_url",
     "products.created_at as product_created_at",
     "products.updated_at as product_updated_at",
     "users.id as user_id",
@@ -1691,6 +1694,32 @@ app.post(
           console.log(err);
           next(err);
         });
+    });
+  }
+);
+
+app.post(
+  "/upload-logo",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  (req, res, next) => {
+    singleLogoUpload(req, res, function handleUpload(err) {
+      if (err && err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({
+          ok: 0,
+          err:
+            "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+          details: { max: "2MB" },
+        });
+      }
+
+      if (err) {
+        next(err);
+        return;
+      }
+
+      res.json({ ok: 1, err: null, details: { url: req.file.location } });
     });
   }
 );

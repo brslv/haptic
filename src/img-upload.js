@@ -53,4 +53,18 @@ const uploadCover = multer({
   }),
 });
 
-module.exports = { upload, uploadCover };
+const uploadLogo = multer({
+  fileFilter,
+  limits: { fileSize: maxSize },
+  storage: multerS3({
+    acl: "public-read",
+    s3,
+    bucket: process.env.S3_LOGO_UPLOADS_BUCKET,
+    cacheControl: "max-age=31536000",
+    key: function(req, file, cb) {
+      cb(null, Date.now().toString());
+    },
+  }),
+});
+
+module.exports = { upload, uploadCover, uploadLogo };

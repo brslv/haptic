@@ -26,6 +26,7 @@ import comments from "./widgets/comments";
 import twitter from "./widgets/twitter";
 import products from "./widgets/products";
 import coverImage from "./widgets/cover-image";
+import productLogo from "./widgets/product-logo";
 
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
@@ -55,3 +56,4 @@ comments();
 twitter();
 products();
 coverImage();
+productLogo();

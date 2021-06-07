@@ -17,10 +17,12 @@ block content
   div(class="container mx-auto p-4")
 
     // - header
-    div(class="container mx-auto px-4 py-8 rounded-md shadow-sm mb-4 bg-white ring-8 ring-yellow-50 ring-opacity-40 border border-gray-100 relative")
-      //- div(class="bg-white rounded-md shadow-lg overflow-hidden w-24 h-24 absolute -top-12 left-1/2 border-4 border-white flex items-center justify-center" style=`transform: translateX(-50%); background-image: url("${"/static/images/logo/haptic-twitter-avatar.png"}"); background-position: center; background-size: cover;`)
+    div(class="container mx-auto px-4 py-8 rounded-md shadow-sm mb-4 bg-white border border-gray-100 relative")
+      if product.logo_url
+        a(href=`/p/${product.slug}`)
+          div(class="bg-white rounded-xl shadow-lg overflow-hidden w-20 h-20 absolute -top-10 left-1/2 flex items-center justify-center" style=`transform: translateX(-50%); background-image: url("${product.logo_url}"); background-position: center; background-size: cover;`)
       // - use mt-10
-      div(class="flex flex-col items-center justify-center" data-product-slug=product.slug data-product-boosts-count=boosts.length)
+      div(class={"flex flex-col items-center justify-center": true, "mt-8": product.logo_url} data-product-slug=product.slug data-product-boosts-count=boosts.length)
         if !product.is_public
           div(class="mb-8")
             span(class="flex text-xs flex items-center")
@@ -29,9 +31,9 @@ block content
               span(class="flex items-center border-b-4 border-purple-400")
                 span(class="mr-2") Private
                 +icon("info", { width: 12, height: 12 })(data-tippy-content="This product is private, which means that only you can see it. To make it public go to its settings and check the 'Public' checkbox.")
-        h1(class="font-bold text-3xl sm:text-5xl mb-4 text-center")= product.name
+        h1(class="font-bold text-2xl sm:text-4xl mb-4 text-center")= product.name
         if product.description
-          h2(class="font-light text-gray-600 text-xl sm:text-2xl text-center" style="max-width: 42ch;")= product.description
+          h2(class="font-light text-gray-600 text-lg sm:text-xl text-center" style="max-width: 42ch;")= product.description
         else
           div(class="font-medium text-xl text-gray-600") No product description, yet.
 
