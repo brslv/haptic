@@ -1,25 +1,17 @@
-import { $, turbo, req } from "../../utils";
+import { $, turbo, req } from "../../../utils";
 import * as shortUpdateUtils from "./utils";
 
-export default function shortUpdateCreate() {
-  function activate($els) {
-    if ($els.$root.hasClass("hidden")) {
-      open($els);
-      registerCancel($els);
-    }
-  }
+export default function shortUpdateEdit() {
+  function activate($els, $triggerEl) {
+    const postId = $triggerEl.data("post-id");
+    const text = $triggerEl.data("text");
+    const img = $triggerEl.data("img");
 
-  function open($els) {
-    $els.$postTypesContainer
-      .removeClass("p-2 border-4 border-yellow-300")
-      .addClass("p-4 border-4 border-gray-100 shadow-lg");
-    $els.$root.removeClass("hidden");
-    $els.$text.trigger("focus");
-    $els.$allTriggers.each(function(i, btn) {
-      const $btn = $(btn);
-      if ($btn.data("post-type-trigger-no-hide") !== undefined) return;
-      $btn.addClass("hidden");
-    });
+    // populate the update form
+    $els.$text.val(text);
+    if (img) $els.$uploadedImg.val(img);
+    if (img) shortUpdateUtils.previewImage(img, $els);
+    else shortUpdateUtils.clearImagePreview($els);
 
     const extractorFn = shortUpdateUtils.extractFormValues.bind(null, {
       $text: $els.$text,
@@ -31,27 +23,22 @@ export default function shortUpdateCreate() {
     shortUpdateUtils.registerForm({
       $form: $els.$form,
       $text: $els.$text,
-      $previewBtn: $els.$previewBtn,
-      $continueEditingBtn: $els.$continueEditingBtn,
       $symbolsCounter: $els.$symbolsCounter,
       $uploadImgBtn: $els.$uploadImgBtn,
+      $previewBtn: $els.$previewBtn,
+      $continueEditingBtn: $els.$continueEditingBtn,
       $fileUpload: $els.$fileUpload,
       onFormSubmit: shortUpdateUtils.onFormSubmit.bind(null, {
         formValuesExtractorFn: extractorFn,
         validatorFn: shortUpdateUtils.validateFormValues,
         hideErrorsFn: shortUpdateUtils.hideErrors.bind(null, $els),
         showErrorsFn: shortUpdateUtils.showErrors.bind(null, $els),
-        requestFn: request,
+        requestFn: request.bind(null, postId),
         onOk: function ok(response) {
           const data = response.data;
-          const details = data.details;
           if (data.ok) {
-            const post = details.post;
-            // we use this flag to preserve the open state of the short update form
-            // after the turbo visit reload of the page.
-            window._keepShortUpdateOpen = true;
             $(document).trigger("haptic:add-toast", {
-              content: "Post published successfully 🎉",
+              content: "Post updated successfully 🎉",
               type: "success",
             });
             turbo.actions.visit(window.location.pathname, {
@@ -75,8 +62,8 @@ export default function shortUpdateCreate() {
       onFileSelected: shortUpdateUtils.onFileSelected.bind(null, $els),
       onImageUploaded: shortUpdateUtils.onImageUploaded.bind(null, $els),
       onPreview: shortUpdateUtils.onPreview.bind(null, {
-        $previewBtn: $els.$previewBtn,
         $continueEditingBtn: $els.$continueEditingBtn,
+        $previewBtn: $els.$previewBtn,
         formValuesExtractorFn: extractorFn,
         $previewPost: $els.$previewPost,
         $formContents: $els.$formContents,
@@ -88,34 +75,19 @@ export default function shortUpdateCreate() {
         $previewPost: $els.$previewPost,
         $formContents: $els.$formContents,
       }),
-      imageUploadedEventName: "haptic:short-update:img-uploaded-create",
+      imageUploadedEventName: "haptic:short-update:img-uploaded-edit",
     });
   }
 
-  function registerCancel($els) {
-    $els.$cancelBtn.on("click", function() {
-      close($els);
-      $(this).off("click");
-    });
-  }
-
-  function close($els) {
-    // el hidden
-    $els.$postTypesContainer
-      .removeClass("p-4 border-4 border-gray-100 shadow-lg")
-      .addClass("p-2 border-4 border-yellow-300");
-    $els.$trigger.removeClass("bg-gray-100");
-    $els.$allTriggers.removeClass("hidden");
-    $els.$root.addClass("hidden");
-    $(document).off("haptic:short-update-img-uploaded");
-    $els.$form.off("submit");
-    $els.$uploadImgBtn.off("click");
-    $els.$fileUpload.off("change");
+  function request(postId, data, opts) {
+    return req(
+      `/post/${postId}`,
+      data,
+      Object.assign(opts, { method: "post" })
+    );
   }
 
   function clear($els) {
-    $els.$text.val("");
-    shortUpdateUtils.clearImagePreview($els);
     shortUpdateUtils.unregisterForm({
       $previewBtn: $els.$previewBtn,
       $continueEditingBtn: $els.$continueEditingBtn,
@@ -124,31 +96,16 @@ export default function shortUpdateCreate() {
       $symbolsCounter: $els.$symbolsCounter,
       $uploadImgBtn: $els.$uploadImgBtn,
       $fileUpload: $els.$fileUpload,
-      imageUploadedEventName: "haptic:short-update:img-uploaded-create",
+      imageUploadedEventName: "haptic:short-update:img-uploaded-edit",
     });
-  }
-
-  function request(data, opts) {
-    return req(
-      `/post/${data.productId}/text`,
-      data,
-      Object.assign(opts, { method: "post" })
-    );
   }
 
   let $els = {};
   turbo.load(() => {
-    const $allTriggers = $("[data-post-type-trigger]");
-    const $root = $(`[data-post-type="short-update-create"]`);
-    const $trigger = $(`[data-post-type-trigger="short-update-create"]`);
-    const $postTypesContainer = $("[data-post-types-container]");
+    const $root = $(`[data-post-type="short-update-edit"]`);
     $els = {
       $root,
-      $trigger,
-      $allTriggers,
-      $postTypesContainer,
       $form: $root.find("form"),
-      $symbolsCounter: $root.find("[data-short-update-create-symbols-counter]"),
       $csrf: $root.find('input[name="csrf"]'),
       $submit: $root.find(`button[type="submit"]`),
       $uploadImgBtn: $root.find(`[data-upload-image-btn]`),
@@ -156,8 +113,8 @@ export default function shortUpdateCreate() {
       $continueEditingBtn: $root.find(`[data-continue-editing-btn]`),
       $previewPost: $root.find(`[data-preview]`),
       $formContents: $root.find(`[data-form-contents]`),
-      $cancelBtn: $root.find(`[data-post-type-cancel]`),
       $text: $root.find("[data-text]"),
+      $symbolsCounter: $root.find("[data-short-update-edit-symbols-counter]"),
       $textError: $root.find("[data-error]"),
       $uploadedImg: $root.find("[data-uploaded]"),
       $loader: $root.find("[data-image-upload-loader]"),
@@ -166,20 +123,25 @@ export default function shortUpdateCreate() {
       $postsContainer: $root.find("[data-posts-container]"),
       $noPostsMsg: $root.find("[data-no-posts-msg]"),
       $productIdInput: $root.find("input[name=id]"),
-      $postTpl: $("[data-post-tpl]"),
     };
 
-    $trigger.on("click", activate.bind(null, $els));
-    if (window._keepShortUpdateOpen) {
-      window._keepShortUpdateOpen = false;
-      activate($els);
-    }
+    $(document).on("haptic:modal-open", function onModalOpen(e, data) {
+      const { $modal, $triggerEl, modalName } = data;
+      if (modalName === "edit-post") {
+        activate($els, $triggerEl);
+        if ($els.$text) $els.$text.trigger("focus").trigger("change");
+      }
+    });
+
+    $(document).on("haptic:modal-close", function onModalClose(e, data) {
+      const { $modal, $triggerEl, modalName } = data;
+      if (modalName === "edit-post") {
+        clear($els, $triggerEl);
+      }
+    });
   });
 
   turbo.beforeCache(() => {
     clear($els);
-    if (!window._keepShortUpdateOpen) {
-      close($els);
-    }
   });
 }

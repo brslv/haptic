@@ -9,6 +9,7 @@ include ../../partials/icon.pug
 include ../../partials/require-module.pug
 include ../../partials/csrf.pug
 include ../../partials/short-update-form.pug
+include ../../partials/survey-form.pug
 
 mixin post-type-btn({trigger, icon, disabled, tooltip, text}, attr = {})
   div(
@@ -46,14 +47,15 @@ block content
         div(class="bg-white p-2 mb-4 rounded-md shadow-sm border-4 border-yellow-300" data-post-types-container)
           div(class="gap-2 flex overflow-y-auto")
             +post-type-btn({ trigger: "short-update-create", icon: "file-text", disabled: false, text: "Quick update" })
+            +post-type-btn({ trigger: "survey", icon: "check-circle", disabled: false, text: "Survey" })
             +post-type-btn({ trigger: "long-update", icon: "feather", disabled: true, tooltip: "Soon!", text: "Article" })
             +post-type-btn({ trigger: "youtube", icon: "youtube", disabled: true, tooltip: "Soon!", text: "YouTube video" }) 
-            +post-type-btn({ trigger: "survey", icon: "check-circle", disabled: true, tooltip: "Soon!", text: "Survey" }) 
             +post-type-btn({ trigger: "milestone", icon: "smile", disabled: true, tooltip: "Soon!", text: "Milestone" }) 
             +post-type-btn({ trigger: "roadmap", icon: "map", disabled: true, tooltip: "Soon!", text: "Roadmap" }) 
 
           div
             +short-update-form({ mode: 'create', isHidden: true, showCancelButton: true })
+            +survey-form
       
         div
           +page-title(class="mb-4") Posts
@@ -66,7 +68,7 @@ block content
                     span No posts available
                 div(class="text-xs")
                   p Tip: start simple with a #[button(class="btn btn-small btn-default inline-block" data-post-type-trigger="short-update-create" data-post-type-trigger-no-hide) quick update]
-                  p Share your what's the next small step.
+                  p Share what's your next small step.
           div(data-posts-container)
             if posts && posts.length
               each post in posts

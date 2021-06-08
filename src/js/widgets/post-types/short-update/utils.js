@@ -1,4 +1,4 @@
-import { $, req, mdConverter } from "../../utils";
+import { $, req, mdConverter } from "../../../utils";
 
 const MAX_SHORT_UPDATE_TEXT_LENGTH = 1000;
 

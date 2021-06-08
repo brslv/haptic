@@ -1,0 +1,38 @@
+mixin survey-form
+  div(data-post-type="survey" class="hidden")
+    form(class="relative")
+
+      // - builder
+      div(class="mb-4")
+        label(class="label block pb-1 pl-1" for="survey-title") Title
+        div(class="flex items-center")
+          input(type="text" name="title" class="input mr-2" id="survey-title" placeholder="What do you think of the new landing page?" data-survey-title)
+          button(type="button" class="btn btn-default ring-0 border border-gray-100 hover:border-gray-200 py-2.5 whitespace-nowrap click-scale" data-add-details-btn) Add details
+
+      div(class="mb-4" style="display: none;" data-details-container)
+        div(class="label pb-1 pl-1") Details
+        div(class="relative")
+          div(class="bg-yellow-100 px-2 py-1 rounded-full absolute top-1 right-1 flex items-center justify-center font-medium cursor-help" style="font-size: 8px;" data-tippy-content="Markdown supported") MD
+          textarea(data-autoresize="2" rows="2" class="textarea w-full" placeholder="The focus of the new landing page is on the messaging..." data-survey-details)
+
+      hr(class="mt-4 mb-4 -mx-4 border-dashed")
+
+      div(class="mb-2")
+        label(class="label block pb-1 pl-1" for="add-survey-option") Add options
+        div(class="flex items-center")
+          input(class="input mr-2" name="option" id="add-survey-option" value="" placeholder="Love it!" data-add-option-input)
+          button(type="button" class="btn btn-default ring-0 border border-gray-100 hover:border-gray-200 py-2.5 whitespace-nowrap click-scale" data-add-option-btn) Add option
+
+      div(data-survey-options-container)
+        div(class="text-xs text-gray-500" data-no-options-label) No options...
+      
+      // - controls
+      div(class="flex flex-row-reverse items-center justify-between -m-4 mt-4 bg-gray-50 px-4 py-2 border-t border-gray-200 rounded-b-md")
+        div(class="flex flex-row-reverse items-center")
+          button(type="submit" class="text-sm py-1.5 btn btn-primary border border-yellow-300 hover:border-yellow-400 rounded-md click-scale") Publish
+
+          span(data-image-upload-loader class="hidden mr-2")
+            span(class="animate-spin icon-container opacity-75 my-0 block relative")
+              +icon("refresh-cw", { width: 14, height: 14 })
+        button(data-modal-close data-post-type-cancel type="button" class="btn px-2 py-2 border border-gray-200 bg-white hover:bg-gray-100 click-scale" data-tippy-content="Cancel")
+          +icon("x", { width: 16, height: 16 })
