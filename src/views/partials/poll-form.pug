@@ -1,30 +1,31 @@
-mixin survey-form
-  div(data-post-type="survey" class="hidden")
+include ./csrf
+
+mixin poll-form
+  div(data-post-type="poll" class="hidden")
     form(class="relative")
+      +csrf
+      input(type="hidden" name="id" value=product.id)
 
       // - builder
       div(class="mb-4")
-        label(class="label block pb-1 pl-1" for="survey-title") Title
+        label(class="label block pb-1 pl-1" for="poll-question") Question
         div(class="flex items-center")
-          input(type="text" name="title" class="input mr-2" id="survey-title" placeholder="What do you think of the new landing page?" data-survey-title)
-          button(type="button" class="btn btn-default ring-0 border border-gray-100 hover:border-gray-200 py-2.5 whitespace-nowrap click-scale" data-add-details-btn) Add details
+          input(type="text" name="question" class="input mr-2" id="poll-question" placeholder="i.e. How do you take notes?" data-poll-question)
+          button(type="button" class="btn btn-default ring-0 border border-gray-100 hover:border-gray-200 py-2.5 whitespace-nowrap click-scale" data-tippy-content="Add some context to your question" data-add-details-btn) Add details
+        div(data-question-errors)
 
       div(class="mb-4" style="display: none;" data-details-container)
         div(class="label pb-1 pl-1") Details
         div(class="relative")
           div(class="bg-yellow-100 px-2 py-1 rounded-full absolute top-1 right-1 flex items-center justify-center font-medium cursor-help" style="font-size: 8px;" data-tippy-content="Markdown supported") MD
-          textarea(data-autoresize="2" rows="2" class="textarea w-full" placeholder="The focus of the new landing page is on the messaging..." data-survey-details)
+          textarea(data-autoresize="2" rows="2" class="textarea w-full" placeholder="i.e. I want to improve my notetaking system..." data-poll-details)
 
       hr(class="mt-4 mb-4 -mx-4 border-dashed")
 
-      div(class="mb-2")
-        label(class="label block pb-1 pl-1" for="add-survey-option") Add options
-        div(class="flex items-center")
-          input(class="input mr-2" name="option" id="add-survey-option" value="" placeholder="Love it!" data-add-option-input)
-          button(type="button" class="btn btn-default ring-0 border border-gray-100 hover:border-gray-200 py-2.5 whitespace-nowrap click-scale" data-add-option-btn) Add option
-
-      div(data-survey-options-container)
-        div(class="text-xs text-gray-500" data-no-options-label) No options...
+      div(class="mb-4")
+        button(type="button" class="input py-3 flex items-center justify-center click-scale" data-tippy-content="Add option" data-add-option-btn)
+          +icon("plus", { width: 18, height: 18 })
+        div(data-options-errors)
       
       // - controls
       div(class="flex flex-row-reverse items-center justify-between -m-4 mt-4 bg-gray-50 px-4 py-2 border-t border-gray-200 rounded-b-md")

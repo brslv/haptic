@@ -38,7 +38,7 @@ block content
               comments: post.comments,
               show_posted_in_tag: true,
             }) !{post.text}
-          p(class="text-gray-500 text-center text-sm") Post listing is limited to 24 items only.
+          p(class="text-gray-500 text-center text-sm") Post listing is limited to 12 items only.
 
         aside(class="md:w-2/6 mb-16 md:mb-0 w-full")
           div(class="mb-4")
@@ -53,7 +53,7 @@ block content
                   description: product.description
                 })
             div(class="mt-3")
-              a(href="/products?ord=boosts" class="flex justify-center items-center btn btn-default inline-block transition click-scale")
+              a(href="/products?ord=boosts" class="flex justify-center items-center btn btn-default transition click-scale")
                 span(class="mr-2") View most boosted
                 +icon("arrow-right", { width: 16, height: 16 })
 
@@ -68,7 +68,7 @@ block content
                   description: product.description
                 })
             div(class="mt-3")
-              a(href="/products?ord=newest" class="flex justify-center items-center btn btn-default inline-block transition click-scale")
+              a(href="/products?ord=newest" class="flex justify-center items-center btn btn-default transition click-scale")
                 span(class="mr-2") View latest
                 +icon("arrow-right", { width: 16, height: 16 })
 

@@ -81,11 +81,11 @@ const rollbar = new Rollbar({
 // setup db
 const db = knex(dbConfig[process.env.NODE_ENV]);
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
   done(null, user);
 });
 
-passport.deserializeUser(function(user, done) {
+passport.deserializeUser(function (user, done) {
   if (!user || !user.id) return done(null, user);
 
   // We need to refetch the user every time, in order to
@@ -113,7 +113,7 @@ passport.use(
         "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true",
       callbackURL: process.env.TWITTER_API_CALLBACK_URL,
     },
-    function(accessToken, refreshToken, profile, done) {
+    function (accessToken, refreshToken, profile, done) {
       const emails = profile.emails;
       const twitterData = profile._json;
       db.select()
@@ -1121,7 +1121,7 @@ app.get("/auth/error", (req, res) => res.send("Unknown Error"));
 
 app.get(
   "/auth/twitter",
-  function(req, res, next) {
+  function (req, res, next) {
     req.session.creator = req.query.creator;
     next();
   },
@@ -1131,7 +1131,7 @@ app.get(
 app.get(
   "/auth/twitter/callback",
   passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
-  function(req, res) {
+  function (req, res) {
     req.session.save(function onSessionSave() {
       if (req.session.creator) {
         res.redirect("/checkout");
@@ -1144,7 +1144,7 @@ app.get(
 
 app.get("/logout", (req, res) => {
   req.logout();
-  req.session.destroy(function(err) {
+  req.session.destroy(function (err) {
     res.redirect("/");
   });
 });
@@ -1371,7 +1371,6 @@ app.post(
     const types = posts.types;
     const type = req.params.type;
     const pid = req.params.pid;
-    const postsActions = posts.actions({ db, user: req.user });
 
     if (!types.includes(type)) {
       return res
@@ -1387,28 +1386,83 @@ app.post(
       });
     }
 
-    if (req.body.text.length < 2) {
-      return res.status(400).json({
-        ok: 0,
-        err: `Invalid text length. Min: 2 symbols.`,
-        details: null,
-      });
+    if (type === posts.TEXT_TYPE) {
+      handleTextType(pid, req, res, next);
+    } else if (type === posts.POLL_TYPE) {
+      handlePollType(pid, req, res, next);
     }
-
-    db("products")
-      .select()
-      .where({ id: pid })
-      .first()
-      .then((productResult) => {
-        postsActions
-          .publish(type, productResult, req.body)
-          .then((post) => {
-            res.json({ ok: 1, err: null, details: { post } });
-          })
-          .catch((err) => next(err));
-      });
   }
 );
+
+function handleTextType(pid, req, res, next) {
+  const postsActions = posts.actions({ db, user: req.user });
+  if (req.body.text.length < 2) {
+    return res.status(400).json({
+      ok: 0,
+      err: `Invalid text length. Min: 2 symbols.`,
+      details: null,
+    });
+  }
+
+  db("products")
+    .select()
+    .where({ id: pid })
+    .first()
+    .then((productResult) => {
+      postsActions
+        .publish(posts.TEXT_TYPE, productResult, req.body)
+        .then((post) => {
+          res.json({ ok: 1, err: null, details: { post } });
+        })
+        .catch((err) => next(err));
+    });
+}
+
+function handlePollType(pid, req, res, next) {
+  const postsActions = posts.actions({ db, user: req.user });
+
+  // res.json({ ok: 1, err: null, details: {} });
+
+  // validations
+  const data = req.body;
+  if (data.question.length < 10) {
+    return res.status(400).json({
+      ok: 0,
+      err: `Invalid question length. Min: 10 symbols.`,
+      details: null,
+    });
+  }
+  if (data.options.length < 2) {
+    return res.status(400).json({
+      ok: 0,
+      err: `Provide at least 2 options.`,
+      details: null,
+    });
+  }
+
+  // insert
+  db("products")
+    .select()
+    .where({ id: pid })
+    .first()
+    .then((productResult) => {
+      postsActions
+        .publish(posts.POLL_TYPE, productResult, data)
+        .then((post) => {
+          // respond
+          // console.log({ post });
+          res.json({ ok: 1, err: null, details: { post } });
+        })
+        .catch((err) => {
+          console.log(err);
+          next(err);
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      next(err);
+    });
+}
 
 app.post(
   "/post/:pid",
@@ -1646,8 +1700,7 @@ app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
     if (err && err.code === "LIMIT_FILE_SIZE") {
       return res.status(400).json({
         ok: 0,
-        err:
-          "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+        err: "Files greater than 2MB in size are not allowed. Please, optimize your image.",
         details: { max: "2MB" },
       });
     }
@@ -1671,8 +1724,7 @@ app.post(
       if (err && err.code === "LIMIT_FILE_SIZE") {
         return res.status(400).json({
           ok: 0,
-          err:
-            "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+          err: "Files greater than 2MB in size are not allowed. Please, optimize your image.",
           details: { max: "2MB" },
         });
       }
@@ -1708,8 +1760,7 @@ app.post(
       if (err && err.code === "LIMIT_FILE_SIZE") {
         return res.status(400).json({
           ok: 0,
-          err:
-            "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+          err: "Files greater than 2MB in size are not allowed. Please, optimize your image.",
           details: { max: "2MB" },
         });
       }
@@ -1989,7 +2040,7 @@ app.post("/wh", express.json(), (req, res) => {
 });
 
 // 404
-app.get("*", function(req, res, next) {
+app.get("*", function (req, res, next) {
   res.status(404).render("404", { meta: defaultMetas });
 });
 
@@ -2001,8 +2052,7 @@ app.use((err, req, res, next) => {
   if (isAjaxCall(req))
     return res.status(500).json({
       ok: 0,
-      err:
-        "Something went wrong. 😱 Please, use the feedback form or contact me on Twitter.",
+      err: "Something went wrong. 😱 Please, use the feedback form or contact me on Twitter.",
       details: { err },
     });
   res.status(500);

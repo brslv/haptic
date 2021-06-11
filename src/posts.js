@@ -2,8 +2,9 @@ const { cache, cacheKeys, ttl } = require("./cache");
 const comments = require("./comments");
 
 const TEXT_TYPE = "text";
+const POLL_TYPE = "poll";
 
-const types = [TEXT_TYPE];
+const types = [TEXT_TYPE, POLL_TYPE];
 
 const BROWSABLE_ORDER = {
   BOOSTS: [
@@ -82,6 +83,104 @@ function actions({ db, user }) {
     });
   }
 
+  // TODO: image is not yet implemented
+  function _publishPoll(product, { question, details, options }, image) {
+    return new Promise((res, rej) => {
+      db.transaction((trx) => {
+        // insert in posts
+
+        db("posts")
+          .transacting(trx)
+          .insert({ type: POLL_TYPE, product_id: product.id, user_id: user.id })
+          .returning("id")
+          .then((result) => result[0])
+          .then(function postPollInsert(postId) {
+            // insert in posts_poll
+
+            return db("posts_poll")
+              .transacting(trx)
+              .insert({
+                post_id: postId,
+                question,
+                details,
+              })
+              .returning("id")
+              .then(function postPollInsertSuccess([postPollId]) {
+                return { postPollId, postId };
+              })
+              .catch((err) => {
+                throw err;
+              });
+          })
+          .then(({ postPollId, postId }) => {
+            // insert poll options
+            const pollOptionsPromises = options.map((option) => {
+              return db("poll_options")
+                .transacting(trx)
+                .insert({
+                  text: option,
+                  post_id: postId,
+                })
+                .returning("id");
+            });
+
+            return Promise.all(pollOptionsPromises)
+              .then(function pollOptionsInsertSuccess(result) {
+                return {
+                  postId,
+                  postPollId,
+                  pollOptionsIds: result.map((idInArray) => idInArray[0]),
+                };
+              })
+              .catch((err) => {
+                console.log(err);
+                throw Error("Could not insert poll options");
+              });
+          })
+          .then(({ postId, postPollId, pollOptionsIds }) => {
+            // console.log({ postId, postPollId, pollOptionsIds });
+
+            // insert images if any and return the post
+            if (image) {
+              // insert image then commit
+              return db("images")
+                .transacting(trx)
+                .insert({ post_id: postId, url: image })
+                .returning("id")
+                .then(function imageInsertSuccess(imageResult) {
+                  trx.commit().then(() => {
+                    _getPostPoll(postId)
+                      .then((post) => {
+                        res(post);
+                      })
+                      .catch((err) => {
+                        throw err;
+                      });
+                  });
+                })
+                .catch((err) => {
+                  throw err;
+                });
+            } else {
+              // no image - commit trx
+              trx.commit().then(() => {
+                _getPostPoll(postId)
+                  .then((post) => {
+                    res(post);
+                  })
+                  .catch((err) => {
+                    throw err;
+                  });
+              });
+            }
+          })
+          .catch((err) => {
+            trx.rollback().then(() => rej(err));
+          });
+      });
+    });
+  }
+
   function _getPostText(
     postId,
     userId,
@@ -147,6 +246,119 @@ function actions({ db, user }) {
       });
   }
 
+  function _getPostPoll(
+    postId,
+    userId,
+    { withComments = false } = { withComments: false }
+  ) {
+    const commentsActions = comments.actions({ db, user });
+    const query = db
+      .select(
+        "posts.id",
+        "posts.type",
+        "posts.created_at",
+        "posts.updated_at",
+        "posts.user_id as user_id",
+        "posts_poll.question",
+        "posts_poll.details",
+        "users.type as user_type",
+        "users.slug as user_slug",
+        "users.twitter_name as user_twitter_name",
+        "users.twitter_profile_image_url as user_twitter_profile_image_url",
+        "users.twitter_screen_name as user_twitter_screen_name",
+        "images.id as image_id",
+        "images.url as image_url",
+        "images.created_at as image_created_at",
+        db("post_boosts")
+          .count()
+          .whereRaw("post_id = posts.id")
+          .as("boosts_count")
+      )
+      .table("posts_poll")
+      .leftJoin("posts", "posts_poll.post_id", "posts.id")
+      .leftJoin("users", "posts.user_id", "users.id")
+      .leftJoin("images", "images.post_id", "posts.id")
+      .where({ "posts_poll.post_id": postId });
+
+    if (userId) {
+      query.where({ "posts.user_id": userId });
+    }
+
+    return query
+      .first()
+      .then((result) => {
+        return db("poll_options")
+          .select("poll_options.id", "poll_options.text")
+          .leftJoin("posts", "posts.id", "poll_options.post_id")
+          .where("posts.id", result.id)
+          .then(function pollOptionsSuccess(pollOptions) {
+            return {
+              result,
+              pollOptions,
+            };
+          });
+      })
+      .then(({ result, pollOptions }) => {
+        return db("poll_answers")
+          .select(
+            "poll_answers.id",
+            "poll_options.text",
+            "users.type as user_type",
+            "users.slug as user_slug",
+            "users.twitter_name as user_twitter_name",
+            "users.twitter_profile_image_url as user_twitter_profile_image_url",
+            "users.twitter_screen_name as user_twitter_screen_name"
+          )
+          .leftJoin(
+            "poll_options",
+            "poll_answers.poll_option_id",
+            "poll_options.id"
+          )
+          .leftJoin("users", "poll_answers.user_id", "users.id")
+          .whereIn(
+            "poll_answers.poll_option_id",
+            pollOptions.map((o) => o.id)
+          )
+          .then(function pollAnswersSuccess(pollAnswers) {
+            return {
+              result,
+              pollOptions,
+              pollAnswers,
+            };
+          });
+      })
+      .then(({ result, pollOptions, pollAnswers }) => {
+        if (withComments) {
+          return commentsActions
+            .getComments(result.id)
+            .then((commentsResult) => {
+              return {
+                ...result,
+                comments: commentsResult,
+                poll_options: pollOptions,
+                poll_answers: pollAnswers,
+              };
+            })
+            .catch((err) => {
+              console.log(err);
+              throw err;
+            });
+        } else {
+          return {
+            ...result,
+            poll_options: pollOptions,
+            poll_answers: pollAnswers,
+          };
+        }
+      })
+      .then((result) => {
+        return result;
+      })
+      .catch((err) => {
+        return err;
+      });
+  }
+
   function getBrowsablePosts({
     order = BROWSABLE_ORDER.BOOSTS,
     withComments = true,
@@ -191,7 +403,7 @@ function actions({ db, user }) {
           .leftJoin("images", "images.post_id", "posts.id")
           .where({ "products.is_public": true, "products.is_listed": true })
           .orderBy(order)
-          .limit(24)
+          .limit(12)
           .then((result) => {
             if (withComments) {
               let commentsPromises = [];
@@ -230,8 +442,11 @@ function actions({ db, user }) {
 
   function getPost(type, { postId, userId }, options = {}) {
     switch (type) {
-      case "text": {
+      case TEXT_TYPE: {
         return _getPostText(postId, userId, options);
+      }
+      case POLL_TYPE: {
+        return _getPostPoll(postId, userId, options);
       }
     }
   }
@@ -312,8 +527,12 @@ function actions({ db, user }) {
     cache.del(cacheKeys.browsablePosts(BROWSABLE_ORDER.BOOSTS));
     cache.del(cacheKeys.browsablePosts(BROWSABLE_ORDER.NEWEST));
     switch (type) {
-      case "text": {
+      case TEXT_TYPE: {
         return _publishText(product, data.text, data.image);
+        break;
+      }
+      case POLL_TYPE: {
+        return _publishPoll(product, data);
         break;
       }
     }
@@ -468,5 +687,6 @@ module.exports = {
   actions,
   types,
   TEXT_TYPE,
+  POLL_TYPE,
   BROWSABLE_ORDER,
 };
