@@ -7,8 +7,8 @@ include partials/csrf.pug
 include partials/empty-list-message.pug
 
 mixin notif({ notif })
-  div(class="p-4 border border-gray-100 rounded-md bg-white shadow-sm mb-4" data-notification-id=notif.id)
-    div(class="flex items-center justify-between mb-4 border-b border-gray-100 px-4 py-2 -mt-4 -mx-4")
+  div(class="p-4 border border-gray-200 rounded-md bg-white mb-4 hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 transition" data-notification-id=notif.id)
+    div(class="flex items-center justify-between mb-4 border-b border-gray-200 px-4 py-2 -mt-4 -mx-4")
       div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
       a(href=`/p/${notif.product_slug}` class="btn btn-small btn-plain" title="Open product page")= `${notif.product_name}`
     div(class="flex items-start")

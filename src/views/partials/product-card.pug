@@ -7,7 +7,7 @@ mixin product-card({ slug, name, description, link, cover_url, logo_url = null, 
     div(class="relative")
       div(
         class={
-          "bg-white shadow-sm rounded-md hover:shadow-md p-4 transition overflow-hidden": true,
+          "bg-white border border-gray-200 rounded-md hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 p-4 transition overflow-hidden": true,
           "border border-gray-100": place === null,
           "border-2 border-yellow-400": place === 0,
           "border-2 border-gray-400": place === 1,

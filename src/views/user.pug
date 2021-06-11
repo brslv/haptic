@@ -8,7 +8,6 @@ include partials/product-card.pug
 include partials/empty-list-message.pug
 
 block content
-  div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")
   div(class="relative")
     +top-bar
   
@@ -16,7 +15,7 @@ block content
       div(class="block sm:grid sm:grid-cols-8 sm:gap-4")
         div(class="w-full sm:col-span-4 md:col-span-5 mb-4 sm:mb-0")
           +page-title(class="mb-4") User profile
-          section(class="bg-white border border-gray-100 p-4 rounded-md shadow-sm")
+          section(class="bg-white border border-gray-200 p-4 rounded-md")
             div(class="flex items-start")
               img(src=data.twitter_profile_image_url alt=`Photo of the creator of ${data.twitter_name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": data.type === USER_TYPES.CREATOR})
               div
@@ -36,7 +35,7 @@ block content
 
         section(class="w-full sm:col-span-4 md:col-span-3")
           +page-title(class="mb-4") Details
-          section(class="bg-white border border-gray-100 p-4 rounded-md shadow-sm")
+          section(class="bg-white border border-gray-200 p-4 rounded-md")
             ul(class="")
               if data.website
                 div(class="mb-2")

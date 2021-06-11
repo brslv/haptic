@@ -1,4 +1,5 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
+const colors = require("tailwindcss/colors");
 
 module.exports = {
   purge: {
@@ -16,8 +17,16 @@ module.exports = {
       },
     },
     extend: {
+      backgroundColor: {
+        ...defaultTheme.backgroundColor,
+        gray: { ...colors.warmGray, 70: "#F6F7F8" },
+      },
+      borderColor: {
+        ...defaultTheme.borderColor,
+        gray: { ...colors.warmGray, 200: "#E8ECF1" },
+      },
       scale: {
-        "98": "0.98",
+        98: "0.98",
         ...defaultTheme.scale,
       },
       fontFamily: {
@@ -28,11 +37,21 @@ module.exports = {
         "twitter-dark": "#1690db",
         ...defaultTheme.backgroundColor,
       },
+      boxShadow: {
+        ...defaultTheme.boxShadow,
+        ghost: `0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02)`,
+        "ghost-2": `0 12px 21px -5px rgba(0, 0, 0, 0.04), 0 3px 8px -3px rgba(0, 0, 0, 0.02)`,
+      },
     },
   },
   variants: {
     extend: {
-      scale: ["focus", "active"],
+      scale: ["focus", "hover", "active"],
+      ringColor: ["focus", "hover"],
+      ringOffsetColor: ["focus", "hover"],
+      ringOffsetWidth: ["focus", "hover"],
+      ringOpacity: ["focus", "hover"],
+      ringWidth: ["focus", "hover"],
     },
   },
   plugins: [require("@tailwindcss/typography")],

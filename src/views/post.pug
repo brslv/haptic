@@ -3,6 +3,7 @@ extends layouts/base.layout.pug
 include partials/icon.pug
 include partials/top-bar.pug
 include partials/post.pug
+include partials/poll.pug
 include partials/require-module.pug
 include partials/login-modal.pug
 
@@ -18,26 +19,48 @@ block content
         a(href=`/p/${product.slug}` class="btn btn-small btn-plain flex items-center")
           +icon("arrow-left", { width: 16, height: 16 })(class="mr-2")
           span= `Go to ${product.name}`
-      +post({
-        author_id: post.user_id,
-        product_slug: product.slug,
-        product_name: product.name,
-        post_id: post.id,
-        post_twitter_text: post.twitter_text,
-        img: post.user_twitter_profile_image_url,
-        img_url: post.image_url,
-        user_type: post.user_type,
-        user_slug: post.user_slug,
-        twitter_name: post.user_twitter_name,
-        twitter_screen_name: post.user_twitter_screen_name,
-        date_str: post.created_at_formatted,
-        show_opts: false,
-        show_view_btn: false,
-        boosts_count: post.boosts_count,
-        disable_boost_btn: !user,
-        trigger_login_modal: !user,
-        comments: post.comments
-      }) !{post_text}
+      if post.type === 'text'
+        +post({
+          author_id: post.user_id,
+          product_slug: product.slug,
+          product_name: product.name,
+          post_id: post.id,
+          post_twitter_text: post.twitter_text,
+          img: post.user_twitter_profile_image_url,
+          img_url: post.image_url,
+          user_type: post.user_type,
+          user_slug: post.user_slug,
+          twitter_name: post.user_twitter_name,
+          twitter_screen_name: post.user_twitter_screen_name,
+          date_str: post.created_at_formatted,
+          show_opts: false,
+          show_view_btn: false,
+          boosts_count: post.boosts_count,
+          disable_boost_btn: !user,
+          trigger_login_modal: !user,
+          comments: post.comments
+        }) !{post_text}
+      if post.type === 'poll'
+        +poll({
+          question: post.question,
+          options: post.poll_options,
+          author_id: post.user_id,
+          product_slug: product.slug,
+          product_name: product.name,
+          post_id: post.id,
+          post_twitter_text: post.twitter_text,
+          user_type: post.user_type,
+          user_slug: post.user_slug,
+          img: post.user_twitter_profile_image_url,
+          img_url: post.image_url,
+          twitter_name: post.user_twitter_name,
+          twitter_screen_name: post.user_twitter_screen_name,
+          date_str: post.created_at_formatted,
+          disable_boost_btn: false,
+          boosts_count: post.boosts_count,
+          comments: post.comments
+        }) !{post.details}
+
 
 block modals
   if !user

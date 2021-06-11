@@ -5,15 +5,13 @@ export default function createPostTypesUtil() {
   const $postTypesContainer = $("[data-post-types-container]");
 
   function openPostType($postType, $focusableElement) {
-    $postTypesContainer
-      .removeClass("p-2 border-4 border-yellow-300")
-      .addClass("p-4 border-4 border-gray-100 shadow-lg");
+    $postTypesContainer.removeClass("p-2").addClass("p-4 ");
     $postType.removeClass("hidden");
     if ($focusableElement && typeof $focusableElement.trigger === "function") {
       $focusableElement.trigger("focus");
     }
 
-    $allTriggers.each(function(i, btn) {
+    $allTriggers.each(function (i, btn) {
       const $btn = $(btn);
       if ($btn.data("post-type-trigger-no-hide") !== undefined) return;
       $btn.addClass("hidden");
@@ -21,9 +19,7 @@ export default function createPostTypesUtil() {
   }
 
   function closePostType($postType, $trigger) {
-    $postTypesContainer
-      .removeClass("p-4 border-4 border-gray-100 shadow-lg")
-      .addClass("p-2 border-4 border-yellow-300");
+    $postTypesContainer.removeClass("p-4").addClass("p-2");
     $trigger.removeClass("bg-gray-100");
     $allTriggers.removeClass("hidden");
     $postType.addClass("hidden");

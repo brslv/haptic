@@ -22,7 +22,7 @@ block content
         div(class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" data-collections-list)
           each product in collections
             a(href=`/p/${product.slug}` data-collected-product-root data-ctx-menu-container class="click-scale")
-              div(class="relative bg-white shadow-sm hover:shadow-md border border-gray-100 transition-all h-full rounded-md p-4" style="min-height: 100px;")
+              div(class="relative bg-white border border-gray-200 hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 transition-all h-full rounded-md p-4" style="min-height: 100px;")
                 +icon("bookmark", { width: 18, height: 18, stroke: 'primary', fill: 'primary' })(class="absolute -top-1 left-2")
 
                 div(class="flex items-center justify-between pb-4")

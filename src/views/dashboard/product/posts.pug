@@ -5,6 +5,7 @@ include ../../partials/product-header.pug
 include ../../partials/page-title.pug
 include ../../partials/modal.pug
 include ../../partials/post.pug
+include ../../partials/poll.pug
 include ../../partials/icon.pug
 include ../../partials/require-module.pug
 include ../../partials/csrf.pug
@@ -44,7 +45,7 @@ block content
     div(class="flex flex-col md:flex-row items-start pt-4")
       div(class="w-full md:w-4/6 md:mr-4 mb-4")
         +page-title(class="mb-4") Publish new
-        div(class="bg-white p-2 mb-4 rounded-md shadow-sm border-4 border-yellow-300" data-post-types-container)
+        div(class="bg-white p-2 mb-4 rounded-md border border-gray-200 hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 transition" data-post-types-container)
           div(class="gap-2 flex overflow-y-auto")
             +post-type-btn({ trigger: "short-update-create", icon: "file-text", disabled: false, text: "Quick update" })
             +post-type-btn({ trigger: "poll", icon: "check-circle", disabled: false, text: "Poll" })
@@ -59,7 +60,7 @@ block content
       
         div
           +page-title(class="mb-4") Posts
-          div(data-no-posts-msg class={"hidden": posts.length, "flex items-center justify-center bg-white shadow p-4 rounded-md border border-gray-100": true} style="min-height: 300px")
+          div(data-no-posts-msg class={"hidden": posts.length, "flex items-center justify-center bg-white p-4 rounded-md border border-gray-100": true} style="min-height: 300px")
             div(class="text-center flex flex-col items-center")
               span(class="mb-2 p-2 w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full")
                 +icon("activity", { stroke: "muted" })
@@ -72,25 +73,46 @@ block content
           div(data-posts-container)
             if posts && posts.length
               each post in posts
-                - var post_text = post.text
-                +post({
-                  author_id: post.user_id,
-                  product_slug: product.slug,
-                  product_name: product.name,
-                  post_id: post.id,
-                  post_text_md: post.text_md,
-                  post_twitter_text: post.twitter_text,
-                  user_type: post.user_type,
-                  user_slug: post.user_slug,
-                  img: post.user_twitter_profile_image_url,
-                  img_url: post.image_url,
-                  twitter_name: post.user_twitter_name,
-                  twitter_screen_name: post.user_twitter_screen_name,
-                  date_str: post.created_at_formatted,
-                  disable_boost_btn: true,
-                  boosts_count: post.boosts_count,
-                  comments: post.comments
-                }) !{post_text}
+                if post.type === 'text'
+                  - var post_text = post.text
+                  +post({
+                    author_id: post.user_id,
+                    product_slug: product.slug,
+                    product_name: product.name,
+                    post_id: post.id,
+                    post_text_md: post.text_md,
+                    post_twitter_text: post.twitter_text,
+                    user_type: post.user_type,
+                    user_slug: post.user_slug,
+                    img: post.user_twitter_profile_image_url,
+                    img_url: post.image_url,
+                    twitter_name: post.user_twitter_name,
+                    twitter_screen_name: post.user_twitter_screen_name,
+                    date_str: post.created_at_formatted,
+                    disable_boost_btn: true,
+                    boosts_count: post.boosts_count,
+                    comments: post.comments
+                  }) !{post_text}
+                if post.type === 'poll'
+                  +poll({
+                    question: post.question,
+                    options: post.poll_options,
+                    author_id: post.user_id,
+                    product_slug: product.slug,
+                    product_name: product.name,
+                    post_id: post.id,
+                    post_twitter_text: post.twitter_text,
+                    user_type: post.user_type,
+                    user_slug: post.user_slug,
+                    img: post.user_twitter_profile_image_url,
+                    img_url: post.image_url,
+                    twitter_name: post.user_twitter_name,
+                    twitter_screen_name: post.user_twitter_screen_name,
+                    date_str: post.created_at_formatted,
+                    disable_boost_btn: true,
+                    boosts_count: post.boosts_count,
+                    comments: post.comments
+                  }) !{post.details}
 
       div(class="w-full md:w-2/6 mb-4")
         +page-title(class="mb-4") Product details
@@ -98,7 +120,7 @@ block content
         // -   +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-4 cursor-pointer")
         // -   span(class="font-medium") Tip!
         // -   p Make sure to fill in the most important product details on the side of your product's page. This will help visitors grasp your product in a blink of an eye.
-        div(class="p-4 bg-white shadow-sm border border-gray-100 rounded-md")
+        div(class="p-4 bg-white border border-gray-200 rounded-md")
           span(class="font-medium text-sm mb-4 block") Tools
           div(data-product-tools-root data-product-tools-product-slug=product.slug)
             div(class={"flex flex-wrap gap-2":true, "mb-2": tools.length} data-product-tools-container)
@@ -109,9 +131,9 @@ block content
             button(class="flex items-center btn bg-white bg-yellow-100 hover:bg-yellow-300 btn-small click-scale" data-product-tools-add-btn)
               +icon("plus", { width: 18, height: 18 })(class="mr-2")
               span Add new
-            form(data-product-tools-form class="hidden relative mt-4 -mx-4 -mb-4 px-4 py-2 bg-transparent border-t border-gray-100")
+            form(data-product-tools-form class="hidden relative mt-4 -mx-4 -mb-4 px-4 py-2 bg-transparent border-t border-gray-200")
               +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-2 cursor-pointer" data-product-tools-close-btn)
-              label(class="label" for="tools-input")
+              label(class="block label pb-2" for="tools-input")
                 span Type and hit enter
               input(class="input mb-2" placeholder="E.g. React" id="tools-input" data-product-tools-input)
               button(type="submit" class="hidden") Submit

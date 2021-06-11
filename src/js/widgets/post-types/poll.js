@@ -8,7 +8,7 @@ export default function poll() {
     if ($els.$root.hasClass("hidden")) {
       open($els, postTypesUtil);
       registerCancel($els, postTypesUtil);
-      registerSubmitEventHooks($els);
+      registerSubmitEventHooks($els, postTypesUtil);
     }
   }
 
@@ -164,7 +164,7 @@ export default function poll() {
     });
   }
 
-  function registerSubmitEventHooks($els) {
+  function registerSubmitEventHooks($els, postTypesUtil) {
     const borderClasses = "border-yellow-300 hover:border-yellow-400";
 
     const lockInteractions = () => {
@@ -197,9 +197,14 @@ export default function poll() {
 
       if (response) {
         clearForm($els);
+        close($els, postTypesUtil);
+
         $(document).trigger("haptic:add-toast", {
           content: "Poll created successfully",
           type: "success",
+        });
+        turbo.actions.visit(window.location.pathname, {
+          action: "replace",
         });
       } else if (err) {
         console.log({ err });
@@ -215,6 +220,8 @@ export default function poll() {
 
   function close($els, postTypesUtil) {
     postTypesUtil.closePostType($els.$root, $els.$trigger);
+    clearForm($els);
+    clear($els);
   }
 
   function clear($els) {

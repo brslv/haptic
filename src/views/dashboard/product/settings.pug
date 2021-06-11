@@ -24,7 +24,7 @@ block content
           input(type="file" id="cover-image" data-choose-cover-input data-product-slug=product.slug class="hidden")
         div(class=" flex items-center justify-center")
           button(data-choose-cover-btn type="button" class="btn btn-primary shadow-lg hover:shadow-md transition") Choose cover
-        div(class="hidden flex items-center justify-center bg-white p-4 border border-gray-100 rounded-md shadow-sm" data-cover-image-picker-container)
+        div(class="hidden flex items-center justify-center bg-white p-4 border border-gray-100 rounded-md shadow-xl" data-cover-image-picker-container)
           each cover in predefinedCovers
             +predefCoverImg(cover, product.slug)(class="mr-2")
           p(class="mx-6 text-gray-500") &mdash;
@@ -49,7 +49,7 @@ block content
         // -- left
         div(class="w-full md:w-2/3 md:mr-4")
           div(class="container mx-auto")
-            div(class="p-4 bg-white rounded-md shadow-sm border border-gray-100 mb-4")
+            div(class="p-4 bg-white rounded-md border border-gray-200 mb-4")
               div(class="pb-4")
                 label
                   div(class="label pb-1 pl-1") Name
@@ -66,11 +66,11 @@ block content
               div(class="pb-4")
                 label(class="")
                   div(class="label pb-1 pl-1") Logo
-                div(class="block px-4 py-2 bg-gray-50 border border-gray-200 rounded-md shadow-sm")
+                div(class="block px-4 py-2 bg-gray-50 border border-gray-200 rounded-md")
                   input(type="file" id="logo" data-upload-logo-input data-product-slug=product.slug class="hidden")
                   div(class="flex items-center")
                     div(class="mr-4")
-                      button(type="button" data-upload-logo-btn class="bg-white border border-dashed border-gray-200 w-16 h-16 rounded-md shadow-sm flex items-center justify-center text-xs click-scale overflow-hidden")
+                      button(type="button" data-upload-logo-btn class="bg-white border border-dashed border-gray-200 w-16 h-16 rounded-md shadow-lg flex items-center justify-center text-xs click-scale overflow-hidden")
                         span(class={"text-center": true, "hidden": product.logo_url} data-upload-logo-label) Upload
                         span(data-upload-logo-loader class="hidden block")
                           span(class="animate-spin icon-container opacity-75 my-0 block relative")
@@ -90,7 +90,7 @@ block content
 
 
           div(class="container mx-auto")
-            div(class="p-4 bg-white rounded-md shadow-sm border-4 border-red-100 mb-4 relative")
+            div(class="p-4 bg-white rounded-md border-4 border-red-100 mb-4 relative")
               div(class="px-2 py-1 bg-red-300 rounded-full text-xs absolute -top-4 left-4") Danger zone
               div(class="relative rounded-md pt-2")
                 button(type="button" class="btn btn-danger click-scale" data-delete-product-btn) Delete product
@@ -98,7 +98,7 @@ block content
 
         // -- right
         div(class="flex-1 container mx-auto")
-          div(class="p-4 bg-white rounded-md shadow-sm border border-gray-100 mb-4")
+          div(class="p-4 bg-white rounded-md border border-gray-200 mb-4")
             div
               div(class="pb-8")
                 label(class="flex items-center")
@@ -112,5 +112,5 @@ block content
                   span(class="label cursor-pointer") List on Haptic
                 span(class="text-sm text-gray-500") By having this on, you agree that we can list your product on our homepage (might take up to an hour to update caches)
 
-          div(class="p-4 bg-white rounded-md shadow-sm border border-gray-100 mb-4")
+          div(class="p-4 bg-white rounded-md border border-gray-200 mb-4")
             button(type="submit" class="btn btn-primary w-full transition") Save

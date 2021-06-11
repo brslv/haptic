@@ -1,0 +1,15 @@
+mixin comment({ img, type, slug, twitter_name, twitter_screen_name, created_at, content })
+  div(class="flex items-start mt-4 p-4 border border-gray-200 rounded-md border-dashed")
+    img(src=img class={"w-10 h-10 rounded-full mr-2": true, "border-4 border-double border-yellow-300": type === USER_TYPES.CREATOR} data-comment-author-img)
+    div
+      a(href=`/u/${slug}` class="font-bold mb-2 underline hover:no-underline" data-comment-author-link)= twitter_name
+      div(class="flex items-center text-xs text-gray-600 dark:text-gray-400 mb-2")
+        div(class="flex items-center")
+          +icon("twitter", { width: 10, height: 10, stroke:"twitter", fill: "twitter" })(class="mr-1")
+          span(class="mr-2" data-comment-author-twitter-screen-name)= `@${twitter_screen_name}`
+        span(class="mr-2") &mdash;
+        span(class="flex items-center")
+          span(class="mr-2")
+            +icon("clock", { width: '12', height: '12' })
+          span(data-comment-created-at)= created_at
+      div(class="comment prose prose-sm prose-yellow" data-comment-content) !{content}
