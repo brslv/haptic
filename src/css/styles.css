@@ -283,6 +283,10 @@
     animation: fadeOut 0.3s;
   }
 
+  .primary-glow {
+    box-shadow: 0 14px 10px -13px rgba(255, 200, 45, 0.7);
+  }
+
   @keyframes fadeIn {
     from {
       /*margin-top: -5px;*/

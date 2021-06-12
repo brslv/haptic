@@ -3,6 +3,7 @@ const comments = require("./comments");
 
 const TEXT_TYPE = "text";
 const POLL_TYPE = "poll";
+const UNKNOWN_TYPE = "unkown";
 
 const types = [TEXT_TYPE, POLL_TYPE];
 
@@ -448,7 +449,33 @@ function actions({ db, user }) {
       case POLL_TYPE: {
         return _getPostPoll(postId, userId, options);
       }
+      case UNKNOWN_TYPE: {
+        return _getUnknownTypePost(postId, userId, options);
+      }
+      default:
+        return Promise.reject(Error("Invalid post type."));
     }
+  }
+
+  function _getUnknownTypePost(postId, userId, options) {
+    return new Promise((res, rej) => {
+      return db("posts")
+        .select("type")
+        .where({ id: postId })
+        .first()
+        .then((result) => {
+          getPost(result.type, { postId, userId }, options)
+            .then((post) => {
+              res(post);
+            })
+            .catch((err) => {
+              rej(err);
+            });
+        })
+        .catch((err) => {
+          rej(err);
+        });
+    });
   }
 
   function getAllPosts(
@@ -538,27 +565,8 @@ function actions({ db, user }) {
               return acc;
             }, []);
           return Promise.all(enrichedPosts);
-
-          // const nonPollPosts = postsWithCommentsResult.filter(
-          //   (p) => p.type !== "poll"
-          // );
-          // const pollPromises = postsWithCommentsResult
-          //   .filter((p) => p.type === "poll")
-          //   .map((post) => {
-          //     return _getPostPoll(post.id);
-          //   });
-
-          // return Promise.all(pollPromises)
-          //   .then((pollPostsResults) => {
-          //     return [...nonPollPosts, ...pollPostsResults];
-          //   })
-          //   .catch((err) => {
-          //     console.log(err);
-          //     throw err;
-          //   });
         })
         .then((result) => {
-          console.log({ result });
           cache.set(cacheKeys.productPosts(productId), result, ttl.day);
           res(result);
         })
@@ -806,5 +814,6 @@ module.exports = {
   types,
   TEXT_TYPE,
   POLL_TYPE,
+  UNKNOWN_TYPE,
   BROWSABLE_ORDER,
 };

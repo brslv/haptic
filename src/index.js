@@ -1028,7 +1028,7 @@ app.get("/p/:slug/:postId", (req, res, next) => {
       }
 
       return postsActions
-        .getPost("text", { postId }, { withComments: true })
+        .getPost(posts.UNKNOWN_TYPE, { postId }, { withComments: true })
         .then((result) => {
           if (!result) {
             return res.status(404).render("404", {
@@ -1040,22 +1040,42 @@ app.get("/p/:slug/:postId", (req, res, next) => {
             });
           }
 
-          const title =
-            result.text.length > 100
-              ? result.text.slice(0, 100) + "..."
-              : result.text;
+          // resolve title
+          let title = "";
+          if (result.type === "text") {
+            title = result.text;
+          }
+          if (result.type === "poll") {
+            title = result.question;
+          }
+          title = title.length > 100 ? title.slice(0, 100) + "..." : title;
 
+          // setup meta tags
           const ogTags = {
             ...defaultMetas.og,
             title: `${title} | ${productResult.name}`,
           };
           if (result.image_url) ogTags.image = result.image_url;
 
-          const strippedMdText = removeMd(result.text);
+          const strippedMdText = removeMd(
+            result.type === "text" ? result.text : result.question
+          );
           const twitterText =
             strippedMdText.length > 180
               ? strippedMdText.substring(0, 180) + "..."
               : strippedMdText;
+
+          const finalPost = {
+            ...result,
+            twitter_text: twitterText,
+            created_at_formatted: dateFmt(result.created_at),
+          };
+          if (finalPost.type === "text") {
+            finalPost.text = mdConverter.makeHtml(result.text);
+          }
+          if (finalPost.type === "poll") {
+            finalPost.details = mdConverter.makeHtml(result.text);
+          }
 
           return res.render("post", {
             meta: {
@@ -1066,12 +1086,7 @@ app.get("/p/:slug/:postId", (req, res, next) => {
               og: ogTags,
             },
             product: productResult,
-            post: {
-              ...result,
-              twitter_text: twitterText,
-              text: mdConverter.makeHtml(result.text),
-              created_at_formatted: dateFmt(result.created_at),
-            },
+            post: finalPost,
           });
         })
         .catch((err) => {

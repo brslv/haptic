@@ -21,7 +21,7 @@ mixin notif({ notif })
         div(class="flex-1")
           p(class="mb-2")
             | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] commented on 
-            a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold text-yellow-300") post
+            a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold underline hover:no-underline") post
             |.
           div(class="comment prose prose-sm prose-yellow border border-gray-200 border-dashed p-2 rounded-md") !{notif.comment_content}
       if notif.type === 'post_boosts'
