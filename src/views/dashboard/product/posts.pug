@@ -128,9 +128,7 @@ block content
                 div(class="px-2 py-1 border border-gray-300 rounded-md flex items-center justify-between" data-product-tool-id=tool.id)
                   span(class="pr-2")= tool.text
                   +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale" data-product-tools-remove-btn)
-            button(class="flex items-center btn bg-white bg-yellow-100 hover:bg-yellow-300 btn-small click-scale" data-product-tools-add-btn)
-              +icon("plus", { width: 18, height: 18 })(class="mr-2")
-              span Add new
+            button(class="flex items-center btn bg-white bg-yellow-100 hover:bg-yellow-300 btn-small click-scale" data-product-tools-add-btn) Add new
             form(data-product-tools-form class="hidden relative mt-4 -mx-4 -mb-4 px-4 py-2 bg-transparent border-t border-gray-200")
               +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-2 cursor-pointer" data-product-tools-close-btn)
               label(class="block label pb-2" for="tools-input")

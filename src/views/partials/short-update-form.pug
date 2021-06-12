@@ -23,21 +23,21 @@ mixin short-update-form({ mode, isHidden, showCancelPill, showCancelButton, text
       div(data-preview class="hidden prose prose-yellow")
       
       // - controls
-      div(class="flex flex-row-reverse items-center justify-between -m-4 mt-4 bg-gray-50 px-4 py-2 border-t border-gray-200 rounded-b-md")
-        div(class="flex flex-row-reverse items-center")
+      div(class="flex flex-row items-center justify-between -m-4 mt-4 bg-gray-50 px-4 py-2 border-t border-gray-200 rounded-b-md")
+        div(class="flex flex-row items-center")
           button(type="submit" class="text-sm py-1.5 btn btn-primary border border-yellow-300 hover:border-yellow-400 rounded-md click-scale") Publish
 
           div(class="text-xs mx-4 text-gray-400") &mdash;
 
-          button(type="button" class="text-sm px-2 py-2 bg-white hover:bg-gray-100 border border-l-0 rounded-r-md click-scale" data-preview-btn data-tippy-content="Preview")
+          button(type="button" class="text-sm px-2 py-2 bg-white hover:bg-gray-100 border border-r-0 rounded-l-md click-scale" data-preview-btn data-tippy-content="Preview")
             +icon("eye", { width: 16, height: 16 })
-          button(type="button" class="hidden text-sm px-2 py-2 bg-blue-50 hover:bg-blue-100 border border-l-0 rounded-r-md click-scale" data-continue-editing-btn data-tippy-content="Continue editing")
+          button(type="button" class="hidden text-sm px-2 py-2 bg-blue-50 hover:bg-blue-100 border border-r-0 rounded-l-md click-scale" data-continue-editing-btn data-tippy-content="Continue editing")
             +icon("eye-off", { width: 16, height: 16 })
 
-          button(type="button" class="text-sm px-2 py-2 bg-white rounded-l-md hover:bg-gray-100 border click-scale" data-upload-image-btn data-tippy-content="Attach image")
+          button(type="button" class="text-sm px-2 py-2 bg-white rounded-r-md hover:bg-gray-100 border click-scale" data-upload-image-btn data-tippy-content="Attach image")
             +icon("image", { width: 16, height: 16 })
 
-          span(data-image-upload-loader class="hidden mr-2")
+          span(data-image-upload-loader class="hidden ml-2")
             span(class="animate-spin icon-container opacity-75 my-0 block relative")
               +icon("refresh-cw", { width: 14, height: 14 })
         if showCancelButton
