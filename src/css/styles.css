@@ -181,7 +181,7 @@
   }
 
   .product-btn {
-    @apply select-none cursor-pointer block px-4 py-2 rounded-md border border-gray-200 outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-2 hover:ring-2 hover:ring-yellow-300 hover:ring-offset-2;
+    @apply select-none cursor-pointer block px-4 py-2 rounded-md border border-gray-200 outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-2 hover:ring-2 hover:ring-yellow-300 hover:ring-offset-2 transition;
   }
 
   .product-btn-small {
