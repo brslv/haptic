@@ -2,7 +2,7 @@ include ./page-title.pug
 include ./icon.pug
 include ./comment.pug
 
-mixin poll({ question, options, product_slug, product_name, post_id, post_twitter_text, img, img_url, author_id, user_type, user_slug, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false, comments = [], show_posted_in_tag = false })
+mixin poll({ user_has_voted, question, options, product_slug, product_name, post_id, post_twitter_text, img, img_url, author_id, user_type, user_slug, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false, comments = [], show_posted_in_tag = false })
   if show_posted_in_tag && product_slug && product_name
     div(class="relative mx-4 text-sm")
       div(class="absolute w-6 h-4 bottom-0 left-0 border-t border-l rounded-tl-md border-gray-300")
@@ -38,20 +38,26 @@ mixin poll({ question, options, product_slug, product_name, post_id, post_twitte
           button(data-post-action-delete data-post-id=post_id class="btn btn-icon btn-small icon-container rounded-full hover:bg-gray-100 p-2 click-scale-2 inline-block ml-2")
               +icon("trash-2", { width: 18, height: 18 })
 
-    h2(class="text-2xl font-medium text-gray-700 flex items-center")= question
-    div(class="prose prose-yellow my-4")
-      div(class={"hidden":!img_url, "border rounded-md p-1.5 bg-white border-gray-300 w-full mb-4": true})
-        img(data-image data-zoomable src=img_url class={"hidden": !img_url, "mx-auto cursor-pointer rounded-md": true} style="margin-top: 0; margin-bottom: 0;")
-      div(data-content="data-content")
-        div
-          block
-    div(class="mb-4")
-      ul
-        each option in options 
-          li(class="flex items-center")
-            label(class="block w-full px-1.5 py-2 mt-1 border border-gray-100 rounded-md cursor-pointer transition")
-              input(type="checkbox" class="checkbox cursor-pointer click-scale-2 mr-2")
-              span= option.text
+    div(data-poll)
+      h2(class="text-2xl font-medium text-gray-700 flex items-center")= question
+      div(class="prose prose-yellow my-4")
+        div(class={"hidden":!img_url, "border rounded-md p-1.5 bg-white border-gray-300 w-full mb-4": true})
+          img(data-image data-zoomable src=img_url class={"hidden": !img_url, "mx-auto cursor-pointer rounded-md": true} style="margin-top: 0; margin-bottom: 0;")
+        div(data-content="data-content")
+          div
+            block
+      div(class="mb-4")
+        if user_has_voted
+          h2 Showing results here...
+        else
+          ul
+            each option in options 
+              li(class="flex items-center")
+                label(class="flex items-center w-full px-1.5 py-2 mt-1 border border-gray-100 rounded-md cursor-pointer transition")
+                  div(class="relative inline-block")
+                    input(type="checkbox" class="checkbox cursor-pointer mr-2 click-scale-2" value=option.id data-post-id=post_id)
+                    +icon("check", { width: 16, height: 16 })(id="checkbox-check")
+                  span= option.text
         
 
     div(class="flex items-center justify-between")

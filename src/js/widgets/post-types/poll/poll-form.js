@@ -1,7 +1,7 @@
-import { $, turbo, req } from "../../utils";
-import createPostTypesUtil from "./utils";
+import { $, turbo, req } from "../../../utils";
+import createPostTypesUtil from "../utils";
 
-export default function poll() {
+export default function pollForm() {
   const detailsToggleClasses =
     "bg-red-50 hover:bg-red-100 border-red-50 hover:border-red-100";
   function activate($els, postTypesUtil) {

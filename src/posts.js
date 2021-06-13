@@ -300,10 +300,12 @@ function actions({ db, user }) {
           });
       })
       .then(({ result, pollOptions }) => {
-        return db("poll_answers")
+        return db("poll_votes")
           .select(
-            "poll_answers.id",
+            "poll_votes.id",
+            "poll_options.id as poll_options_id",
             "poll_options.text",
+            "users.id as user_id",
             "users.type as user_type",
             "users.slug as user_slug",
             "users.twitter_name as user_twitter_name",
@@ -312,12 +314,12 @@ function actions({ db, user }) {
           )
           .leftJoin(
             "poll_options",
-            "poll_answers.poll_option_id",
+            "poll_votes.poll_option_id",
             "poll_options.id"
           )
-          .leftJoin("users", "poll_answers.user_id", "users.id")
+          .leftJoin("users", "poll_votes.user_id", "users.id")
           .whereIn(
-            "poll_answers.poll_option_id",
+            "poll_votes.poll_option_id",
             pollOptions.map((o) => o.id)
           )
           .then(function pollAnswersSuccess(pollAnswers) {
@@ -337,7 +339,7 @@ function actions({ db, user }) {
                 ...result,
                 comments: commentsResult,
                 poll_options: pollOptions,
-                poll_answers: pollAnswers,
+                poll_votes: pollAnswers,
               };
             })
             .catch((err) => {
@@ -348,9 +350,17 @@ function actions({ db, user }) {
           return {
             ...result,
             poll_options: pollOptions,
-            poll_answers: pollAnswers,
+            poll_votes: pollAnswers,
           };
         }
+      })
+      .then((result) => {
+        return {
+          ...result,
+          user_has_voted: result.poll_votes.some(
+            (vote) => vote.user_id === user.id
+          ),
+        };
       })
       .then((result) => {
         return result;
@@ -567,7 +577,7 @@ function actions({ db, user }) {
           return Promise.all(enrichedPosts);
         })
         .then((result) => {
-          cache.set(cacheKeys.productPosts(productId), result, ttl.day);
+          // cache.set(cacheKeys.productPosts(productId), result, ttl.day);
           res(result);
         })
         .catch((err) => {
@@ -799,6 +809,20 @@ function actions({ db, user }) {
     });
   }
 
+  function vote(postId, optionId) {
+    return new Promise((res, rej) => {
+      return db("poll_votes")
+        .insert({ post_id: postId, poll_option_id: optionId, user_id: user.id })
+        .returning("id")
+        .then((result) => {
+          return res(result);
+        })
+        .catch((err) => {
+          return rej(err);
+        });
+    });
+  }
+
   return {
     publish,
     getBrowsablePosts,
@@ -806,6 +830,7 @@ function actions({ db, user }) {
     updatePost,
     getAllPosts,
     removePost,
+    vote,
   };
 }
 

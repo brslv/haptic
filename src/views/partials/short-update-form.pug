@@ -7,7 +7,7 @@ mixin short-update-form({ mode, isHidden, showCancelPill, showCancelButton, text
     form(class="relative")
       
       +csrf
-      input(type="file" id="image-upload" data-upload-file class="hidden")
+      input(type="file" data-upload-file class="hidden")
       input(type="hidden" name="uploaded_image" value="" data-uploaded)
       input(type="hidden" name="id" value=product.id)
       div(class="border border-gray-300 p-1.5 rounded-md relative mb-2" style="display: none;" data-upload-image-preview)

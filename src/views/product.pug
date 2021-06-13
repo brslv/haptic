@@ -69,6 +69,7 @@ block content
                 }) !{post_text}
               if post.type === 'poll'
                 +poll({
+                  user_has_voted: post.user_has_voted,
                   question: post.question,
                   options: post.poll_options,
                   author_id: post.user_id,
@@ -146,7 +147,7 @@ block content
             span(class="font-medium text-sm mb-4 block") Tools
             div(class="flex flex-wrap -m-1")
               each tool of tools
-                div(class="px-2 py-1 m-1 border border-gray-300 rounded-lg")= tool.text
+                div(class="px-2 py-1 m-1 border border-gray-200 rounded-lg")= tool.text
 
 block modals
   if !user

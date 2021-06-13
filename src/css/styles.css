@@ -193,10 +193,6 @@
     outline: none !important;
   }
 
-  .input[disabled] {
-    @apply bg-gray-100 dark:bg-gray-600;
-  }
-
   .checkbox {
     @apply w-6 h-6 bg-white border-2 border-gray-200 shadow-sm rounded-md hover:border-yellow-300 cursor-pointer;
     -webkit-appearance: none;
@@ -214,8 +210,16 @@
     flex-shrink: 0;
   }
 
-  .checkbox.selected {
-    @apply bg-yellow-300 border-2 border-yellow-300 shadow-sm rounded-md hover:shadow-md;
+  .checkbox:not(:checked) ~ #checkbox-check {
+    @apply hidden;
+  }
+
+  .checkbox:checked ~ #checkbox-check {
+    @apply absolute top-1.5 left-1;
+  }
+
+  .checkbox[disabled] {
+    @apply bg-gray-100 hover:bg-gray-100 hover:border-gray-200 shadow-none;
   }
 
   .label {

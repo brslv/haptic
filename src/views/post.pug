@@ -42,6 +42,7 @@ block content
         }) !{post_text}
       if post.type === 'poll'
         +poll({
+          user_has_voted: post.user_has_voted,
           question: post.question,
           options: post.poll_options,
           author_id: post.user_id,

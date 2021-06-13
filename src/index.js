@@ -1480,6 +1480,56 @@ function handlePollType(pid, req, res, next) {
 }
 
 app.post(
+  "/vote",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const data = req.body;
+    const postsActions = posts.actions({ db, user: req.user });
+
+    if (!data.post_id || !data.option_id || isNaN(Number(data.option_id))) {
+      return res.status(400).json({
+        ok: 0,
+        err: `Invalid vote input.`,
+        details: null,
+      });
+    }
+
+    postsActions
+      .vote(data.post_id, data.option_id)
+      .then((result) => {
+        const id = result[0];
+        if (!id) {
+          return res.status(400).json({
+            ok: 0,
+            err: "Couldn't process your vote. Please, try again in a minute.",
+            details: null,
+          });
+        }
+
+        postsActions
+          .getPost(posts.POLL_TYPE, { postId: data.post_id })
+          .then((pollResult) => {
+            res.json({ ok: 1, err: null, details: { poll: pollResult } });
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.code === dbErrCodes.DUP_CODE)
+          return res.status(400).json({
+            ok: 0,
+            err: "You've already voted in this poll.",
+            details: null,
+          });
+
+        next(err);
+      });
+  }
+);
+
+app.post(
   "/post/:pid",
   ajaxOnly,
   authOnly,
