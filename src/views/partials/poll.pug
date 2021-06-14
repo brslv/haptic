@@ -48,7 +48,15 @@ mixin poll({ user_has_voted, question, options, product_slug, product_name, post
             block
       div(class="mb-4")
         if user_has_voted
-          h2 Showing results here...
+          ul
+            each option in options 
+              li(class="flex items-center")
+                div(class="relative flex items-center w-full px-1.5 py-2 mt-1 transition")
+                  div(class="absolute top-0 left-0 h-full" style=`width: ${option.votes_percent}%`)
+                    div(class="bg-gray-100 h-full rounded-md poll-bar border-b-2 border-gray-200")
+                  span(class="relative flex items-center")
+                    span(class="mr-1")=option.text
+                    span(class="font-medium")=`(${option.votes_percent}%)`
         else
           ul
             each option in options 

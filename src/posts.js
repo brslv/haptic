@@ -322,15 +322,28 @@ function actions({ db, user }) {
             "poll_votes.poll_option_id",
             pollOptions.map((o) => o.id)
           )
-          .then(function pollAnswersSuccess(pollAnswers) {
+          .then(function pollVotesSuccess(pollVotes) {
+            const allVotesCount = pollVotes.length;
+
+            pollOptions = pollOptions.map((opt) => {
+              const votesCount = pollVotes.reduce((count, vote) => {
+                if (vote.poll_options_id === opt.id) count += 1;
+                return count;
+              }, 0);
+
+              opt.votes_count = votesCount;
+              opt.votes_percent = (votesCount / allVotesCount) * 100;
+              return opt;
+            });
+
             return {
               result,
               pollOptions,
-              pollAnswers,
+              pollVotes,
             };
           });
       })
-      .then(({ result, pollOptions, pollAnswers }) => {
+      .then(({ result, pollOptions, pollVotes }) => {
         if (withComments) {
           return commentsActions
             .getComments(result.id)
@@ -339,7 +352,7 @@ function actions({ db, user }) {
                 ...result,
                 comments: commentsResult,
                 poll_options: pollOptions,
-                poll_votes: pollAnswers,
+                poll_votes: pollVotes,
               };
             })
             .catch((err) => {
@@ -350,7 +363,7 @@ function actions({ db, user }) {
           return {
             ...result,
             poll_options: pollOptions,
-            poll_votes: pollAnswers,
+            poll_votes: pollVotes,
           };
         }
       })
