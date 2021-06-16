@@ -15,6 +15,26 @@ export default function pollVote() {
     // send request to the backend
     function ok(response) {
       console.log(response);
+
+      const pollData = response.data.details.poll;
+      const $optionsList = $target.parents("[data-options-list]");
+      console.log({ optionsList: $optionsList });
+      $optionsList.children().remove();
+
+      // create options bars and append them to the options list
+      pollData.poll_options.forEach((opt) => {
+        const text = opt.text;
+        const percent = opt.votes_percent;
+        const votesCount = opt.votes_count;
+
+        const $bar = $($("[data-option-bar-tpl]").html());
+        $bar.find("[data-option-bar]").css({
+          width: `${percent}%`,
+        });
+        $bar.find("[data-votes-percent-label]").text(percent);
+        $bar.find("[data-option-text]").text(text);
+        $optionsList.append($bar);
+      });
     }
 
     function fail(err) {

@@ -600,77 +600,6 @@ function actions({ db, user }) {
     });
   }
 
-  // function getAllPosts(
-  //   productId,
-  //   { withComments = false } = { withComments: false }
-  // ) {
-  //   const commentsActions = comments.actions({ db, user });
-
-  //   return new Promise((res, rej) => {
-  //     const cachedPosts = cache.get(cacheKeys.productPosts(productId));
-  //     if (cachedPosts) {
-  //       return res(cachedPosts);
-  //     }
-
-  //     db.select(
-  //       "posts.id",
-  //       "posts.type",
-  //       "posts.created_at",
-  //       "posts.updated_at",
-  //       "posts_text.text",
-  //       "users.id as user_id",
-  //       "users.type as user_type",
-  //       "users.slug as user_slug",
-  //       "users.twitter_name as user_twitter_name",
-  //       "users.twitter_profile_image_url as user_twitter_profile_image_url",
-  //       "users.twitter_screen_name as user_twitter_screen_name",
-  //       "images.id as image_id",
-  //       "images.url as image_url",
-  //       "images.created_at as image_created_at",
-  //       db("post_boosts")
-  //         .count()
-  //         .whereRaw("post_id = posts.id")
-  //         .as("boosts_count")
-  //     )
-  //       .table("posts_text")
-  //       .leftJoin("posts", "posts_text.post_id", "posts.id")
-  //       .leftJoin("users", "posts.user_id", "users.id")
-  //       .leftJoin("images", "images.post_id", "posts.id")
-  //       .where({ "posts.product_id": productId })
-  //       .orderBy("posts.created_at", "DESC")
-  //       .then((result) => {
-  //         if (withComments) {
-  //           let commentsPromises = [];
-  //           result.forEach((post) => {
-  //             commentsPromises.push(commentsActions.getComments(post.id));
-  //           });
-  //           return Promise.all(commentsPromises)
-  //             .then((commentsResult) => {
-  //               return [
-  //                 ...result.map((post, idx) => ({
-  //                   ...post,
-  //                   comments: commentsResult[idx],
-  //                 })),
-  //               ];
-  //             })
-  //             .catch((err) => {
-  //               console.log(err);
-  //               throw err;
-  //             });
-  //         } else {
-  //           return result;
-  //         }
-  //       })
-  //       .then((result) => {
-  //         cache.set(cacheKeys.productPosts(productId), result, ttl[1]);
-  //         res(result);
-  //       })
-  //       .catch((err) => {
-  //         trx.rollback().then(() => rej(err));
-  //       });
-  //   });
-  // }
-
   function publish(type, product, data) {
     cache.del(cacheKeys.productPosts(product.id));
     cache.del(cacheKeys.browsablePosts(BROWSABLE_ORDER.BOOSTS));
@@ -703,11 +632,10 @@ function actions({ db, user }) {
         db.transacting(trx)
           .table("posts_text")
           .update({ text: data.text }) // update the post
-          .where({ id: postId })
+          .where({ post_id: postId })
           .then((result) => {
+            if (!result) throw Error("Couldn't update post " + postId);
             cache.del(cacheKeys.productPosts(result.product_id));
-
-            if (!result) throw Error("Couldn't update post" + postId);
             return result;
           })
           .then((updateResult) => {

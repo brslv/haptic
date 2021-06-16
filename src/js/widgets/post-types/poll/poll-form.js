@@ -96,7 +96,7 @@ export default function pollForm() {
       options,
     };
 
-    const errors = validateInput(data);
+    const errors = {}; // validateInput(data);
     clearErrors();
     if (Object.keys(errors).length) {
       $(document).trigger("haptic:poll-submit-suspended", {

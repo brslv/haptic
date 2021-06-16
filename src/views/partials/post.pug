@@ -28,7 +28,7 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
         div(class="relative inline-block ml-2")
           button(data-ctx-menu-trigger=`share_${post_id}` class="btn btn-icon btn-small icon-container rounded-full hover:bg-gray-100 hover:ring-1 hover:ring-gray-300 hover:ring-offset-2 p-2 click-scale-2")
             +icon('share-2', { width: '18', height: '18' })
-          div(data-ctx-menu=`share_${post_id}` class="hidden absolute top-8 -right-2 bg-white shadow-xl rounded-md border border-gray-100" style="min-width: 150px;")
+          div(data-ctx-menu=`share_${post_id}` class="hidden z-10 absolute top-8 -right-2 bg-white shadow-xl rounded-md border border-gray-100" style="min-width: 150px;")
             +page-title(class="px-4 py-2 inline-block w-full") Share
             div(class="py-2 pb-4 px-4")
               a(href=`https://twitter.com/share?url=${ROOT_URL}/p/${product_slug}/${post_id}&via=hapticso&hashtags=buildinpublic,onhaptic&text=${post_twitter_text}` class="flex items-center btn btn-twitter text-sm click-scale" onclick="window.open(this.href);return false;")

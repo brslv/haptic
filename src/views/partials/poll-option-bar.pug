@@ -1,0 +1,10 @@
+mixin poll-option-bar({ option })
+  li(class="flex items-center")
+    div(class="relative flex items-center w-full px-1.5 py-2 mt-1 transition")
+      div(class="absolute top-0 left-0 h-full" style=`width: ${option.votes_percent}%` data-option-bar)
+        div(class="bg-gray-50 h-full rounded-md poll-bar border border-gray-200")
+      span(class="relative flex items-center justify-between")
+        span(class="mr-1 block flex-1" data-option-text)=option.text
+        span(class="font-medium block")
+          span(data-votes-percent-label)= option.votes_percent
+          span %

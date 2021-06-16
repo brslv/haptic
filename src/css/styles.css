@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer components {
+  #bg {
+    background: rgb(255, 255, 255);
+    background: linear-gradient(0deg, rgba(249, 250, 251,1) 0%, rgba(255,255,255,1) 100%);
+  }
+
   .turbo-progress-bar {
     @apply bg-yellow-400;
     height: 5px;

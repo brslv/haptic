@@ -126,7 +126,10 @@ passport.use(
               .insert({
                 bio: twitterData.description,
                 slug: twitterData.screen_name,
-                email: emails[0] ? emails[0].value : undefined,
+                email:
+                  emails && emails[0] && emails[0].value
+                    ? emails[0].value
+                    : undefined,
                 twitter_id: twitterData.id,
                 twitter_name: twitterData.name,
                 twitter_screen_name: twitterData.screen_name,
@@ -1440,20 +1443,20 @@ function handlePollType(pid, req, res, next) {
 
   // validations
   const data = req.body;
-  if (data.question.length < 10) {
-    return res.status(400).json({
-      ok: 0,
-      err: `Invalid question length. Min: 10 symbols.`,
-      details: null,
-    });
-  }
-  if (data.options.length < 2) {
-    return res.status(400).json({
-      ok: 0,
-      err: `Provide at least 2 options.`,
-      details: null,
-    });
-  }
+  // if (data.question.length < 10) {
+  //   return res.status(400).json({
+  //     ok: 0,
+  //     err: `Invalid question length. Min: 10 symbols.`,
+  //     details: null,
+  //   });
+  // }
+  // if (data.options.length < 2) {
+  //   return res.status(400).json({
+  //     ok: 0,
+  //     err: `Provide at least 2 options.`,
+  //     details: null,
+  //   });
+  // }
 
   // insert
   db("products")

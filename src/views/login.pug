@@ -4,7 +4,7 @@ include partials/page-title.pug
 
 block content
   div(class="max-w-md absolute top-1/2 left-1/2" style="transform: translate(-50%, -50%)")
-    div(class="bg-white shadow-md rounded-md p-4" style="width: 280px;")
+    div(class="bg-white border border-gray-200 rounded-md p-4" style="width: 280px;")
       div
         h1(class="text-xl font-bold mb-4 text-center") Login
         a(href=(creator ? "/auth/twitter?creator=true" : "/auth/twitter") class="flex items-center justify-center btn btn-twitter")
