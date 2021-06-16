@@ -387,80 +387,88 @@ function actions({ db, user }) {
     order = BROWSABLE_ORDER.BOOSTS,
     withComments = true,
   }) {
-    const commentsActions = comments.actions({ db, user });
     return new Promise((res, rej) => {
       const cachedPosts = cache.get(cacheKeys.browsablePosts(order));
       if (cachedPosts) {
         return res(cachedPosts);
       }
 
-      db.transaction().then((trx) => {
-        db.transacting(trx)
-          .select(
-            "posts.id",
-            "posts.type",
-            "posts.created_at",
-            "posts.updated_at",
-            "posts.user_id as user_id",
-            "posts_text.text",
-            "products.slug as product_slug",
-            "products.name as product_name",
-            "products.is_public",
-            "products.is_listed",
-            "users.type as user_type",
-            "users.slug as user_slug",
-            "users.twitter_name as user_twitter_name",
-            "users.twitter_profile_image_url as user_twitter_profile_image_url",
-            "users.twitter_screen_name as user_twitter_screen_name",
-            "images.id as image_id",
-            "images.url as image_url",
-            "images.created_at as image_created_at",
-            db("post_boosts")
-              .count()
-              .whereRaw("post_id = posts.id")
-              .as("boosts_count")
-          )
-          .table("posts_text")
-          .leftJoin("posts", "posts_text.post_id", "posts.id")
-          .leftJoin("products", "posts.product_id", "products.id")
-          .leftJoin("users", "posts.user_id", "users.id")
-          .leftJoin("images", "images.post_id", "posts.id")
-          .where({ "products.is_public": true, "products.is_listed": true })
-          .orderBy(order)
-          .limit(12)
-          .then((result) => {
-            if (withComments) {
-              let commentsPromises = [];
-              result.forEach((post) => {
-                commentsPromises.push(commentsActions.getComments(post.id));
-              });
-              return Promise.all(commentsPromises)
-                .then((commentsResult) => {
-                  return [
-                    ...result.map((post, idx) => ({
-                      ...post,
-                      comments: commentsResult[idx],
-                    })),
-                  ];
-                })
-                .catch((err) => {
-                  console.log(err);
-                  throw err;
-                });
-            } else {
-              return result;
-            }
-          })
-          .then((result) => {
-            trx.commit().then(() => {
-              cache.set(cacheKeys.browsablePosts(order), result, ttl[1]);
-              res(result);
-            });
-          })
-          .catch((err) => {
-            trx.rollback().then(() => rej(err));
-          });
-      });
+      _getAllPostsQuery(null, { order, withComments })
+        .then((result) => {
+          cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
+          res(result);
+        })
+        .catch((err) => {
+          rej(err);
+        });
+
+      // db.transaction().then((trx) => {
+      //   db.transacting(trx)
+      //     .select(
+      //       "posts.id",
+      //       "posts.type",
+      //       "posts.created_at",
+      //       "posts.updated_at",
+      //       "posts.user_id as user_id",
+      //       "posts_text.text",
+      //       "products.slug as product_slug",
+      //       "products.name as product_name",
+      //       "products.is_public",
+      //       "products.is_listed",
+      //       "users.type as user_type",
+      //       "users.slug as user_slug",
+      //       "users.twitter_name as user_twitter_name",
+      //       "users.twitter_profile_image_url as user_twitter_profile_image_url",
+      //       "users.twitter_screen_name as user_twitter_screen_name",
+      //       "images.id as image_id",
+      //       "images.url as image_url",
+      //       "images.created_at as image_created_at",
+      //       db("post_boosts")
+      //         .count()
+      //         .whereRaw("post_id = posts.id")
+      //         .as("boosts_count")
+      //     )
+      //     .table("posts_text")
+      //     .leftJoin("posts", "posts_text.post_id", "posts.id")
+      //     .leftJoin("products", "posts.product_id", "products.id")
+      //     .leftJoin("users", "posts.user_id", "users.id")
+      //     .leftJoin("images", "images.post_id", "posts.id")
+      //     .where({ "products.is_public": true, "products.is_listed": true })
+      //     .orderBy(order)
+      //     .limit(12)
+      //     .then((result) => {
+      //       if (withComments) {
+      //         let commentsPromises = [];
+      //         result.forEach((post) => {
+      //           commentsPromises.push(commentsActions.getComments(post.id));
+      //         });
+      //         return Promise.all(commentsPromises)
+      //           .then((commentsResult) => {
+      //             return [
+      //               ...result.map((post, idx) => ({
+      //                 ...post,
+      //                 comments: commentsResult[idx],
+      //               })),
+      //             ];
+      //           })
+      //           .catch((err) => {
+      //             console.log(err);
+      //             throw err;
+      //           });
+      //       } else {
+      //         return result;
+      //       }
+      //     })
+      //     .then((result) => {
+      //       trx.commit().then(() => {
+      //         cache.set(cacheKeys.browsablePosts(order), result, ttl[1]);
+      //         res(result);
+      //       });
+      //     })
+      //     .catch((err) => {
+      //       trx.rollback().then(() => rej(err));
+      //     });
+      // });
     });
   }
 
@@ -503,17 +511,38 @@ function actions({ db, user }) {
 
   function getAllPosts(
     productId,
-    { withComments = false } = { withComments: false }
+    { withComments = false, limit = null, order = BROWSABLE_ORDER.NEWEST } = {
+      withComments: false,
+      limit: null,
+      order: BROWSABLE_ORDER.NEWEST,
+    }
   ) {
-    const commentsActions = comments.actions({ db, user });
-
     return new Promise((res, rej) => {
       const cachedPosts = cache.get(cacheKeys.productPosts(productId));
       if (cachedPosts) {
         return res(cachedPosts);
       }
 
-      db("posts")
+      _getAllPostsQuery(productId, { withComments, limit, order }).then(
+        (result) => {
+          // cache.set(cacheKeys.productPosts(productId), result, ttl.day);
+          res(result);
+        }
+      );
+    });
+  }
+
+  function _getAllPostsQuery(
+    productId,
+    { withComments = false, limit = null, order = BROWSABLE_ORDER.NEWEST } = {
+      withComments: false,
+      limit: null,
+      order: BROWSABLE_ORDER.NEWEST,
+    }
+  ) {
+    const commentsActions = comments.actions({ db, user });
+    return new Promise((res, rej) => {
+      const query = db("posts")
         .select(
           "posts.id",
           "posts.type",
@@ -522,6 +551,10 @@ function actions({ db, user }) {
           "posts_text.text",
           "posts_poll.question as poll_question",
           "posts_poll.details as poll_details",
+          "products.slug as product_slug",
+          "products.name as product_name",
+          "products.is_public",
+          "products.is_listed",
           "users.id as user_id",
           "users.type as user_type",
           "users.slug as user_slug",
@@ -540,8 +573,22 @@ function actions({ db, user }) {
         .leftJoin("posts_poll", "posts_poll.post_id", "posts.id")
         .leftJoin("users", "posts.user_id", "users.id")
         .leftJoin("images", "images.post_id", "posts.id")
-        .where({ "posts.product_id": productId })
-        .orderBy("posts.created_at", "DESC")
+        .leftJoin("products", "products.id", "posts.product_id");
+
+      let where = { "products.is_listed": true, "products.is_public": true };
+      if (productId) {
+        where["posts.product_id"] = productId;
+      }
+      query.where(where);
+
+      if (order) {
+        query.orderBy(order);
+      }
+      if (limit) {
+        query.limit(limit);
+      }
+
+      query
         .then((postsResult) => {
           if (withComments) {
             let commentsPromises = [];
@@ -570,8 +617,13 @@ function actions({ db, user }) {
 
           const enrichedPosts = postsWithCommentsResult
             .map((post) => {
-              if (post.type === "poll") return _getPostPoll(post.id);
-              else return post;
+              if (post.type === "poll") {
+                return new Promise((res, rej) => {
+                  return _getPostPoll(post.id).then((pollPostResult) =>
+                    res({ ...post, ...pollPostResult })
+                  );
+                });
+              } else return post;
             })
             .reduce((acc, post) => {
               acc.push(
@@ -589,9 +641,8 @@ function actions({ db, user }) {
             }, []);
           return Promise.all(enrichedPosts);
         })
-        .then((result) => {
-          // cache.set(cacheKeys.productPosts(productId), result, ttl.day);
-          res(result);
+        .then((finalPostsResult) => {
+          res(finalPostsResult);
         })
         .catch((err) => {
           console.error(err);
