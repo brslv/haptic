@@ -9,13 +9,19 @@ export default function pollVote() {
 
   function onCheckboxClick($els, e) {
     const $target = $(e.currentTarget);
+    const triggersLoginModal = $target.data("modal-trigger") === "login";
+
+    if (triggersLoginModal) {
+      $target.get(0).checked = false;
+      // the user is guest and click on the input will trigger the login modal
+      return;
+    }
+
     const optionId = $target.val();
     const postId = $target.data("post-id");
 
     // send request to the backend
     function ok(response) {
-      console.log(response);
-
       const pollData = response.data.details.poll;
       const $optionsList = $target.parents("[data-options-list]");
       console.log({ optionsList: $optionsList });

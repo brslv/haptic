@@ -46,6 +46,7 @@ block content
                 user_has_voted: post.user_has_voted,
                 question: post.question,
                 options: post.poll_options,
+                votes: post.poll_votes,
                 author_id: post.user_id,
                 product_slug: post.product_slug,
                 product_name: post.product_name,
@@ -59,6 +60,7 @@ block content
                 twitter_screen_name: post.user_twitter_screen_name,
                 date_str: post.created_at_formatted,
                 disable_boost_btn: false,
+                show_opts: false,
                 show_posted_in_tag: true,
                 boosts_count: post.boosts_count,
                 comments: post.comments

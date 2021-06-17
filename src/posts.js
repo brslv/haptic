@@ -371,7 +371,7 @@ function actions({ db, user }) {
         return {
           ...result,
           user_has_voted: result.poll_votes.some(
-            (vote) => vote.user_id === user.id
+            (vote) => user && vote.user_id === user.id
           ),
         };
       })
@@ -395,7 +395,7 @@ function actions({ db, user }) {
 
       _getAllPostsQuery(null, { order, withComments })
         .then((result) => {
-          cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
+          // cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
           res(result);
         })
         .catch((err) => {
@@ -619,9 +619,9 @@ function actions({ db, user }) {
             .map((post) => {
               if (post.type === "poll") {
                 return new Promise((res, rej) => {
-                  return _getPostPoll(post.id).then((pollPostResult) =>
-                    res({ ...post, ...pollPostResult })
-                  );
+                  _getPostPoll(post.id).then((pollPostResult) => {
+                    return res({ ...post, ...pollPostResult });
+                  });
                 });
               } else return post;
             })
