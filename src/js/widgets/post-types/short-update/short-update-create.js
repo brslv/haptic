@@ -34,6 +34,9 @@ export default function shortUpdateCreate() {
         hideErrorsFn: shortUpdateUtils.hideErrors.bind(null, $els),
         showErrorsFn: shortUpdateUtils.showErrors.bind(null, $els),
         requestFn: request,
+        beforeSend: function beforeSend() {
+          $els.$submit.attr("disabled", "disabled"); // disable the submit. Since we're reloading the page after the submit, no need to reenable it again on ok/fail.
+        },
         onOk: function ok(response) {
           const data = response.data;
           const details = data.details;
@@ -85,7 +88,7 @@ export default function shortUpdateCreate() {
   }
 
   function registerCancel($els, postTypesUtil) {
-    $els.$cancelBtn.on("click", function() {
+    $els.$cancelBtn.on("click", function () {
       close($els, postTypesUtil);
       $(this).off("click");
     });

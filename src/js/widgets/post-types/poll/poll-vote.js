@@ -24,7 +24,6 @@ export default function pollVote() {
     function ok(response) {
       const pollData = response.data.details.poll;
       const $optionsList = $target.parents("[data-options-list]");
-      console.log({ optionsList: $optionsList });
       $optionsList.children().remove();
 
       // create options bars and append them to the options list

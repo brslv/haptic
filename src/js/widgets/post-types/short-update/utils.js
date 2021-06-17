@@ -19,7 +19,7 @@ export function registerForm({
   imageUploadedEventName,
   formValuesExtractorFn,
 }) {
-  $text.on("input", function(e) {
+  $text.on("input", function (e) {
     const value = e.currentTarget.value;
     const length = value.length;
 
@@ -34,11 +34,11 @@ export function registerForm({
   $previewBtn.on("click", () => onPreview());
   $continueEditingBtn.on("click", () => onContinueEditing());
   $text.trigger("input");
-  $form.on("submit", function(e) {
+  $form.on("submit", function (e) {
     e.preventDefault();
     onFormSubmit();
   });
-  $uploadImgBtn.on("click", function(e) {
+  $uploadImgBtn.on("click", function (e) {
     onUploadImageBtnClick();
   });
   $fileUpload.on("change", onFileSelected);
@@ -104,6 +104,7 @@ export function onFormSubmit({
   hideErrorsFn,
   showErrorsFn,
   requestFn,
+  beforeSend,
   onOk,
   onFail,
 }) {
@@ -113,6 +114,7 @@ export function onFormSubmit({
   hideErrorsFn();
   if (Object.keys(errors).length) return showErrorsFn(errors);
 
+  if (typeof beforeSend === "function") beforeSend({ formValues });
   requestFn(formValues, {
     ok: onOk,
     fail: onFail,
@@ -247,10 +249,7 @@ export function previewImage(url, $els) {
   const $rmBtn = $(
     `<button type="button" class="shadow-xl absolute top-1/2 left-1/2 btn btn-danger btn-small text-sm" style="transform: translate(-50%, -50%);">Remove</button>`
   ).on("click", clearImagePreview.bind(null, $els));
-  $container
-    .find("[data-content]")
-    .append($img)
-    .append($rmBtn);
+  $container.find("[data-content]").append($img).append($rmBtn);
   $els.$preview.append($container);
   $els.$preview.show();
   $els.$uploadedImg.val(url);

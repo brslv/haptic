@@ -409,6 +409,12 @@ app.get("/browse", (req, res) => {
                       text_md: post.text,
                       twitter_text: twitterText,
                       text: mdConverter.makeHtml(post.text),
+                      details_md:
+                        post.type === "poll" ? post.details : undefined,
+                      details:
+                        post.type === "poll"
+                          ? mdConverter.makeHtml(post.details)
+                          : undefined,
                       created_at_formatted: dateFmt(post.created_at),
                     };
                   }),
@@ -573,6 +579,12 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
                       text_md: post.text,
                       twitter_text: twitterText,
                       text: mdConverter.makeHtml(post.text),
+                      details_md:
+                        post.type === "poll" ? post.details : undefined,
+                      details:
+                        post.type === "poll"
+                          ? mdConverter.makeHtml(post.details)
+                          : undefined,
                       created_at_formatted: dateFmt(post.created_at),
                     };
                   }),
@@ -946,6 +958,12 @@ app.get("/p/:slug", (req, res, next) => {
                           text_md: post.text,
                           twitter_text: twitterText,
                           text: mdConverter.makeHtml(post.text),
+                          details_md:
+                            post.type === "poll" ? post.details : undefined,
+                          details:
+                            post.type === "poll"
+                              ? mdConverter.makeHtml(post.details)
+                              : undefined,
                           created_at_formatted: dateFmt(post.created_at),
                         };
                       }),
@@ -1077,7 +1095,8 @@ app.get("/p/:slug/:postId", (req, res, next) => {
             finalPost.text = mdConverter.makeHtml(result.text);
           }
           if (finalPost.type === "poll") {
-            finalPost.details = mdConverter.makeHtml(result.text);
+            finalPost.details_md = result.details;
+            finalPost.details = mdConverter.makeHtml(result.details);
           }
 
           return res.render("post", {
