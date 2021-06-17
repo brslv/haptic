@@ -19,8 +19,11 @@ mixin top-bar(activePage)
                           li(class="flex items-center")
                             +icon("grid", { width:20, height: 20 })(class="mr-2")
                             span(class="font-medium") Browse
-
-                      +icon("menu", { width: 20, height: 20 })(data-mobile-nav-open)
+                      
+                      div(class="relative" data-mobile-nav-open)
+                        +icon("menu", { width: 20, height: 20 })
+                        if notificationsCount > 0
+                          span(class="absolute -top-3 -right-2 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notificationsCount
 
                     //- mobile
 
