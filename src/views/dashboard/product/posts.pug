@@ -12,7 +12,7 @@ include ../../partials/csrf.pug
 include ../../partials/short-update-form.pug
 include ../../partials/poll-form.pug
 
-mixin post-type-btn({trigger, icon, disabled, tooltip, text}, attr = {})
+mixin post-type-btn({trigger, icon, iconClass, disabled, tooltip, text}, attr = {})
   div(
     tabindex="0"
     role="button"
@@ -26,7 +26,7 @@ mixin post-type-btn({trigger, icon, disabled, tooltip, text}, attr = {})
     data-tippy-content= tooltip
   )&attributes(attr)
     span(class="mb-1")
-      +icon(icon, { width: '18', height: '18', stroke: disabled ? "disabled" : "default" })
+      +icon(icon, { width: '18', height: '18', stroke: disabled ? "disabled" : "default" })(class=iconClass)
 
     span(class="text-xs text-gray-500")= text
     //- if block
@@ -48,7 +48,7 @@ block content
         div(class="bg-white p-2 mb-4 rounded-md border border-gray-200 hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 transition" data-post-types-container)
           div(class="gap-2 flex overflow-y-auto")
             +post-type-btn({ trigger: "short-update-create", icon: "file-text", disabled: false, text: "Quick update" })
-            +post-type-btn({ trigger: "poll", icon: "check-circle", disabled: false, text: "Poll" })
+            +post-type-btn({ trigger: "poll", icon: "bar-chart-2", iconClass: "transform rotate-90", disabled: false, text: "Poll" })
             +post-type-btn({ trigger: "long-update", icon: "feather", disabled: true, tooltip: "Soon!", text: "Article" })
             +post-type-btn({ trigger: "youtube", icon: "youtube", disabled: true, tooltip: "Soon!", text: "YouTube video" }) 
             +post-type-btn({ trigger: "milestone", icon: "smile", disabled: true, tooltip: "Soon!", text: "Milestone" }) 
@@ -127,9 +127,9 @@ block content
           div(data-product-tools-root data-product-tools-product-slug=product.slug)
             div(class={"flex flex-wrap gap-2":true, "mb-2": tools.length} data-product-tools-container)
               each tool of tools
-                div(class="px-2 py-1 border border-gray-200 rounded-md flex items-center justify-between" data-product-tool-id=tool.id)
+                div(class="px-2 py-1 border border-gray-200 rounded-md transition flex items-center justify-between" data-product-tool-id=tool.id)
                   span(class="pr-2")= tool.text
-                  +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale" data-product-tools-remove-btn)
+                  +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale hover:scale-125 transform" data-product-tools-remove-btn)
             button(class="flex items-center btn bg-white bg-yellow-100 hover:bg-yellow-300 btn-small click-scale" data-product-tools-add-btn) Add new
             form(data-product-tools-form class="hidden relative mt-4 -mx-4 -mb-4 px-4 py-2 bg-transparent border-t border-gray-200")
               +icon("x", { width: 18, height: 18 })(class="absolute top-0 right-0 m-2 cursor-pointer" data-product-tools-close-btn)
@@ -139,9 +139,9 @@ block content
               button(type="submit" class="hidden") Submit
 
   template(data-product-tool-tpl)
-    div(class="px-2 py-1 border border-gray-300 rounded-md flex items-center justify-between" data-product-tool-id="-1")
+    div(class="px-2 py-1 border border-gray-200 rounded-md transition flex items-center justify-between" data-product-tool-id="-1")
       span(class="pr-2" data-text-container)
-      +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale" data-product-tools-remove-btn)
+      +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale hover:scale-125 transform" data-product-tools-remove-btn)
 
 block modals
   +modal('edit-post', {}, {
