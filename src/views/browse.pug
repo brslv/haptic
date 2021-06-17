@@ -7,6 +7,19 @@ include partials/product-card-simple.pug
 include partials/post.pug
 include partials/poll.pug
 include partials/login-modal.pug
+include partials/comment.pug
+
+block append templates
+  template(data-comment-tpl)
+    +comment({
+      img: '',
+      type: USER_TYPES.CREATOR_LITE,
+      slug: '',
+      twitter_name: '',
+      twitter_screen_name: '',
+      created_at: '',
+      content: ''
+    })
 
 block content
   div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")

@@ -11,6 +11,24 @@ include ../../partials/require-module.pug
 include ../../partials/csrf.pug
 include ../../partials/short-update-form.pug
 include ../../partials/poll-form.pug
+include ../../partials/comment.pug
+
+block append templates
+  template(data-comment-tpl)
+    +comment({
+      img: '',
+      type: USER_TYPES.CREATOR_LITE,
+      slug: '',
+      twitter_name: '',
+      twitter_screen_name: '',
+      created_at: '',
+      content: ''
+    })
+
+  template(data-product-tool-tpl)
+    div(class="px-2 py-1 border border-gray-200 rounded-md transition flex items-center justify-between" data-product-tool-id="-1")
+      span(class="pr-2" data-text-container)
+      +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale hover:scale-125 transform" data-product-tools-remove-btn)
 
 mixin post-type-btn({trigger, icon, iconClass, disabled, tooltip, text}, attr = {})
   div(
@@ -137,11 +155,6 @@ block content
                 span Type and hit enter
               input(class="input mb-2" placeholder="E.g. React" id="tools-input" data-product-tools-input)
               button(type="submit" class="hidden") Submit
-
-  template(data-product-tool-tpl)
-    div(class="px-2 py-1 border border-gray-200 rounded-md transition flex items-center justify-between" data-product-tool-id="-1")
-      span(class="pr-2" data-text-container)
-      +icon("x", { width: 14, height: 14 })(class="cursor-pointer click-scale hover:scale-125 transform" data-product-tools-remove-btn)
 
 block modals
   +modal('edit-post', {}, {

@@ -126,14 +126,3 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
           created_at: comment.created_at_formatted,
           content: comment.content
         })
-
-    template(data-comment-tpl)
-      +comment({
-        img: '',
-        type: USER_TYPES.CREATOR_LITE,
-        slug: '',
-        twitter_name: '',
-        twitter_screen_name: '',
-        created_at: '',
-        content: ''
-      })

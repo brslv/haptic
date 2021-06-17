@@ -128,14 +128,3 @@ mixin poll({ user_has_voted, question, options, votes, product_slug, product_nam
           created_at: comment.created_at_formatted,
           content: comment.content
         })
-
-    template(data-comment-tpl)
-      +comment({
-        img: '',
-        type: USER_TYPES.CREATOR_LITE,
-        slug: '',
-        twitter_name: '',
-        twitter_screen_name: '',
-        created_at: '',
-        content: ''
-      })

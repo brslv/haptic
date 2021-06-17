@@ -103,16 +103,17 @@ html(lang="en" id="html" class="")
 
       block content
 
-      //- toasts
-      div(class="z-30 fixed bottom-0 right-0 overflow-y-auto p-4" data-toasts id="toasts" data-turbo-permanent)
-      template(data-toast-tpl)
-        +toast
-      //- end toasts
+      block templates
+        //- toasts
+        div(class="z-30 fixed bottom-0 right-0 overflow-y-auto p-4" data-toasts id="toasts" data-turbo-permanent)
+        template(data-toast-tpl)
+          +toast
+        //- end toasts
 
-      //- poll bars
-      template(data-option-bar-tpl)
-        +poll-option-bar({option:{}})
-      //- end poll bars
+        //- poll bars
+        template(data-option-bar-tpl)
+          +poll-option-bar({option:{}})
+        //- end poll bars
 
       block modals
 

@@ -6,9 +6,22 @@ include partials/post.pug
 include partials/poll.pug
 include partials/require-module.pug
 include partials/login-modal.pug
+include partials/comment.pug
 
 block append scripts
   +require-module('post')
+
+block append templates
+  template(data-comment-tpl)
+    +comment({
+      img: '',
+      type: USER_TYPES.CREATOR_LITE,
+      slug: '',
+      twitter_name: '',
+      twitter_screen_name: '',
+      created_at: '',
+      content: ''
+    })
 
 block content
   - var post_text = post.text;

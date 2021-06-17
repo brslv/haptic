@@ -1,8 +1,6 @@
 import { $, turbo, req } from "../../../utils";
 
 export default function pollVote() {
-  console.log("loading poll vote module");
-
   function load($els) {
     $els.$checkboxes.on("click", onCheckboxClick.bind(null, $els));
   }
