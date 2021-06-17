@@ -5,10 +5,6 @@ include partials/post.pug
 include partials/poll.pug
 include partials/login-modal.pug
 include partials/icon.pug
-include partials/require-module.pug
-
-block append scripts
-  +require-module('product')
 
 block content
   - var cover = product.cover_image_url || predefinedCovers[0];
