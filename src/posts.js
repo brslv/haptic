@@ -318,10 +318,7 @@ function actions({ db, user }) {
             "poll_options.id"
           )
           .leftJoin("users", "poll_votes.user_id", "users.id")
-          .whereIn(
-            "poll_votes.poll_option_id",
-            pollOptions.map((o) => o.id)
-          )
+          .whereIn("poll_votes.poll_option_id", pollOptions.map((o) => o.id))
           .then(function pollVotesSuccess(pollVotes) {
             const allVotesCount = pollVotes.length;
 
@@ -332,7 +329,10 @@ function actions({ db, user }) {
               }, 0);
 
               opt.votes_count = votesCount;
-              opt.votes_percent = (votesCount / allVotesCount) * 100;
+              const percent = (votesCount / allVotesCount) * 100;
+              opt.votes_percent =
+                Math.round((percent + Number.EPSILON) * 100) / 100;
+
               return opt;
             });
 
