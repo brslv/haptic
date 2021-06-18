@@ -17,7 +17,7 @@ block content
           +page-title(class="mb-4") User profile
           section(class="bg-white border border-gray-200 p-4 rounded-md")
             div(class="flex items-start")
-              img(src=data.twitter_profile_image_url alt=`Photo of the creator of ${data.twitter_name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": data.type === USER_TYPES.CREATOR})
+              img(src=data.twitter_profile_image_url alt=`Photo of ${data.twitter_name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": data.type === USER_TYPES.CREATOR})
               div
                 h2(class="font-bold")
                   a(href="/u/" + data.twitter_screen_name class="underline hover:no-underline")= data.twitter_name

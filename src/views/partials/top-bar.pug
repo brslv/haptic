@@ -6,8 +6,8 @@ mixin top-bar(activePage)
             div(class="flex h-14 items-center justify-between")
                 a(href="/" class="click-scale hover:scale-105 transition")
                     div(class="flex items-center")
-                        img(src="/static/images/logo/logo-main.svg" class="h-8 logo-dark")
-                        img(src="/static/images/logo/logo-main-light.svg" class="h-8 logo-light")
+                        img(src="/static/images/logo/logo-main.svg" alt="Dark Haptic logo" class="h-8 logo-dark")
+                        img(src="/static/images/logo/logo-main-light.svg" class="Light Haptic logo" class="h-8 logo-light")
                 nav
                     div(class="h-14 flex md:hidden items-center justify-center")
                       if !user
@@ -51,7 +51,7 @@ mixin top-bar(activePage)
                             span Notifications
                         div(class="mb-4")
                           a(href="/dashboard/profile" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            img(class={"rounded-full w-8 h-8 mr-2": true, "w-9 h-9 border-4 border-double border-yellow-300": user.type === USER_TYPES.CREATOR } src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
+                            img(class={"rounded-full w-8 h-8 mr-2": true, "w-9 h-9 border-4 border-double border-yellow-300": user.type === USER_TYPES.CREATOR } src=`${user.twitter_profile_image_url}` alt=`${user.twitter_name} profile image`)
                             span Profile
                         div(class="mb-4")
                           a(href="/logout" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
@@ -124,7 +124,7 @@ mixin top-bar(activePage)
                               data-tippy-content="Profile settings"
                             )
                                 span(class="relative")
-                                  img(class={"rounded-full w-8 h-8": true, "w-9 h-9 border-4 border-double border-yellow-300": user.type === USER_TYPES.CREATOR } src=`${user.twitter_profile_image_url}` alt=`${user.twitter_screen_name} profile image`)
+                                  img(class={"rounded-full w-8 h-8": true, "w-9 h-9 border-4 border-double border-yellow-300": user.type === USER_TYPES.CREATOR } src=`${user.twitter_profile_image_url}` alt=`${user.twitter_name} profile image`)
 
                             a(href="/logout" class="h-full flex items-center hover:bg-gray-50 px-4 click-scale" data-tippy-content="Log out")
                                 span

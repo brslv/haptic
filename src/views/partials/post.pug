@@ -12,7 +12,7 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
   div(class="hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 relative post p-4 rounded-md bg-white border border-gray-200 mb-4 transition" data-post-id=post_id)
     div(class="flex flex-col-reverse sm:flex-row sm:items-center justify-between mb-4")
       div(class="flex items-center mb-4 sm:mb-0")
-        img(src=img class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": user_type === USER_TYPES.CREATOR})
+        img(src=img alt=`Photo of ${twitter_name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": user_type === USER_TYPES.CREATOR})
         div()
           a(href=`/u/${user_slug}` class="underline hover:no-underline font-bold inline-block")= twitter_name
           div(class="flex items-center text-xs text-gray-600 dark:text-gray-400")
@@ -60,7 +60,7 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
 
     div(class="prose prose-yellow my-4")
       div(class={"hidden":!img_url, "border rounded-md p-1.5 bg-white border-gray-300 w-full mb-4": true})
-        img(data-image data-zoomable src=img_url class={"hidden": !img_url, "mx-auto cursor-pointer rounded-md": true} style="margin-top: 0; margin-bottom: 0;")
+        img(data-image data-zoomable src=img_url alt="Main photo" class={"hidden": !img_url, "mx-auto cursor-pointer rounded-md": true} style="margin-top: 0; margin-bottom: 0;")
       div(data-content="data-content")
         block
 
