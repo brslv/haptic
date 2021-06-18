@@ -81,11 +81,11 @@ const rollbar = new Rollbar({
 // setup db
 const db = knex(dbConfig[process.env.NODE_ENV]);
 
-passport.serializeUser(function (user, done) {
+passport.serializeUser(function(user, done) {
   done(null, user);
 });
 
-passport.deserializeUser(function (user, done) {
+passport.deserializeUser(function(user, done) {
   if (!user || !user.id) return done(null, user);
 
   // We need to refetch the user every time, in order to
@@ -113,7 +113,7 @@ passport.use(
         "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true",
       callbackURL: process.env.TWITTER_API_CALLBACK_URL,
     },
-    function (accessToken, refreshToken, profile, done) {
+    function(accessToken, refreshToken, profile, done) {
       const emails = profile.emails;
       const twitterData = profile._json;
       db.select()
@@ -473,15 +473,24 @@ app.get("/products", (req, res) => {
 });
 
 app.get("/terms-of-service", (req, res) => {
-  res.render("legal/terms-of-service.pug", { meta: defaultMetas });
+  const title = "Terms of service | Haptic";
+  res.render("legal/terms-of-service.pug", {
+    meta: { ...defaultMetas, title, og: { ...defaultMetas.og, title } },
+  });
 });
 
 app.get("/privacy-policy", (req, res) => {
-  res.render("legal/privacy-policy.pug", { meta: defaultMetas });
+  const title = "Privacy policy | Haptic";
+  res.render("legal/privacy-policy.pug", {
+    meta: { ...defaultMetas, title, og: { ...defaultMetas.og, title } },
+  });
 });
 
 app.get("/cookie-policy", (req, res) => {
-  res.render("legal/cookie-policy.pug", { meta: defaultMetas });
+  const title = "Cookie policy | Haptic";
+  res.render("legal/cookie-policy.pug", {
+    meta: { ...defaultMetas, title, og: { ...defaultMetas.og, title } },
+  });
 });
 
 app.get("/dashboard", authOnly, async (req, res, next) => {
@@ -845,10 +854,12 @@ app.get("/u/:slug", (req, res, next) => {
           userId: userResult.id,
         })
         .then((productsResult) => {
+          const title = `${userResult.twitter_name} | User profile on Haptic`;
           res.render("user", {
             meta: {
               ...defaultMetas,
-              title: `${userResult.twitter_name} | Haptic`,
+              title,
+              og: { ...defaultMetas.og, title },
               description: userResult.bio,
             },
             data: {
@@ -1148,8 +1159,9 @@ app.post(
 );
 
 app.get("/login", guestsOnly, (req, res) => {
+  const title = "Haptic | Login";
   res.render("login", {
-    meta: defaultMetas,
+    meta: { ...defaultMetas, title, og: { ...defaultMetas, title } },
     creator: req.query && req.query.creator === "true",
   });
 });
@@ -1158,7 +1170,7 @@ app.get("/auth/error", (req, res) => res.send("Unknown Error"));
 
 app.get(
   "/auth/twitter",
-  function (req, res, next) {
+  function(req, res, next) {
     req.session.creator = req.query.creator;
     next();
   },
@@ -1168,7 +1180,7 @@ app.get(
 app.get(
   "/auth/twitter/callback",
   passport.authenticate("twitter", { failureRedirect: "/auth/error" }),
-  function (req, res) {
+  function(req, res) {
     req.session.save(function onSessionSave() {
       if (req.session.creator) {
         res.redirect("/checkout");
@@ -1181,7 +1193,7 @@ app.get(
 
 app.get("/logout", (req, res) => {
   req.logout();
-  req.session.destroy(function (err) {
+  req.session.destroy(function(err) {
     res.redirect("/");
   });
 });
@@ -1787,7 +1799,8 @@ app.post("/upload-image", ajaxOnly, authOnly, (req, res, next) => {
     if (err && err.code === "LIMIT_FILE_SIZE") {
       return res.status(400).json({
         ok: 0,
-        err: "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+        err:
+          "Files greater than 2MB in size are not allowed. Please, optimize your image.",
         details: { max: "2MB" },
       });
     }
@@ -1811,7 +1824,8 @@ app.post(
       if (err && err.code === "LIMIT_FILE_SIZE") {
         return res.status(400).json({
           ok: 0,
-          err: "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+          err:
+            "Files greater than 2MB in size are not allowed. Please, optimize your image.",
           details: { max: "2MB" },
         });
       }
@@ -1847,7 +1861,8 @@ app.post(
       if (err && err.code === "LIMIT_FILE_SIZE") {
         return res.status(400).json({
           ok: 0,
-          err: "Files greater than 2MB in size are not allowed. Please, optimize your image.",
+          err:
+            "Files greater than 2MB in size are not allowed. Please, optimize your image.",
           details: { max: "2MB" },
         });
       }
@@ -2127,7 +2142,7 @@ app.post("/wh", express.json(), (req, res) => {
 });
 
 // 404
-app.get("*", function (req, res, next) {
+app.get("*", function(req, res, next) {
   res.status(404).render("404", { meta: defaultMetas });
 });
 
@@ -2139,7 +2154,8 @@ app.use((err, req, res, next) => {
   if (isAjaxCall(req))
     return res.status(500).json({
       ok: 0,
-      err: "Something went wrong. 😱 Please, use the feedback form or contact me on Twitter.",
+      err:
+        "Something went wrong. 😱 Please, use the feedback form or contact me on Twitter.",
       details: { err },
     });
   res.status(500);
