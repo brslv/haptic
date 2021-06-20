@@ -1,4 +1,4 @@
-import { $, turbo } from "../utils";
+import { $, turbo, onFrameLoaded } from "../utils";
 
 export default function twitter() {
   function load() {
@@ -69,6 +69,7 @@ export default function twitter() {
   turbo.load(() => {
     load();
     $(document).on("haptic:post-preview", () => load());
+    onFrameLoaded("browse-posts-list", load);
   });
 
   turbo.beforeCache(() => {

@@ -9,6 +9,58 @@ include partials/poll.pug
 include partials/login-modal.pug
 include partials/comment.pug
 
+mixin browse-posts-list-loading()
+  div(class="w-full bg-white rounded-md border border-gray-200 animate-pulse mb-4")
+    div(class="w-full h-full relative p-4")
+      div(class="w-14 h-14 bg-gray-200 rounded-full")
+      div(class="my-4")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 w-full bg-gray-200")
+
+  div(class="w-full bg-white rounded-md border border-gray-200 animate-pulse mb-4")
+    div(class="w-full h-full relative p-4")
+      div(class="w-14 h-14 bg-gray-200 rounded-full")
+      div(class="my-4")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 w-full bg-gray-200")
+
+  div(class="w-full bg-white rounded-md border border-gray-200 animate-pulse mb-4")
+    div(class="w-full h-full relative p-4")
+      div(class="w-14 h-14 bg-gray-200 rounded-full")
+      div(class="my-4")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 w-full bg-gray-200")
+
+  div(class="w-full bg-white rounded-md border border-gray-200 animate-pulse mb-4")
+    div(class="w-full h-full relative p-4")
+      div(class="w-14 h-14 bg-gray-200 rounded-full")
+      div(class="my-4")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 w-full bg-gray-200")
+
+  div(class="w-full bg-white rounded-md border border-gray-200 animate-pulse mb-4")
+    div(class="w-full h-full relative p-4")
+      div(class="w-14 h-14 bg-gray-200 rounded-full")
+      div(class="my-4")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 w-full bg-gray-200")
+
+  div(class="w-full bg-white rounded-md border border-gray-200 animate-pulse mb-4")
+    div(class="w-full h-full relative p-4")
+      div(class="w-14 h-14 bg-gray-200 rounded-full")
+      div(class="my-4")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 mb-2 w-full bg-gray-200")
+        div(class="h-2 w-full bg-gray-200")
+
+block append head
+  meta(name="turbo-cache-control" content="no-cache")
+
 block append templates
   template(data-comment-tpl)
     +comment({
@@ -29,57 +81,12 @@ block content
       div(class="flex flex-col-reverse md:flex-row items-start")
         main(class="mr-0 w-full md:w-4/6 md:mr-4")
           +page-title(class="mb-4") Latest posts
-          each post in posts
-            if post.type === 'text'
-              +post({
-                author_id: post.user_id,
-                product_slug: post.product_slug,
-                product_name: post.product_name,
-                post_id: post.id,
-                post_text_md: post.text_md,
-                post_twitter_text: post.twitter_text,
-                img: post.user_twitter_profile_image_url,
-                img_url: post.image_url,
-                user_type: post.user_type,
-                user_slug: post.user_slug,
-                twitter_name: post.user_twitter_name,
-                twitter_screen_name: post.user_twitter_screen_name,
-                date_str: post.created_at_formatted,
-                show_opts: false,
-                show_view_btn: true,
-                boosts_count: post.boosts_count,
-                disable_boost_btn: !user,
-                trigger_login_modal: !user,
-                comments: post.comments,
-                show_posted_in_tag: true,
-              }) !{post.text}
-            
-            if post.type === 'poll'
-              +poll({
-                user_has_voted: post.user_has_voted,
-                question: post.question,
-                options: post.poll_options,
-                votes: post.poll_votes,
-                author_id: post.user_id,
-                product_slug: post.product_slug,
-                product_name: post.product_name,
-                post_id: post.id,
-                post_twitter_text: post.twitter_text,
-                user_type: post.user_type,
-                user_slug: post.user_slug,
-                img: post.user_twitter_profile_image_url,
-                img_url: post.image_url,
-                twitter_name: post.user_twitter_name,
-                twitter_screen_name: post.user_twitter_screen_name,
-                date_str: post.created_at_formatted,
-                disable_boost_btn: false,
-                show_opts: false,
-                show_posted_in_tag: true,
-                boosts_count: post.boosts_count,
-                comments: post.comments
-              }) !{post.details}
+          
+          turbo-frame(id="browse-posts-list" src="/browse/posts" target="_top")
+            +browse-posts-list-loading
 
-          p(class="text-gray-500 text-center text-sm") Post listing is limited to 12 items only.
+
+          p(class="text-gray-500 text-center text-sm") Post listing is limited to 18 items only.
 
         aside(class="md:w-2/6 mb-16 md:mb-0 w-full")
           div(class="mb-4")

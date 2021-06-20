@@ -393,7 +393,7 @@ function actions({ db, user }) {
         return res(cachedPosts);
       }
 
-      _getAllPostsQuery(null, { order, withComments, limit: 12 })
+      _getAllPostsQuery(null, { order, withComments, limit: 18 })
         .then((result) => {
           // cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
           res(result);

@@ -21,6 +21,12 @@ const turbo = {
   load(fn) {
     document.addEventListener("turbo:load", fn);
   },
+  beforeFetchResponse(fn) {
+    document.addEventListener("turbo:before-fetch-response", fn);
+  },
+  beforeFetchRequest(fn) {
+    document.addEventListener("turbo:before-fetch-request", fn);
+  },
   beforeCache(fn) {
     document.addEventListener("turbo:before-cache", fn);
   },
@@ -49,4 +55,30 @@ function req(url, data, opts) {
     });
 }
 
-export { $, turbo, req, mdConverter };
+function registerFrame(id) {
+  const frame = $("#" + id);
+  if (frame.get(0)) frame.get(0).loaded.then(() => frameLoaded(id));
+}
+
+function unregisterFrame(id) {
+  $(document).off("haptic:frame-loaded:" + id);
+}
+
+function frameLoaded(id) {
+  $(document).trigger("haptic:frame-loaded:" + id);
+}
+
+function onFrameLoaded(id, fn) {
+  $(document).on("haptic:frame-loaded:" + id, fn);
+}
+
+export {
+  $,
+  turbo,
+  req,
+  mdConverter,
+  registerFrame,
+  unregisterFrame,
+  frameLoaded,
+  onFrameLoaded,
+};

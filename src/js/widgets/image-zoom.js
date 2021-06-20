@@ -1,4 +1,4 @@
-import { $, turbo } from "../utils";
+import { $, turbo, onFrameLoaded } from "../utils";
 
 export default function imageZoom() {
   let $container, $imageContainer;
@@ -48,6 +48,7 @@ export default function imageZoom() {
 
   turbo.load(() => {
     loadImageZoom();
+    onFrameLoaded("browse-posts-list", loadImageZoom);
   });
   turbo.beforeCache(() => {
     clean();

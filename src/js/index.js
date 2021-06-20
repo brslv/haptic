@@ -1,7 +1,7 @@
 import * as Turbo from "@hotwired/turbo";
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
-import { $, turbo } from "./utils";
+import { $, turbo, frameLoaded, registerFrame, unregisterFrame } from "./utils";
 import modal from "./widgets/modal";
 import toasts from "./widgets/toasts";
 import tooltip from "./widgets/tooltip";
@@ -23,16 +23,25 @@ import cookieConsent from "./widgets/cookie-consent";
 import waitlistForm from "./widgets/waitlist-form";
 import mobileNav from "./widgets/mobile-nav";
 import postActions from "./widgets/post-actions";
-// import browse from "./widgets/browse";
+import browse from "./widgets/browse";
 import comments from "./widgets/comments";
 import twitter from "./widgets/twitter";
 import products from "./widgets/products";
 import coverImage from "./widgets/cover-image";
 import productLogo from "./widgets/product-logo";
 
+turbo.beforeFetchResponse(() => {
+  registerFrame("browse-posts-list");
+});
+
+turbo.beforeFetchRequest(() => {
+  unregisterFrame("browse-posts-list");
+});
+
 turbo.load(() => {
   Turbo.setProgressBarDelay(0);
 });
+
 modal();
 tooltip();
 toasts();
@@ -53,7 +62,7 @@ cookieConsent();
 waitlistForm();
 mobileNav();
 postActions();
-// browse();
+browse();
 comments();
 twitter();
 products();

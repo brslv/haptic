@@ -1,7 +1,12 @@
-import { $, turbo, req, mdConverter } from "../utils";
+import { $, turbo, req, mdConverter, onFrameLoaded } from "../utils";
 
 export default function comments() {
-  function load($els) {
+  function load() {
+    const $els = {
+      $commentBtn: $("[data-comment-btn]"),
+      $form: $("[data-comment-form]"),
+      $commentTpl: $("[data-comment-tpl]"),
+    };
     $els.$commentBtn.on("click", (e) => onCommentBtnClick($els, e));
     $els.$form.on("submit", (e) => onFormSubmit($els, e));
   }
@@ -105,14 +110,8 @@ export default function comments() {
     );
   }
 
-  let $els = {};
   turbo.load(() => {
-    $els = {
-      $commentBtn: $("[data-comment-btn]"),
-      $form: $("[data-comment-form]"),
-      $commentTpl: $("[data-comment-tpl]"),
-    };
-
-    load($els);
+    load();
+    onFrameLoaded("browse-posts-list", load);
   });
 }

@@ -1,4 +1,4 @@
-import { $, turbo, req } from "../utils";
+import { $, turbo, req, onFrameLoaded } from "../utils";
 
 export default function contextMenu() {
   let $triggers;
@@ -72,6 +72,7 @@ export default function contextMenu() {
 
   turbo.load(() => {
     load();
+    onFrameLoaded("browse-posts-list", load);
   });
 
   turbo.beforeCache(() => {

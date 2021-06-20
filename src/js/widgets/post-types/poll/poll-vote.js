@@ -1,7 +1,11 @@
-import { $, turbo, req } from "../../../utils";
+import { $, turbo, req, onFrameLoaded } from "../../../utils";
 
 export default function pollVote() {
-  function load($els) {
+  function load() {
+    const $poll = $("[data-poll]");
+    const $els = {
+      $checkboxes: $poll.find(".checkbox"),
+    };
     $els.$checkboxes.on("click", onCheckboxClick.bind(null, $els));
   }
 
@@ -58,12 +62,8 @@ export default function pollVote() {
     );
   }
 
-  let $els = {};
   turbo.load(() => {
-    const $poll = $("[data-poll]");
-    $els = {
-      $checkboxes: $poll.find(".checkbox"),
-    };
-    load($els);
+    load();
+    onFrameLoaded("browse-posts-list", load);
   });
 }

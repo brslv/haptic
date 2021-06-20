@@ -369,68 +369,83 @@ app.get("/browse", (req, res) => {
   const productsActions = products.actions({ db, user: req.user });
   const postsActions = posts.actions({ db, user: req.user });
   const order = posts.BROWSABLE_ORDER.NEWEST;
-  postsActions
-    .getBrowsablePosts({
-      order,
+
+  productsActions
+    .getBrowsableProducts({
+      order: products.BROWSABLE_ORDER.NEWEST,
+      limit: 8,
     })
-    .then((postsResult) => {
+    .then((newestProductsResult) => {
       productsActions
         .getBrowsableProducts({
-          order: products.BROWSABLE_ORDER.NEWEST,
+          order: products.BROWSABLE_ORDER.BOOSTS,
           limit: 8,
         })
-        .then((newestProductsResult) => {
-          productsActions
-            .getBrowsableProducts({
-              order: products.BROWSABLE_ORDER.BOOSTS,
-              limit: 8,
-            })
-            .then((mostBoostedProductsResult) => {
-              res.render("browse", {
-                meta: {
-                  ...defaultMetas,
-                  title: "Browse | Haptic",
-                  og: {
-                    ...defaultMetas.og,
-                    title: "Browse | Haptic",
-                  },
-                },
-                newestProducts: newestProductsResult,
-                mostBoostedProducts: mostBoostedProductsResult,
-                posts: [
-                  ...postsResult.map((post) => {
-                    const strippedMdText = removeMd(post.text);
-                    const twitterText =
-                      strippedMdText.length > 180
-                        ? strippedMdText.substring(0, 180) + "..."
-                        : strippedMdText;
-                    return {
-                      ...post,
-                      text_md: post.text,
-                      twitter_text: twitterText,
-                      text: mdConverter.makeHtml(post.text),
-                      details_md:
-                        post.type === "poll" ? post.details : undefined,
-                      details:
-                        post.type === "poll"
-                          ? mdConverter.makeHtml(post.details)
-                          : undefined,
-                      created_at_formatted: dateFmt(post.created_at),
-                    };
-                  }),
-                ],
-                // ord: ord === "newest" ? ord : "boosts",
-              });
-            })
-            .catch((err) => {
-              console.log(err);
-              throw err;
-            });
+        .then((mostBoostedProductsResult) => {
+          res.render("browse", {
+            meta: {
+              ...defaultMetas,
+              title: "Browse | Haptic",
+              og: {
+                ...defaultMetas.og,
+                title: "Browse | Haptic",
+              },
+            },
+            newestProducts: newestProductsResult,
+            mostBoostedProducts: mostBoostedProductsResult,
+          });
         })
         .catch((err) => {
           console.log(err);
           throw err;
         });
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
+});
+
+app.get("/browse/posts", (req, res) => {
+  const productsActions = products.actions({ db, user: req.user });
+  const postsActions = posts.actions({ db, user: req.user });
+  const order = posts.BROWSABLE_ORDER.NEWEST;
+  postsActions
+    .getBrowsablePosts({
+      order,
+    })
+    .then((postsResult) => {
+      res.render("browse-posts", {
+        meta: {
+          ...defaultMetas,
+          title: "Browse | Haptic",
+          og: {
+            ...defaultMetas.og,
+            title: "Browse | Haptic",
+          },
+        },
+        posts: [
+          ...postsResult.map((post) => {
+            const strippedMdText = removeMd(post.text);
+            const twitterText =
+              strippedMdText.length > 180
+                ? strippedMdText.substring(0, 180) + "..."
+                : strippedMdText;
+            return {
+              ...post,
+              text_md: post.text,
+              twitter_text: twitterText,
+              text: mdConverter.makeHtml(post.text),
+              details_md: post.type === "poll" ? post.details : undefined,
+              details:
+                post.type === "poll"
+                  ? mdConverter.makeHtml(post.details)
+                  : undefined,
+              created_at_formatted: dateFmt(post.created_at),
+            };
+          }),
+        ],
+      });
     })
     .catch((err) => {
       console.log(err);

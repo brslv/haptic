@@ -1,4 +1,4 @@
-import { $, turbo, req } from "../utils";
+import { $, turbo, req, onFrameLoaded } from "../utils";
 export default function boost() {
   function onPostBoostClick($el, $els) {
     const postId = $el.data("post-id");
@@ -64,7 +64,11 @@ export default function boost() {
     );
   }
 
-  function load($els) {
+  function load() {
+    const $els = {
+      $postBoostBtns: $("[data-post-boost-btn]"),
+      $productBoostBtn: $("[data-product-boost-btn]"),
+    };
     $els.$postBoostBtns.on("click", function(e) {
       const $this = $(this);
       if ($this.data("disabled") !== undefined) return;
@@ -79,13 +83,8 @@ export default function boost() {
     });
   }
 
-  let $els = {};
   turbo.load(() => {
-    $els = {
-      $postBoostBtns: $("[data-post-boost-btn]"),
-      $productBoostBtn: $("[data-product-boost-btn]"),
-    };
-
-    load($els);
+    load();
+    onFrameLoaded("browse-posts-list", load);
   });
 }
