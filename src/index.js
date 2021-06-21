@@ -263,7 +263,17 @@ const adminOnly = (req, res, next) => {
         .json({ ok: 0, err: "Not allowed.", details: null });
     }
 
-    res.status(405).render("not-allowed", { meta: defaultMetas });
+    const title = "Page not allowed for guests | Haptic";
+    res.status(405).render("not-allowed", {
+      meta: {
+        ...defaultMetas,
+        title,
+        og: {
+          ...defaultMetas.og,
+          title,
+        },
+      },
+    });
   }
 };
 const authOnly = (req, res, next) => {
@@ -382,13 +392,18 @@ app.get("/browse", (req, res) => {
           limit: 8,
         })
         .then((mostBoostedProductsResult) => {
+          const title = "Browse | Haptic";
+          const description =
+            "Get inspired by other build in public makers by browsing their public updates and products";
           res.render("browse", {
             meta: {
               ...defaultMetas,
-              title: "Browse | Haptic",
+              title,
+              description,
               og: {
                 ...defaultMetas.og,
-                title: "Browse | Haptic",
+                title,
+                description,
               },
             },
             newestProducts: newestProductsResult,
@@ -415,13 +430,18 @@ app.get("/browse/posts", (req, res) => {
       order,
     })
     .then((postsResult) => {
+      const title = "Browse public updates | Haptic";
+      const description =
+        "Browse public updates by other makers, who build their products in public";
       res.render("browse-posts", {
         meta: {
           ...defaultMetas,
-          title: "Browse | Haptic",
+          title,
+          description,
           og: {
             ...defaultMetas.og,
-            title: "Browse | Haptic",
+            title,
+            description,
           },
         },
         posts: [
@@ -468,17 +488,28 @@ app.get("/products", (req, res) => {
     })
     .then((result) => {
       let title = "Products | Haptic";
-      if (order === PRODUCTS_BROWSABLE_ORDER.NEWEST)
+      let description =
+        "Browse products that are being built publicly on Haptic.";
+      if (order === PRODUCTS_BROWSABLE_ORDER.NEWEST) {
         title = "Newest Products | Haptic";
-      if (order === PRODUCTS_BROWSABLE_ORDER.BOOSTS)
+        description =
+          "Browse the newest products that are being built publicly on Haptic.";
+      }
+      if (order === PRODUCTS_BROWSABLE_ORDER.BOOSTS) {
         title = "Top Products | Haptic";
+        description =
+          "Browse the top products that are being built publicly on Haptic.";
+      }
+
       res.render("products", {
         meta: {
           ...defaultMetas,
           title,
+          description,
           og: {
             ...defaultMetas.og,
             title,
+            description,
           },
         },
         products: result,
@@ -494,22 +525,40 @@ app.get("/products", (req, res) => {
 
 app.get("/terms-of-service", (req, res) => {
   const title = "Terms of service | Haptic";
+  const description = "Terms of service on Haptic";
   res.render("legal/terms-of-service.pug", {
-    meta: { ...defaultMetas, title, og: { ...defaultMetas.og, title } },
+    meta: {
+      ...defaultMetas,
+      title,
+      description,
+      og: { ...defaultMetas.og, title, description },
+    },
   });
 });
 
 app.get("/privacy-policy", (req, res) => {
   const title = "Privacy policy | Haptic";
+  const description = "Privacy policy on Haptic";
   res.render("legal/privacy-policy.pug", {
-    meta: { ...defaultMetas, title, og: { ...defaultMetas.og, title } },
+    meta: {
+      ...defaultMetas,
+      title,
+      description,
+      og: { ...defaultMetas.og, title, description },
+    },
   });
 });
 
 app.get("/cookie-policy", (req, res) => {
   const title = "Cookie policy | Haptic";
+  const description = "Cookie policy on Haptic";
   res.render("legal/cookie-policy.pug", {
-    meta: { ...defaultMetas, title, og: { ...defaultMetas.og, title } },
+    meta: {
+      ...defaultMetas,
+      title,
+      description,
+      og: { ...defaultMetas.og, title, description },
+    },
   });
 });
 
@@ -518,6 +567,8 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
     success: await req.consumeFlash("success"),
   };
   const productsActions = products.actions({ db, user: req.user });
+  const title = "Dashboard | " + req.user.twitter_name + " | Haptic";
+  const description = "Dashboard of " + req.user.twitter_name;
 
   productsActions
     .getMyProducts()
@@ -525,8 +576,9 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
       res.render("dashboard", {
         meta: {
           defaultMetas,
-          title: "Dashboard | Haptic",
-          og: { title: "Dashboard | Haptic" },
+          title,
+          description,
+          og: { title, description },
         },
         products: result,
         canCreateProducts:
@@ -540,6 +592,8 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
 });
 
 app.get("/collections", authOnly, (req, res, next) => {
+  const title = "Collections | " + req.user.twitter_name + " | Haptic";
+  const description = "Collected products by " + req.user.twitter_name;
   db.select(
     "collections.id",
     "collections.created_at",
@@ -551,7 +605,15 @@ app.get("/collections", authOnly, (req, res, next) => {
     .innerJoin("products", "collections.product_id", "products.id")
     .where({ "collections.user_id": req.user.id })
     .then((result) => {
-      res.render("collections", { meta: defaultMetas, collections: result });
+      res.render("collections", {
+        meta: {
+          ...defaultMetas,
+          title,
+          description,
+          og: { ...defaultMetas.og, title, description },
+        },
+        collections: result,
+      });
     })
     .catch((err) => {
       next(err);
@@ -585,13 +647,17 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
           return db("product_tools")
             .where({ product_id: productResult.id })
             .then((toolsResult) => {
+              const title = `Product | ${productResult.name} | Haptic`;
+              const description = `Product dashboard - ${productResult.name}`;
               res.render("dashboard/product/posts", {
                 meta: {
                   ...defaultMetas,
-                  title: `${productResult.name} | Haptic`,
+                  title,
+                  description,
                   og: {
                     ...defaultMetas.og,
-                    title: `${productResult.name} | Haptic`,
+                    title,
+                    description,
                   },
                 },
                 product: { ...productResult },
@@ -657,13 +723,18 @@ app.get(
           });
         }
 
+        const title = `Settings | ${result.name} | Haptic`;
+        const description = `Product settings - ${result.name}`;
+
         res.render("dashboard/product/settings", {
           meta: {
             ...defaultMetas,
-            title: `${result.name} | Haptic`,
+            title,
+            description,
             og: {
               ...defaultMetas.og,
-              title: `${result.name} | Haptic`,
+              title,
+              description,
             },
           },
           product: { ...result },
@@ -792,8 +863,15 @@ app.get("/dashboard/profile", authOnly, async (req, res, next) => {
     error: await req.consumeFlash("error"),
     data: await req.consumeFlash("data"),
   };
+  const title = `Profile | ${req.user.twitter_name} | Haptic`;
+  const description = `Profile of ${req.user.twitter_name}`;
   return res.render("dashboard/profile", {
-    meta: defaultMetas,
+    meta: {
+      ...defaultMetas,
+      title,
+      description,
+      og: { ...defaultMetas.og, title, description },
+    },
     form: {
       action: "/dashboard/profile/update",
     },
@@ -875,11 +953,13 @@ app.get("/u/:slug", (req, res, next) => {
         })
         .then((productsResult) => {
           const title = `${userResult.twitter_name} | User profile on Haptic`;
+          const description = `Public profile of ${userResult.twitter_name} on Haptic`;
           res.render("user", {
             meta: {
               ...defaultMetas,
               title,
-              og: { ...defaultMetas.og, title },
+              description,
+              og: { ...defaultMetas.og, title, description },
               description: userResult.bio,
             },
             data: {
@@ -972,6 +1052,7 @@ app.get("/p/:slug", (req, res, next) => {
                       og: {
                         ...defaultMetas.og,
                         title: `${result.name} | Haptic`,
+                        description: result.description,
                       },
                     },
                     predefinedCovers,
@@ -1106,6 +1187,7 @@ app.get("/p/:slug/:postId", (req, res, next) => {
           const ogTags = {
             ...defaultMetas.og,
             title: `${title} | ${productResult.name}`,
+            description: productResult.description || undefined,
           };
           if (result.image_url) ogTags.image = result.image_url;
 
@@ -1155,7 +1237,17 @@ app.get("/notifications", authOnly, async (req, res, next) => {
   const flash = {
     success: await req.consumeFlash("success"),
   };
-  res.render("notifications", { meta: defaultMetas, flash });
+  const title = "Notifications | " + req.user.twitter_name + " | Haptic";
+  const description = `Notifications of ${req.user.twitter_name} on Haptic`;
+  res.render("notifications", {
+    meta: {
+      ...defaultMetas,
+      title,
+      description,
+      og: { ...defaultMetas.og, title, description },
+    },
+    flash,
+  });
 });
 
 app.post(
@@ -1180,8 +1272,15 @@ app.post(
 
 app.get("/login", guestsOnly, (req, res) => {
   const title = "Haptic | Login";
+  const description = "Login on Haptic";
+
   res.render("login", {
-    meta: { ...defaultMetas, title, og: { ...defaultMetas, title } },
+    meta: {
+      ...defaultMetas,
+      title,
+      description,
+      og: { ...defaultMetas.og, title, description },
+    },
     creator: req.query && req.query.creator === "true",
   });
 });
@@ -2037,8 +2136,15 @@ app.post(
 
 // payments
 app.get("/checkout", authOnly, (req, res) => {
+  const title = "Checkout | Haptic";
+  const description = "Checkout page on Haptic";
   res.render("checkout", {
-    meta: defaultMetas,
+    meta: {
+      ...defaultMetas,
+      title,
+      description,
+      og: { ...defaultMetas.og, title, description },
+    },
   });
 });
 
@@ -2163,7 +2269,9 @@ app.post("/wh", express.json(), (req, res) => {
 
 // 404
 app.get("*", function(req, res, next) {
-  res.status(404).render("404", { meta: defaultMetas });
+  res.status(404).render("404", {
+    meta: { ...defaultMetas, title: "Page not found | Haptic" },
+  });
 });
 
 // error handler
