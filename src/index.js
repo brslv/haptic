@@ -467,13 +467,18 @@ app.get("/products", (req, res) => {
       order,
     })
     .then((result) => {
+      let title = "Products | Haptic";
+      if (order === PRODUCTS_BROWSABLE_ORDER.NEWEST)
+        title = "Newest Products | Haptic";
+      if (order === PRODUCTS_BROWSABLE_ORDER.BOOSTS)
+        title = "Top Products | Haptic";
       res.render("products", {
         meta: {
           ...defaultMetas,
-          title: "Products | Haptic",
+          title,
           og: {
             ...defaultMetas.og,
-            title: "Products | Haptic",
+            title,
           },
         },
         products: result,
