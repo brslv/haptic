@@ -1,7 +1,7 @@
-import { turbo } from "../utils";
+import { turbo, onFrameLoaded } from "../utils";
 
 export default function textareaAutoresize() {
-  turbo.load(() => {
+  function load() {
     document.querySelectorAll("[data-autoresize]").forEach(function(element) {
       element.style.boxSizing = "border-box";
       var offset = element.offsetHeight - element.clientHeight;
@@ -11,5 +11,10 @@ export default function textareaAutoresize() {
       });
       element.removeAttribute("data-autoresize");
     });
+  }
+
+  turbo.load(() => {
+    load();
+    onFrameLoaded("browse-posts-list", load);
   });
 }
