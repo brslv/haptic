@@ -70,6 +70,7 @@ export default function twitter() {
     load();
     $(document).on("haptic:post-preview", () => load());
     onFrameLoaded("browse-posts-list", load);
+    onFrameLoaded("product", load);
   });
 
   turbo.beforeCache(() => {

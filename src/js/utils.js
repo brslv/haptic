@@ -33,6 +33,9 @@ const turbo = {
   beforeVisit(fn) {
     document.addEventListener("turbo:before-visit", fn);
   },
+  beforeRender(fn) {
+    document.addEventListener("turbo:before-render", fn);
+  },
 };
 
 function req(url, data, opts) {

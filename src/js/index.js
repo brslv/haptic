@@ -32,10 +32,12 @@ import productLogo from "./widgets/product-logo";
 
 turbo.beforeFetchResponse(() => {
   registerFrame("browse-posts-list");
+  registerFrame("product");
 });
 
 turbo.beforeFetchRequest(() => {
   unregisterFrame("browse-posts-list");
+  unregisterFrame("product");
 });
 
 turbo.load(() => {

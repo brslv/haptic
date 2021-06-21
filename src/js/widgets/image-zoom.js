@@ -49,6 +49,7 @@ export default function imageZoom() {
   turbo.load(() => {
     loadImageZoom();
     onFrameLoaded("browse-posts-list", loadImageZoom);
+    onFrameLoaded("product", loadImageZoom);
   });
   turbo.beforeCache(() => {
     clean();

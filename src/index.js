@@ -421,7 +421,7 @@ app.get("/browse", (req, res) => {
     });
 });
 
-app.get("/browse/posts", (req, res) => {
+app.get("/frame/browse/posts", (req, res) => {
   const productsActions = products.actions({ db, user: req.user });
   const postsActions = posts.actions({ db, user: req.user });
   const order = posts.BROWSABLE_ORDER.NEWEST;
@@ -980,7 +980,7 @@ app.get("/u/:slug", (req, res, next) => {
     });
 });
 
-app.get("/p/:slug", (req, res, next) => {
+app.get("/frame/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
   const postsActions = posts.actions({ db, user: req.user });
   const boostsActions = boosts.actions({ db });
@@ -1038,58 +1038,135 @@ app.get("/p/:slug", (req, res, next) => {
       return postsActions
         .getAllPosts(result.id, { withComments: true })
         .then((postsResult) => {
-          return boostsActions
-            .getProductBoosts(result.id)
-            .then((boostsResult) => {
-              return db("product_tools")
-                .where({ product_id: result.id })
-                .then((productToolsResult) => {
-                  res.render("product", {
-                    meta: {
-                      ...defaultMetas,
-                      title: `${result.name} | Haptic`,
-                      description: result.description,
-                      og: {
-                        ...defaultMetas.og,
-                        title: `${result.name} | Haptic`,
-                        description: result.description,
-                      },
-                    },
-                    predefinedCovers,
-                    product: { ...result },
-                    boosts: boostsResult,
-                    posts: [
-                      ...postsResult.map((post) => {
-                        const strippedMdText = removeMd(post.text);
-                        const twitterText =
-                          strippedMdText.length > 180
-                            ? strippedMdText.substring(0, 180) + "..."
-                            : strippedMdText;
-                        return {
-                          ...post,
-                          text_md: post.text,
-                          twitter_text: twitterText,
-                          text: mdConverter.makeHtml(post.text),
-                          details_md:
-                            post.type === "poll" ? post.details : undefined,
-                          details:
-                            post.type === "poll"
-                              ? mdConverter.makeHtml(post.details)
-                              : undefined,
-                          created_at_formatted: dateFmt(post.created_at),
-                        };
-                      }),
-                    ],
-                    tools: productToolsResult,
-                    links: {
-                      posts: `/dashboard/product/${slug}/posts`,
-                      settings: `/dashboard/product/${slug}/settings`,
-                      url: `/p/${slug}`,
-                    },
-                  });
-                });
-            });
+          res.render("frame-product", {
+            meta: {
+              ...defaultMetas,
+              title: `${result.name} | Haptic`,
+              description: result.description,
+              og: {
+                ...defaultMetas.og,
+                title: `${result.name} | Haptic`,
+                description: result.description,
+              },
+            },
+            predefinedCovers,
+            product: { ...result },
+            posts: [
+              ...postsResult.map((post) => {
+                const strippedMdText = removeMd(post.text);
+                const twitterText =
+                  strippedMdText.length > 180
+                    ? strippedMdText.substring(0, 180) + "..."
+                    : strippedMdText;
+                return {
+                  ...post,
+                  text_md: post.text,
+                  twitter_text: twitterText,
+                  text: mdConverter.makeHtml(post.text),
+                  details_md: post.type === "poll" ? post.details : undefined,
+                  details:
+                    post.type === "poll"
+                      ? mdConverter.makeHtml(post.details)
+                      : undefined,
+                  created_at_formatted: dateFmt(post.created_at),
+                };
+              }),
+            ],
+            links: {
+              posts: `/dashboard/product/${slug}/posts`,
+              settings: `/dashboard/product/${slug}/settings`,
+              url: `/p/${slug}`,
+            },
+          });
         });
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+app.get("/p/:slug", (req, res, next) => {
+  const slug = req.params.slug;
+  const postsActions = posts.actions({ db, user: req.user });
+  const boostsActions = boosts.actions({ db });
+
+  db.select(
+    "products.id",
+    "products.name",
+    "products.slug",
+    "products.description",
+    "products.website",
+    "products.is_public",
+    "products.is_listed",
+    "products.cover_image_url",
+    "products.logo_url",
+    "products.created_at as product_created_at",
+    "products.updated_at as product_updated_at",
+    "users.id as user_id",
+    "users.bio as user_bio",
+    "users.slug as user_slug",
+    "users.type as user_type",
+    "users.twitter_id as user_twitter_id",
+    "users.twitter_name as user_twitter_name",
+    "users.twitter_screen_name as user_twitter_screen_name",
+    "users.twitter_location as user_twitter_location",
+    "users.twitter_url as user_twitter_url",
+    "users.twitter_profile_image_url as user_twitter_profile_image_url",
+    "users.created_at as user_created_at",
+    "users.updated_at as user_updated_at"
+  )
+    .table("products")
+    .leftJoin("users", "products.user_id", "users.id")
+    .where({ "products.slug": slug })
+    .first()
+    .then((result) => {
+      if (!result) {
+        return res.status(404).render("404", {
+          meta: {
+            ...defaultMetas,
+            title: "Page not found | Haptic",
+            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+          },
+        });
+      }
+
+      if (!result.is_public && (!req.user || req.user.id !== result.user_id)) {
+        return res.render("private-product", {
+          meta: {
+            ...defaultMetas,
+            title: "Private product | Haptic",
+            og: { ...defaultMetas.og, title: "Private product | Haptic" },
+          },
+        });
+      }
+
+      return boostsActions.getProductBoosts(result.id).then((boostsResult) => {
+        return db("product_tools")
+          .where({ product_id: result.id })
+          .then((productToolsResult) => {
+            res.render("product", {
+              meta: {
+                ...defaultMetas,
+                title: `${result.name} | Haptic`,
+                description: result.description,
+                og: {
+                  ...defaultMetas.og,
+                  title: `${result.name} | Haptic`,
+                  description: result.description,
+                },
+              },
+              predefinedCovers,
+              product: { ...result },
+              boosts: boostsResult,
+              tools: productToolsResult,
+              links: {
+                posts: `/dashboard/product/${slug}/posts`,
+                settings: `/dashboard/product/${slug}/settings`,
+                url: `/p/${slug}`,
+              },
+            });
+          });
+      });
     })
     .catch((err) => {
       next(err);

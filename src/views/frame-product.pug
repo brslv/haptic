@@ -1,0 +1,90 @@
+extends layouts/base.layout.pug
+
+include partials/top-bar.pug
+include partials/post.pug
+include partials/poll.pug
+include partials/login-modal.pug
+include partials/icon.pug
+include partials/comment.pug
+
+block append templates
+  template(data-comment-tpl)
+    +comment({
+      img: '',
+      type: USER_TYPES.CREATOR_LITE,
+      slug: '',
+      twitter_name: '',
+      twitter_screen_name: '',
+      created_at: '',
+      content: ''
+    })
+
+block content
+  - var cover = product.cover_image_url || predefinedCovers[0];
+  +top-bar
+  div(class="bg-white h-96 -mt-8 -mb-24 border-b border-gray-100" style=`background-image: url("${cover}"); background-size: cover; background-position: center;`)
+
+  div(class="container mx-auto p-4")
+    // - content
+    div(class="flex flex-col-reverse md:flex-row items-start")
+
+      main(id="product-main" class="mr-0 w-full md:w-4/6 md:mr-4")
+        turbo-frame(id=`product`)
+          section(id="product-feed")
+            if posts.length
+              each post in posts
+                - var post_text = post.text;
+                // - console.log(post)
+                if post.type === 'text'
+                  +post({
+                    author_id: post.user_id,
+                    comments: post.comments,
+                    product_slug: product.slug,
+                    product_name: product.name,
+                    post_id: post.id,
+                    post_twitter_text: post.twitter_text,
+                    img: post.user_twitter_profile_image_url,
+                    img_url: post.image_url,
+                    user_type: post.user_type,
+                    user_slug: post.user_slug,
+                    twitter_name: post.user_twitter_name,
+                    twitter_screen_name: post.user_twitter_screen_name,
+                    date_str: post.created_at_formatted,
+                    show_opts: false,
+                    boosts_count: post.boosts_count,
+                    trigger_login_modal: !user,
+                    disable_boost_btn: !user,
+                  }) !{post_text}
+                if post.type === 'poll'
+                  +poll({
+                    user_has_voted: post.user_has_voted,
+                    question: post.question,
+                    options: post.poll_options,
+                    votes: post.poll_votes,
+                    author_id: post.user_id,
+                    product_slug: product.slug,
+                    product_name: product.name,
+                    post_id: post.id,
+                    post_twitter_text: post.twitter_text,
+                    user_type: post.user_type,
+                    user_slug: post.user_slug,
+                    img: post.user_twitter_profile_image_url,
+                    img_url: post.image_url,
+                    twitter_name: post.user_twitter_name,
+                    twitter_screen_name: post.user_twitter_screen_name,
+                    date_str: post.created_at_formatted,
+                    disable_boost_btn: false,
+                    show_opts: false,
+                    boosts_count: post.boosts_count,
+                    comments: post.comments
+                  }) !{post.details}
+            else
+              div(class="flex items-center justify-center bg-white p-4 rounded-md border border-gray-200" style="min-height: 300px")
+                div(class="rounded-md flex items-center text-gray-500")
+                  span(class="mr-2 p-2 w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full")
+                    +icon("activity", { width: '32', height: '32', stroke: "muted" })
+                  p(class="text-xl") Still no public updates available
+
+block modals
+  if !user
+    +login-modal

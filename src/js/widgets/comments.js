@@ -113,5 +113,6 @@ export default function comments() {
   turbo.load(() => {
     load();
     onFrameLoaded("browse-posts-list", load);
+    onFrameLoaded("product", load);
   });
 }

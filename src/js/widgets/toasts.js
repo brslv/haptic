@@ -55,7 +55,7 @@ export default function toasts() {
     $(document).on("haptic:add-toast", onAddToast.bind($els));
   });
 
-  turbo.beforeCache(() => {
+  turbo.beforeRender(() => {
     $(document).off("haptic:add-toast");
   });
 }

@@ -65,5 +65,6 @@ export default function pollVote() {
   turbo.load(() => {
     load();
     onFrameLoaded("browse-posts-list", load);
+    onFrameLoaded("product", load);
   });
 }

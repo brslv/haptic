@@ -16,5 +16,6 @@ export default function textareaAutoresize() {
   turbo.load(() => {
     load();
     onFrameLoaded("browse-posts-list", load);
+    onFrameLoaded("product", load);
   });
 }

@@ -64,27 +64,31 @@ export default function boost() {
     );
   }
 
-  function load() {
+  function load(type = null) {
     const $els = {
       $postBoostBtns: $("[data-post-boost-btn]"),
       $productBoostBtn: $("[data-product-boost-btn]"),
     };
-    $els.$postBoostBtns.on("click", function(e) {
-      const $this = $(this);
-      if ($this.data("disabled") !== undefined) return;
-      e.preventDefault();
-      onPostBoostClick($this, $els);
-    });
-    $els.$productBoostBtn.on("click", function(e) {
-      const $this = $(this);
-      if ($this.data("disabled") !== undefined) return;
-      e.preventDefault();
-      onProductBoostClick($this, $els);
-    });
+    if (!type || type === "posts")
+      $els.$postBoostBtns.on("click", function(e) {
+        const $this = $(this);
+        if ($this.data("disabled") !== undefined) return;
+        e.preventDefault();
+        onPostBoostClick($this, $els);
+      });
+
+    if (!type || type === "product")
+      $els.$productBoostBtn.on("click", function(e) {
+        const $this = $(this);
+        if ($this.data("disabled") !== undefined) return;
+        e.preventDefault();
+        onProductBoostClick($this, $els);
+      });
   }
 
   turbo.load(() => {
     load();
     onFrameLoaded("browse-posts-list", load);
+    onFrameLoaded("product", load.bind(null, "posts"));
   });
 }
