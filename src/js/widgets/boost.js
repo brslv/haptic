@@ -88,7 +88,7 @@ export default function boost() {
 
   turbo.load(() => {
     load();
-    onFrameLoaded("browse-posts-list", load);
+    onFrameLoaded("browse-posts-list", load.bind(null, "posts"));
     onFrameLoaded("product", load.bind(null, "posts"));
   });
 }
