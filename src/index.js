@@ -901,7 +901,12 @@ app.post(
     }
 
     db("users")
-      .update({ email: data.email, bio: data.bio, website: data.website })
+      .update({
+        email: data.email,
+        bio: data.bio,
+        website: data.website,
+        email_comments: data.email_comments === "on",
+      })
       .where({ id: userId })
       .then((result) => {
         if (result) {

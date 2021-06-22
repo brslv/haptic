@@ -19,10 +19,13 @@ block content
       // - left
       div(class="w-full md:w-2/3 md:mr-4")
         div(class="container mx-auto")
-          div(class="p-4 bg-white rounded-md border border-gray-200 mb-4")
-            span(class="inline-block uppercase text-xs font-medium text-gray-600 bg-gray-100 p-1 rounded mb-4") Details
-            form(action=`${form.action}` method="POST" id="profile-form")
-              +csrf
+          form(action=`${form.action}` method="POST" id="profile-form")
+            +csrf
+
+            div(class="p-4 bg-white rounded-md border border-gray-200 mb-4")
+            
+              span(class="inline-block uppercase text-xs font-medium text-gray-600 bg-gray-100 p-1 rounded mb-4") Details      
+            
               div(class="pb-4")
                 div(class="label pb-1 pl-1") Email
                 input(class="input w-full" placeholder="Email" name="email" type="email" id="email" rows="4" value=user.email)
@@ -39,7 +42,17 @@ block content
                 if formErrors.website
                   p(class="text-xs text-red-500 mt-1")= formErrors.website.msg
 
-              button(type="submit" class="btn btn-primary") Update
+            div(class="p-4 bg-white rounded-md border border-gray-200 mb-4")
+              
+              span(class="inline-block uppercase text-xs font-medium text-gray-600 bg-gray-100 p-1 rounded mb-4") Email settings
+              
+              div(class="pb-4")
+                label(class="flex items-center")
+                  input(type="checkbox" class="mr-2 cursor-pointer" name="email_comments" id="email-comments" checked=(user.email_comments ? 'checked' : false))
+                  span(class="label cursor-pointer") Comments
+                span(class="text-sm text-gray-500") Get notified when someone comments on your posts or replies to your comments
+
+            button(type="submit" class="btn btn-primary") Update
       // - right
       div(class="flex-1 container mx-auto")
         div(class="p-4 bg-white rounded-md border border-gray-200 mb-4")
