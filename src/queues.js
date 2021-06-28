@@ -1,8 +1,9 @@
 const Queue = require("bull");
 const notifications = require("./notifications");
+const emails = require("./emails");
 
 function loadNotificationsQueue({ db }) {
-  const queue = new Queue("notifications-queue", process.env.REDIS_URL); // @TODO
+  const queue = new Queue("notifications-queue", process.env.REDIS_URL);
 
   // consumer
   queue.process(async function processJob(job) {
@@ -53,4 +54,63 @@ function loadNotificationsQueue({ db }) {
   };
 }
 
-module.exports = { loadNotificationsQueue };
+function loadEmailsQueue({ db, isProd }) {
+  const queue = new Queue("emails-queue", process.env.REDIS_URL);
+
+  // consumer
+  queue.process(async function processJob(job) {
+    // don't send emails when in non-prod env.
+    if (!isProd)
+      return Promise.resolve({
+        ok: 1,
+        details: "not send because non-prod env",
+      });
+
+    const data = job.data;
+    const details = data.details;
+    const emailSender = emails.createEmailSender({ db, isProd });
+    const emailData = {
+      to: details.email,
+      body: details.content,
+      commentAuthorName: details.commentAuthorName,
+      postUrl: details.postUrl,
+    };
+    const opts = {
+      checkAllowedByUser: true,
+    };
+
+    return emailSender
+      .sendCommentNotification(emailData, opts)
+      .then((response) => {
+        return { ok: 1, response };
+      })
+      .catch((err) => {
+        console.log(err);
+        throw err;
+      });
+  });
+
+  // producers
+  async function _emailComment({ email, postUrl, commentAuthorName, content }) {
+    const jobData = {
+      details: {
+        email,
+        postUrl,
+        commentAuthorName,
+        content: content,
+      },
+    };
+    await queue.add(jobData);
+  }
+
+  const jobs = {
+    emailComment: _emailComment,
+  };
+
+  return {
+    queue,
+    jobs,
+  };
+}
+
+module.exports = { loadNotificationsQueue, loadEmailsQueue };

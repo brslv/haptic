@@ -48,6 +48,7 @@
     "passport-twitter": "^1.0.4",
     "pg": "^8.5.1",
     "postcss": "^8.2.5",
+    "postmark": "^2.7.6",
     "pug": "^3.0.0",
     "remove-markdown": "^0.3.0",
     "rollbar": "^2.20.0",

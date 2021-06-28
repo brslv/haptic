@@ -27,6 +27,7 @@ function actions({ db, user }) {
           "comments.post_id",
           "comments.user_id as user_id",
           "users.twitter_name as author_twitter_name",
+          "users.email as author_email",
           "users.type as author_type",
           "users.slug as author_slug",
           "users.twitter_screen_name as author_twitter_screen_name",

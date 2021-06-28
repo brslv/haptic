@@ -18,6 +18,7 @@ const posts = require("./posts");
 const boosts = require("./boosts");
 const products = require("./products");
 const comments = require("./comments");
+const emails = require("./emails");
 const { upload, uploadCover, uploadLogo } = require("./img-upload");
 const notifications = require("./notifications");
 const bodyParser = require("body-parser");
@@ -254,7 +255,10 @@ const ajaxOnly = (req, res, next) => {
   else res.status(400).end("400 Bad Request");
 };
 const adminOnly = (req, res, next) => {
-  if (req.user && req.user.twitter_screen_name === "Brslv") {
+  if (
+    (req.user && req.user.twitter_screen_name === "Brslv") ||
+    req.user.twitter_screen_name === "hapticso"
+  ) {
     next();
   } else {
     if (isAjaxCall(req)) {
@@ -325,7 +329,11 @@ app.use(injectEnv);
 
 // JOBS / QUEUES
 const notificationsQueue = queues.loadNotificationsQueue({ db });
-const { router } = createBullBoard([new BullAdapter(notificationsQueue.queue)]);
+const emailsQueue = queues.loadEmailsQueue({ db, isProd: IS_PROD });
+const { router } = createBullBoard([
+  new BullAdapter(notificationsQueue.queue),
+  new BullAdapter(emailsQueue.queue),
+]);
 app.use("/queues", authOnly, adminOnly, router); // @TODO: make admin only
 
 // articles
@@ -1414,6 +1422,7 @@ app.post(
       content: data.content,
     };
     const commentsActions = comments.actions({ user: req.user, db });
+    const emailsActions = emails.actions({ db, emailsQueue });
 
     function enqueueCommentNotification(_commentData) {
       return notificationsQueue.jobs.commentNotification(
@@ -1433,7 +1442,8 @@ app.post(
 
     commentsActions.addComment(commentData).then((commentId) => {
       commentsActions.getComments(data.postId).then((allCommentsInPost) => {
-        let queued = [];
+        let queuedNotifications = [];
+        let queuedEmails = [];
 
         // set notifications for the author of the post
         enqueueCommentNotificationToPostAuthor({
@@ -1442,33 +1452,78 @@ app.post(
           userId: data.postAuthorId,
         })
           .then(() => {
-            return queued.push(data.postAuthorId);
+            return queuedNotifications.push(data.postAuthorId);
           })
           .then(() => {
-            let commentsPromises = [];
+            // user commented on his own post
+            if (commentData.commentAuthorId === data.postAuthorId) return;
+
+            // send a comment email to the post author
+            return db("users")
+              .select("email")
+              .where("id", data.postAuthorId)
+              .first()
+              .then((postAuthor) => {
+                const postAuthorEmail = postAuthor.email;
+
+                emailsActions.emailComment({
+                  emailTo: postAuthorEmail,
+                  commentData,
+                });
+                queuedEmails.push(postAuthorEmail);
+
+                return true;
+              })
+              .catch((err) => {
+                console.log(err);
+                next(err);
+              });
+          })
+          .then(() => {
+            let queuePromises = [];
             // set notifications for all of the users participating in the comments of this post
             allCommentsInPost.forEach((commentInPost) => {
+              const commentAuthorId = commentInPost.user_id;
+              const commentAuthorEmail = commentInPost.author_email;
+              const commentAuthorName = commentInPost.author_twitter_name;
+
+              // enqueue comment email
+              // if the email is not queued and the current comment author is not the author that commented (skips sending emails to the user that has just left a comment)
               if (
-                queued.indexOf(Number(commentInPost.user_id)) !== -1 ||
+                queuedEmails.indexOf(commentAuthorEmail) === -1 &&
+                commentAuthorId !== commentData.commentAuthorId
+              ) {
+                queuePromises.push(
+                  emailsActions.emailComment({
+                    emailTo: commentAuthorEmail,
+                    commentData,
+                  })
+                );
+                queuedEmails.push(commentAuthorEmail);
+              }
+
+              // enqueue comment notification
+              if (
+                queuedNotifications.indexOf(Number(commentInPost.user_id)) !==
+                  -1 ||
                 Number(commentData.commentAuthorId) ===
                   Number(commentInPost.user_id)
               )
                 return;
 
-              const commentAuthorId = commentInPost.user_id;
-              commentsPromises.push(
+              queuePromises.push(
                 enqueueCommentNotification({
                   ...commentData,
                   commentId,
                   userId: commentAuthorId,
                 })
               );
-              queued.push(commentInPost.user_id);
+              queuedNotifications.push(commentInPost.user_id);
             });
-            return commentsPromises;
+            return queuePromises;
           })
-          .then((comentsPromises) => {
-            return Promise.resolve(comentsPromises);
+          .then((queuePromises) => {
+            return Promise.resolve(queuePromises);
           })
           .then(() => {
             return res.json({
