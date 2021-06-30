@@ -1,6 +1,6 @@
 mixin product-header(product, links, activePage)
   div(class="container mx-auto")
-    h1(class="md:hidden md:block pr-4 text-2xl font-bold mb-4 text-center")= product.name
+    h1(class="bg-white rounded-md border border-gray-200 px-4 py-2 inline-block mx-auto md:hidden pr-4 text-xl md:text-2xl font-bold mb-4 text-center")= product.name
     div(class="flex items-center bg-white h-14 px-4 rounded-md border border-gray-200 relative")
       h1(class="hidden md:block pr-4 text-2xl font-bold mr-4")= product.name
       div(class="flex items-center h-full")

@@ -13,27 +13,28 @@ block content
   - var formErrors = flash && flash.data && flash.data[0] && flash.data[0].errors || {};
   - var cover = product.cover_image_url || predefinedCovers[0];
   +top-bar
-  div(class="-mb-24 border border-gray-200 mx-auto rounded-lg" style="width: 980px; height: 410px;")
-    div(
-      class="w-full h-full rounded-lg"
-      style=`background-image: url("${cover}"); background-size: cover; background-position: center;`
-      data-cover-image-container
-    )
-      div(class="w-full h-full flex flex-col items-center justify-center")
-        form(class="hidden")
-          input(type="file" id="cover-image" data-choose-cover-input data-product-slug=product.slug class="hidden")
-        div(class=" flex items-center justify-center")
-          button(data-choose-cover-btn type="button" class="btn btn-primary shadow-lg hover:shadow-md transition") Choose cover
-        div(class="hidden flex items-center justify-center bg-white p-4 border border-gray-100 rounded-md shadow-xl" data-cover-image-picker-container)
-          each cover in predefinedCovers
-            +predefCoverImg(cover, product.slug)(class="mr-2")
-          p(class="mx-6 text-gray-500") &mdash;
-          span(data-cover-image-upload-loader class="hidden mr-2")
-            span(class="animate-spin icon-container opacity-75 my-0 block relative")
-              +icon("refresh-cw", { width: 14, height: 14 })
-          button(class="btn btn-default btn-small mr-4" data-cover-image-upload-btn) Upload image
-          button(class="border-2 hover:bg-gray-100 p-1.5 rounded-md" data-close-cover-image-picker-btn)
-            +icon("x", { width: 16, height: 16})
+  div(class="mx-2")
+    div(class="-mb-24 border border-gray-200 mx-auto rounded-lg" style="max-width: 980px; height: 410px;")
+      div(
+        class="w-full h-full rounded-lg"
+        style=`background-image: url("${cover}"); background-size: cover; background-position: center;`
+        data-cover-image-container
+      )
+        div(class="w-full h-full flex flex-col items-center justify-center")
+          form(class="hidden")
+            input(type="file" id="cover-image" data-choose-cover-input data-product-slug=product.slug class="hidden")
+          div(class=" flex items-center justify-center")
+            button(data-choose-cover-btn type="button" class="btn btn-primary shadow-lg hover:shadow-md transition") Choose cover
+          div(class="hidden flex items-center justify-center bg-white p-4 border border-gray-100 rounded-md shadow-xl" data-cover-image-picker-container)
+            each cover in predefinedCovers
+              +predefCoverImg(cover, product.slug)(class="mr-2")
+            p(class="mx-6 text-gray-500") &mdash;
+            span(data-cover-image-upload-loader class="hidden mr-2")
+              span(class="animate-spin icon-container opacity-75 my-0 block relative")
+                +icon("refresh-cw", { width: 14, height: 14 })
+            button(class="btn btn-default btn-small mr-4" data-cover-image-upload-btn) Upload image
+            button(class="border-2 hover:bg-gray-100 p-1.5 rounded-md" data-close-cover-image-picker-btn)
+              +icon("x", { width: 16, height: 16})
   div(class="relative container mx-auto px-4")
     +product-header(product, links, 'settings')
     div(class="container mx-auto pt-4")

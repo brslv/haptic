@@ -26,7 +26,8 @@ block append head
 block content
   - var cover = product.cover_image_url || predefinedCovers[0];
   +top-bar
-  div(class="bg-white -mb-24 border border-gray-200 mx-auto rounded-lg" style=`width: 980px; height: 410px; background-image: url("${cover}"); background-size: cover; background-position: center;`)
+  div(class="mx-2 mb-8 md:mb-0")
+    div(class="hidden md:block bg-white md:-mb-24 border border-gray-200 mx-auto rounded-lg" style=`max-width: 980px; height: 410px; background-image: url("${cover}"); background-size: cover; background-position: center;`)
 
   div(class="container mx-auto p-4")
 
