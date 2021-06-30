@@ -26,13 +26,13 @@ block append head
 block content
   - var cover = product.cover_image_url || predefinedCovers[0];
   +top-bar
-  div(class="mx-2 mb-8 md:mb-0")
-    div(class="hidden md:block bg-white md:-mb-24 border border-gray-200 mx-auto rounded-lg" style=`max-width: 980px; height: 410px; background-image: url("${cover}"); background-size: cover; background-position: center;`)
+  div(class="mx-2 mb-4 md:mb-0")
+    div(class="hidden md:block bg-white md:-mb-14 border border-gray-200 mx-auto rounded-lg bg-opacity-60 bg-clip-padding" style=`max-width: 980px; height: 410px; background-image: url("${cover}"); background-size: cover; background-position: center;`)
 
   div(class="container mx-auto p-4")
 
     // - header
-    div(class="container mx-auto px-4 py-8 rounded-md mb-4 bg-white border border-gray-200 relative")
+    div(class="container mx-auto px-4 py-8 rounded-md mb-4 bg-white border border-gray-200 relative bg-opacity-70 bg-clip-padding" style="backdrop-filter: blur(20px);")
       if product.logo_url
         a(href=`/p/${product.slug}`)
           div(class="bg-white rounded-xl shadow-lg overflow-hidden w-20 h-20 absolute -top-10 left-1/2 flex items-center justify-center" style=`transform: translateX(-50%); background-image: url("${product.logo_url}"); background-position: center; background-size: contain;`)
