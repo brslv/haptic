@@ -1,7 +1,13 @@
-import { $, turbo } from "../utils";
+import { $, turbo, onFrameLoaded } from "../utils";
 
 export default function modal() {
   const triggerSelector = "[data-modal-trigger]";
+
+  function load() {
+    $(triggerSelector).on("click", function() {
+      onTriggerClick($(this));
+    });
+  }
 
   function openModal($modal, modalName, $triggerEl) {
     $modal.removeClass("hidden");
@@ -43,9 +49,8 @@ export default function modal() {
   }
 
   turbo.load(() => {
-    $(triggerSelector).on("click", function() {
-      onTriggerClick($(this));
-    });
+    onFrameLoaded("browse-posts-list", load);
+    onFrameLoaded("product", load);
   });
 
   turbo.beforeCache(() => {
