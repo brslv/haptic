@@ -13,9 +13,9 @@ block content
   - var formErrors = flash && flash.data && flash.data[0] && flash.data[0].errors || {};
   - var cover = product.cover_image_url || predefinedCovers[0];
   +top-bar
-  div(class="bg-white h-96 -mt-4 -mb-24 border-b border-gray-100")
+  div(class="-mb-24 border border-gray-200 mx-auto rounded-lg" style="width: 980px; height: 410px;")
     div(
-      class="w-full h-full"
+      class="w-full h-full rounded-lg"
       style=`background-image: url("${cover}"); background-size: cover; background-position: center;`
       data-cover-image-container
     )
