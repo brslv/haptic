@@ -18,6 +18,10 @@ export default function comments() {
     const $formContainer = $(
       `[data-comment-form-container][data-post-id="${postId}"`
     );
+    toggleFormContainer($formContainer);
+  }
+
+  function toggleFormContainer($formContainer) {
     if ($formContainer.hasClass("hidden")) {
       // open
       $formContainer.removeClass("hidden");
@@ -92,6 +96,8 @@ export default function comments() {
           $commentsContainer.append($comment);
 
           $content.val("");
+          const $fc = $submittedForm.parent("[data-comment-form-container]");
+          if ($fc) toggleFormContainer($fc);
           $(document).trigger("haptic:add-toast", {
             content: "Your comment has been published 🙌",
             type: "success",
