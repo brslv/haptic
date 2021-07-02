@@ -3,6 +3,11 @@ extend layouts/base.layout.pug
 include partials/top-bar.pug
 include partials/icon.pug
 
+mixin footer-link(href)
+  a(href=href class="block underline hover:no-underline")
+    block
+
+
 mixin people
   div(class="mt-8 flex items-center")
     img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/dom.jpg" alt="Dominik" class="rounded-full select-none  w-10 h-10  border-2 border-white ")
@@ -238,10 +243,19 @@ block content
               div(class="mt-8")
                 a(href="/login?creator=true" class="btn btn-primary lg:text-xl text-center py-3 transition") Join as Creator
   
-  div(class="border-t border-gray-200 bg-white bg-opacity-70 bg-clip-padding" style="backdrop-filter: blur(20px);")
-    div(class="text-center p-8 text-sm")
-      p Built by #[a(href="https://twitter.com/Brslv" title="@Brslv" data-tippy-content="@Brslv on Twitter" class="text-yellow-400 underline hover:no-underline") @Brslv]
-      div(class="mt-2")
-        a(href="/privacy-policy" class="text-xs text-gray-600") Privacy Policy
-        span(class="mx-2 inline-block") •
-        a(href="/terms-of-service" class="text-xs text-gray-600") Terms of Service
+  footer(class="flex flex-col items-center justify-center border-t border-gray-200 bg-white bg-opacity-70 bg-clip-padding py-24" style="backdrop-filter: blur(20px);")
+    div()
+      div(class="flex")
+        div(class="mr-8")
+          h4(class="text-xs text-gray-600 uppercase mb-4") Articles
+          +footer-link("/how-to-build-in-public") How to build in public
+
+        div
+          h4(class="text-xs text-gray-600 uppercase mb-4") Legal
+          +footer-link("/privacy-policy") Privacy Policy
+          +footer-link("/terms-of-service") Terms of Service
+
+
+    hr(class="w-10 border-gray-300 mx-auto my-8")
+
+    p(class="text-xs") Built by #[a(href="https://twitter.com/Brslv" title="@Brslv" data-tippy-content="@Brslv on Twitter" class="text-yellow-400 underline hover:no-underline") @Brslv]
