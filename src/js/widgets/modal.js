@@ -49,6 +49,7 @@ export default function modal() {
   }
 
   turbo.load(() => {
+    load();
     onFrameLoaded("browse-posts-list", load);
     onFrameLoaded("product", load);
   });
