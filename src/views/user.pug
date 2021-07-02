@@ -28,7 +28,7 @@ block content
             p= data.bio
 
             div(class="mt-4")
-              a(href=`https://twitter.com/${data.twitter_screen_name}` class="inline-block btn btn-small btn-twitter" target="_blank" rel="noreferrer noopener" title="Open twitter profile in a new window")
+              a(href=`https://twitter.com/${data.twitter_screen_name}` class="inline-block btn btn-small btn-twitter" target="_blank" rel="noopener" title="Open twitter profile in a new window")
                 span(class="flex items-center")
                   +icon("twitter", { width: 18, height: 18, stroke: "white", fill: "white" })(class="mr-2")
                   span= `@${data.twitter_screen_name}`
@@ -41,7 +41,7 @@ block content
                 div(class="mb-2")
                   +page-title Website
                   div
-                    a(href=data.website class="mr-2 underline hover:no-underline" rel="noreferrer noopener" target="_blank")= data.website
+                    a(href=data.website class="mr-2 underline hover:no-underline" rel="noopener" target="_blank")= data.website
                     +icon('external-link', { width: 13, height: 13 })(class="inline")
 
               div(class="mb-2")
