@@ -643,6 +643,7 @@ app.get("/dashboard/product/:slug", authOnly, (req, res) => {
 
 app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
   const slug = req.params.slug;
+  const page = getPageFromQuery(req.query);
   const productsActions = products.actions({ db, user: req.user });
   productsActions
     .getProductBySlug({ slug, user_id: req.user.id })
@@ -659,7 +660,10 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
 
       return posts
         .actions({ db, user: req.user })
-        .getAllPosts(productResult.id, { withComments: true })
+        .getAllPosts(productResult.id, {
+          withComments: true,
+          paginationData: { ...posts.DEFAULT_PAGINATION_DATA,  perPage: 5, currentPage: page }
+        })
         .then((postsResult) => {
           return db("product_tools")
             .where({ product_id: productResult.id })
@@ -679,8 +683,10 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
                 },
                 product: { ...productResult },
                 tools: [...toolsResult],
+                pagination: postsResult.pagination,
+                createPaginationLink: n => `/dashboard/product/${slug}/posts?page=${n}`,
                 posts: [
-                  ...postsResult.map((post) => {
+                  ...postsResult.data.map((post) => {
                     const strippedMdText = removeMd(post.text);
                     const twitterText =
                       strippedMdText.length > 180

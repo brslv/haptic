@@ -12,6 +12,7 @@ include ../../partials/csrf.pug
 include ../../partials/short-update-form.pug
 include ../../partials/poll-form.pug
 include ../../partials/comment.pug
+include ../../partials/pagination-block.pug
 
 block append templates
   template(data-comment-tpl)
@@ -133,6 +134,8 @@ block content
                     boosts_count: post.boosts_count,
                     comments: post.comments
                   }) !{post.details}
+
+              +pagination-block({ pagination, createPaginationLink })
 
       div(class="w-full md:w-2/6 mb-4")
         +page-title(class="mb-4") Product details
