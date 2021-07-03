@@ -388,6 +388,7 @@ function actions({ db, user }) {
   function getBrowsablePosts({
     order = BROWSABLE_ORDER.BOOSTS,
     withComments = true,
+    paginationData = DEFAULT_PAGINATION_DATA
   }) {
     return new Promise((res, rej) => {
       const cachedPosts = cache.get(cacheKeys.browsablePosts(order));
@@ -395,7 +396,7 @@ function actions({ db, user }) {
         return res(cachedPosts);
       }
 
-      _getAllPostsQuery(null, { order, withComments, limit: 18 })
+      _getAllPostsQuery(null, { order, withComments, paginationData })
         .then((result) => {
           // cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
           res(result);

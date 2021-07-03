@@ -216,6 +216,7 @@ app.use((req, res, next) => {
 app.use(flash({ sessionKeyName: SID }));
 
 // helpers / middlewares
+const getPageFromQuery = query => isNaN(Number(query.page)) || Number(query.page) < 1 ? 1 : Number(query.page);
 const predefinedCovers = [
   "https://hpt-assets.s3.eu-central-1.amazonaws.com/cover-1.jpg",
   "https://hpt-assets.s3.eu-central-1.amazonaws.com/cover-2.jpg",
@@ -387,6 +388,7 @@ app.get("/", (req, res) => {
 
 app.get("/browse", (req, res) => {
   const productsActions = products.actions({ db, user: req.user });
+  const page = getPageFromQuery(req.query);
   const postsActions = posts.actions({ db, user: req.user });
   const order = posts.BROWSABLE_ORDER.NEWEST;
 
@@ -416,6 +418,7 @@ app.get("/browse", (req, res) => {
                 description,
               },
             },
+            page: page,
             newestProducts: newestProductsResult,
             mostBoostedProducts: mostBoostedProductsResult,
           });
@@ -433,17 +436,19 @@ app.get("/browse", (req, res) => {
 
 app.get("/frame/browse/posts", (req, res) => {
   const productsActions = products.actions({ db, user: req.user });
+  const page = getPageFromQuery(req.query);
   const postsActions = posts.actions({ db, user: req.user });
   const order = posts.BROWSABLE_ORDER.NEWEST;
   postsActions
     .getBrowsablePosts({
       order,
+      paginationData: { ...posts.DEFAULT_PAGINATION_DATA, perPage: 5, currentPage: page }
     })
     .then((postsResult) => {
       const title = "Browse public updates | Haptic";
       const description =
         "Browse public updates by other makers, who build their products in public";
-      res.render("browse-posts", {
+      res.render("frame-browse", {
         meta: {
           ...defaultMetas,
           title,
@@ -454,8 +459,10 @@ app.get("/frame/browse/posts", (req, res) => {
             description,
           },
         },
+        pagination: postsResult.pagination,
+        createPaginationLink: n => `/browse?page=${n}`,
         posts: [
-          ...postsResult.map((post) => {
+          ...postsResult.data.map((post) => {
             const strippedMdText = removeMd(post.text);
             const twitterText =
               strippedMdText.length > 180
@@ -997,7 +1004,7 @@ app.get("/u/:slug", (req, res, next) => {
 
 app.get("/frame/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
-  const page = isNaN(Number(req.query.page)) || Number(req.query.page) < 1 ? 1 : Number(req.query.page);
+  const page = getPageFromQuery(req.query);
   const postsActions = posts.actions({ db, user: req.user });
   const boostsActions = boosts.actions({ db });
 
@@ -1052,7 +1059,7 @@ app.get("/frame/p/:slug", (req, res, next) => {
       }
 
       return postsActions
-        .getAllPosts(result.id, { withComments: true, paginationData: { ...posts.DEFAULT_PAGINATION_DATA, perPage: 8, currentPage: page } })
+        .getAllPosts(result.id, { withComments: true, paginationData: { ...posts.DEFAULT_PAGINATION_DATA, perPage: 5, currentPage: page } })
         .then(({ data: postsResult, pagination }) => {
           res.render("frame-product", {
             meta: {

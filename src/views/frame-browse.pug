@@ -8,6 +8,7 @@ include partials/post.pug
 include partials/poll.pug
 include partials/login-modal.pug
 include partials/comment.pug
+include partials/pagination-block.pug
 
 block append templates
   template(data-comment-tpl)
@@ -84,7 +85,8 @@ block content
                   comments: post.comments
                 }) !{post.details}
 
-          p(class="text-gray-500 text-center text-sm") Nobody built great products while scrolling. Get back to work. ❤️
+            if pagination && pagination.lastPage > 1
+              +pagination-block({ pagination, createPaginationLink })
 
 block modals
   if !user

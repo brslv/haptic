@@ -42,11 +42,9 @@ block content
         main(class="mr-0 w-full md:w-4/6 md:mr-4")
           +page-title(class="mb-4") Latest posts
           
-          turbo-frame(id="browse-posts-list" src="/frame/browse/posts" target="_top")
+          turbo-frame(id="browse-posts-list" src=`/frame/browse/posts?page=${page}` target="_top")
             +browse-posts-list-loading
 
-
-          p(class="text-gray-500 text-center text-sm") Nobody built great products while scrolling. Get back to work. ❤️
 
         aside(class="md:w-2/6 mb-16 md:mb-0 w-full")
           div(class="mb-4")
