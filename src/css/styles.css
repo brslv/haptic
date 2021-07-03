@@ -5,7 +5,11 @@
 @layer components {
   #bg {
     background: rgb(255, 255, 255);
-    background: linear-gradient(0deg, rgba(249, 250, 251,1) 0%, rgba(255,255,255,1) 100%);
+    background: linear-gradient(
+      0deg,
+      rgba(249, 250, 251, 1) 0%,
+      rgba(255, 255, 255, 1) 100%
+    );
   }
 
   .turbo-progress-bar {
@@ -21,7 +25,12 @@
     word-break: break-all;
   }
 
-  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
     @apply text-gray-800;
   }
 
@@ -80,6 +89,10 @@
   .comment.prose h6::before {
     content: "######";
     @apply text-gray-300 font-medium mr-1;
+  }
+
+  .comment pre {
+    white-space: pre-wrap;
   }
 
   .link {
