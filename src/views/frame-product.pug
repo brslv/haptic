@@ -6,6 +6,7 @@ include partials/poll.pug
 include partials/login-modal.pug
 include partials/icon.pug
 include partials/comment.pug
+include partials/pagination-block.pug
 
 block append templates
   template(data-comment-tpl)
@@ -84,7 +85,9 @@ block content
                 div(class="rounded-md flex items-center text-gray-500")
                   span(class="mr-2 p-2 w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full")
                     +icon("activity", { width: '32', height: '32', stroke: "muted" })
-                  p(class="text-xl") Still no public updates available
+                  p(class="text-xl") No posts available, yet
+
+            +pagination-block({ pagination, createPaginationLink })
 
 block modals
   if !user

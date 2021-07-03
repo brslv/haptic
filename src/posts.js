@@ -5,6 +5,8 @@ const TEXT_TYPE = "text";
 const POLL_TYPE = "poll";
 const UNKNOWN_TYPE = "unkown";
 
+const DEFAULT_PAGINATION_DATA = { perPage: 10, currentPage: 1, isLengthAware: true };
+
 const types = [TEXT_TYPE, POLL_TYPE];
 
 const BROWSABLE_ORDER = {
@@ -511,10 +513,11 @@ function actions({ db, user }) {
 
   function getAllPosts(
     productId,
-    { withComments = false, limit = null, order = BROWSABLE_ORDER.NEWEST } = {
+    { withComments = false, limit = null, order = BROWSABLE_ORDER.NEWEST, paginationData = DEFAULT_PAGINATION_DATA } = {
       withComments: false,
       limit: null,
       order: BROWSABLE_ORDER.NEWEST,
+      paginationData: DEFAULT_PAGINATION_DATA
     }
   ) {
     return new Promise((res, rej) => {
@@ -523,7 +526,7 @@ function actions({ db, user }) {
         return res(cachedPosts);
       }
 
-      _getAllPostsQuery(productId, { withComments, limit, order }).then(
+      _getAllPostsQuery(productId, { withComments, limit, order, paginationData }).then(
         (result) => {
           // cache.set(cacheKeys.productPosts(productId), result, ttl.day);
           res(result);
@@ -534,10 +537,10 @@ function actions({ db, user }) {
 
   function _getAllPostsQuery(
     productId,
-    { withComments = false, limit = null, order = BROWSABLE_ORDER.NEWEST } = {
+    { withComments = false, order = BROWSABLE_ORDER.NEWEST, paginationData = DEFAULT_PAGINATION_DATA } = {
       withComments: false,
-      limit: null,
       order: BROWSABLE_ORDER.NEWEST,
+      paginationData: DEFAULT_PAGINATION_DATA,
     }
   ) {
     const commentsActions = comments.actions({ db, user });
@@ -584,38 +587,39 @@ function actions({ db, user }) {
       if (order) {
         query.orderBy(order);
       }
-      if (limit) {
-        query.limit(limit);
-      }
 
       query
-        .then((postsResult) => {
+        .paginate(paginationData)
+        .then(postsResultWithPagination => {
           if (withComments) {
             let commentsPromises = [];
-            postsResult.forEach((post) => {
+            postsResultWithPagination.data.forEach((post) => {
               commentsPromises.push(commentsActions.getComments(post.id));
             });
             return Promise.all(commentsPromises)
               .then((commentsResult) => {
-                return [
-                  ...postsResult.map((post, idx) => ({
-                    ...post,
-                    comments: commentsResult[idx],
-                  })),
-                ];
+                return {
+                  ...postsResultWithPagination,
+                  data: [
+                    ...postsResultWithPagination.data.map((post, idx) => ({
+                      ...post,
+                      comments: commentsResult[idx],
+                    })),
+                  ],
+                };
               })
               .catch((err) => {
                 console.log(err);
                 throw err;
               });
           } else {
-            return postsResult;
+            return postsResultWithPagination;
           }
         })
-        .then((postsWithCommentsResult) => {
+        .then((postsWithCommentsAndPaginationResult) => {
           // enrich the poll with options and answers
 
-          const enrichedPosts = postsWithCommentsResult
+          const enrichedPosts = postsWithCommentsAndPaginationResult.data
             .map((post) => {
               if (post.type === "poll") {
                 return new Promise((res, rej) => {
@@ -639,7 +643,12 @@ function actions({ db, user }) {
               );
               return acc;
             }, []);
-          return Promise.all(enrichedPosts);
+
+          return new Promise((res, rej) => {
+            Promise.all(enrichedPosts).then(data => {
+              res({...postsWithCommentsAndPaginationResult, data });
+            });
+          })
         })
         .then((finalPostsResult) => {
           res(finalPostsResult);
@@ -833,4 +842,5 @@ module.exports = {
   POLL_TYPE,
   UNKNOWN_TYPE,
   BROWSABLE_ORDER,
+  DEFAULT_PAGINATION_DATA
 };

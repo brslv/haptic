@@ -1,0 +1,26 @@
+mixin pagination-block({ pagination, createPaginationLink })
+  div(class="mt-4")
+    div(class="flex items-center justify-between")
+      if pagination && pagination.lastPage > 1
+        if pagination.currentPage > 1
+          // show newer
+          a(href=createPaginationLink(pagination.currentPage - 1) class="btn btn-plain hover:ring-2 hover:ring-gray-200 hover:ring-offset-2") Newer
+        else
+          div
+        if pagination.currentPage < pagination.lastPage
+          // show older
+          a(href=createPaginationLink(pagination.currentPage + 1) class="btn btn-plain hover:ring-2 hover:ring-gray-200 hover:ring-offset-2") Older
+
+    //------- This is a pagination with numbers -------------
+    //
+    //- if pagination && pagination.lastPage > 1
+    //-   div(class="my-8")
+    //-     ul(class="inline-block flex items-center")
+    //-       each _, i in Array(pagination.lastPage)
+    //-         a(
+    //-           href=createPaginationLink(i + 1)
+    //-           class={
+    //-             "hover:ring-2 hover:ring-gray-200 hover:ring-offset-2 mr-2 p-1 w-10 h-10 rounded-md border border-gray-200 flex items-center justify-center bg-white transition": true,
+    //-             "ring-2 ring-yellow-300": i + 1 === pagination.currentPage
+    //-           }
+    //-         )= i + 1

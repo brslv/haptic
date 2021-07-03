@@ -29,6 +29,7 @@ const queues = require("./queues");
 const { createBullBoard } = require("bull-board");
 const { BullAdapter } = require("bull-board/bullAdapter");
 const { dateFmt, loadArticleFile, mdConverter } = require("./utils");
+const { attachPaginate } = require("knex-paginate");
 
 const singleUpload = upload.single("image");
 const singleCoverUpload = uploadCover.single("image");
@@ -81,6 +82,7 @@ const rollbar = new Rollbar({
 
 // setup db
 const db = knex(dbConfig[process.env.NODE_ENV]);
+attachPaginate();
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -995,6 +997,7 @@ app.get("/u/:slug", (req, res, next) => {
 
 app.get("/frame/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
+  const page = isNaN(Number(req.query.page)) || Number(req.query.page) < 1 ? 1 : Number(req.query.page);
   const postsActions = posts.actions({ db, user: req.user });
   const boostsActions = boosts.actions({ db });
 
@@ -1049,8 +1052,8 @@ app.get("/frame/p/:slug", (req, res, next) => {
       }
 
       return postsActions
-        .getAllPosts(result.id, { withComments: true })
-        .then((postsResult) => {
+        .getAllPosts(result.id, { withComments: true, paginationData: { ...posts.DEFAULT_PAGINATION_DATA, perPage: 8, currentPage: page } })
+        .then(({ data: postsResult, pagination }) => {
           res.render("frame-product", {
             meta: {
               ...defaultMetas,
@@ -1085,6 +1088,8 @@ app.get("/frame/p/:slug", (req, res, next) => {
                 };
               }),
             ],
+            pagination,
+            createPaginationLink: (n) => `/p/${slug}?page=${n}`,
             links: {
               posts: `/dashboard/product/${slug}/posts`,
               settings: `/dashboard/product/${slug}/settings`,
@@ -1100,6 +1105,7 @@ app.get("/frame/p/:slug", (req, res, next) => {
 
 app.get("/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
+  const page = isNaN(Number(req.query.page)) || Number(req.query.page) < 1 ? 1 : Number(req.query.page);
   const postsActions = posts.actions({ db, user: req.user });
   const boostsActions = boosts.actions({ db });
 
@@ -1170,6 +1176,7 @@ app.get("/p/:slug", (req, res, next) => {
               },
               predefinedCovers,
               product: { ...result },
+              page: page,
               boosts: boostsResult,
               tools: productToolsResult,
               links: {
