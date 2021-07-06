@@ -5,7 +5,11 @@ const TEXT_TYPE = "text";
 const POLL_TYPE = "poll";
 const UNKNOWN_TYPE = "unkown";
 
-const DEFAULT_PAGINATION_DATA = { perPage: 10, currentPage: 1, isLengthAware: true };
+const DEFAULT_PAGINATION_DATA = {
+  perPage: 10,
+  currentPage: 1,
+  isLengthAware: true,
+};
 
 const types = [TEXT_TYPE, POLL_TYPE];
 
@@ -388,7 +392,7 @@ function actions({ db, user }) {
   function getBrowsablePosts({
     order = BROWSABLE_ORDER.BOOSTS,
     withComments = true,
-    paginationData = DEFAULT_PAGINATION_DATA
+    paginationData = DEFAULT_PAGINATION_DATA,
   }) {
     return new Promise((res, rej) => {
       const cachedPosts = cache.get(cacheKeys.browsablePosts(order));
@@ -396,7 +400,13 @@ function actions({ db, user }) {
         return res(cachedPosts);
       }
 
-      _getAllPostsQuery(null, { order, withComments, paginationData, isProductListed: true, isProductPublic: true, })
+      _getAllPostsQuery(null, {
+        order,
+        withComments,
+        paginationData,
+        isProductListed: true,
+        isProductPublic: true,
+      })
         .then((result) => {
           // cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
           res(result);
@@ -514,11 +524,16 @@ function actions({ db, user }) {
 
   function getAllPosts(
     productId,
-    { withComments = false, limit = null, order = BROWSABLE_ORDER.NEWEST, paginationData = DEFAULT_PAGINATION_DATA } = {
+    {
+      withComments = false,
+      limit = null,
+      order = BROWSABLE_ORDER.NEWEST,
+      paginationData = DEFAULT_PAGINATION_DATA,
+    } = {
       withComments: false,
       limit: null,
       order: BROWSABLE_ORDER.NEWEST,
-      paginationData: DEFAULT_PAGINATION_DATA
+      paginationData: DEFAULT_PAGINATION_DATA,
     }
   ) {
     return new Promise((res, rej) => {
@@ -527,18 +542,28 @@ function actions({ db, user }) {
         return res(cachedPosts);
       }
 
-      _getAllPostsQuery(productId, { withComments, limit, order, paginationData, isProductPublic: !user }).then(
-        (result) => {
-          // cache.set(cacheKeys.productPosts(productId), result, ttl.day);
-          res(result);
-        }
-      );
+      _getAllPostsQuery(productId, {
+        withComments,
+        limit,
+        order,
+        paginationData,
+        isProductPublic: !user ? true : undefined,
+      }).then((result) => {
+        // cache.set(cacheKeys.productPosts(productId), result, ttl.day);
+        res(result);
+      });
     });
   }
 
   function _getAllPostsQuery(
     productId,
-    { withComments = false, order = BROWSABLE_ORDER.NEWEST, paginationData = DEFAULT_PAGINATION_DATA, isProductListed = undefined, isProductPublic = undefined } = {
+    {
+      withComments = false,
+      order = BROWSABLE_ORDER.NEWEST,
+      paginationData = DEFAULT_PAGINATION_DATA,
+      isProductListed = undefined,
+      isProductPublic = undefined,
+    } = {
       withComments: false,
       isProductListed: undefined,
       isProductPublic: undefined,
@@ -582,8 +607,10 @@ function actions({ db, user }) {
         .leftJoin("products", "products.id", "posts.product_id");
 
       let where = {};
-      if (isProductListed !== undefined) where['products.is_listed'] = isProductListed;
-      if (isProductPublic !== undefined) where['products.is_public'] = isProductPublic;
+      if (isProductListed !== undefined)
+        where["products.is_listed"] = isProductListed;
+      if (isProductPublic !== undefined)
+        where["products.is_public"] = isProductPublic;
 
       if (productId) {
         where["posts.product_id"] = productId;
@@ -596,7 +623,7 @@ function actions({ db, user }) {
 
       query
         .paginate(paginationData)
-        .then(postsResultWithPagination => {
+        .then((postsResultWithPagination) => {
           if (withComments) {
             let commentsPromises = [];
             postsResultWithPagination.data.forEach((post) => {
@@ -651,10 +678,10 @@ function actions({ db, user }) {
             }, []);
 
           return new Promise((res, rej) => {
-            Promise.all(enrichedPosts).then(data => {
-              res({...postsWithCommentsAndPaginationResult, data });
+            Promise.all(enrichedPosts).then((data) => {
+              res({ ...postsWithCommentsAndPaginationResult, data });
             });
-          })
+          });
         })
         .then((finalPostsResult) => {
           res(finalPostsResult);
@@ -848,5 +875,5 @@ module.exports = {
   POLL_TYPE,
   UNKNOWN_TYPE,
   BROWSABLE_ORDER,
-  DEFAULT_PAGINATION_DATA
+  DEFAULT_PAGINATION_DATA,
 };
