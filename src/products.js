@@ -45,8 +45,8 @@ function actions({ db, user }) {
 
   function updateProduct({ slug, input }) {
     const data = { ...input, updated_at: new Date() };
-    if (input.is_public) data.is_public = input.is_public === "on";
-    if (input.is_listed) data.is_listed = input.is_listed === "on";
+    data.is_public = input.is_public === "on";
+    data.is_listed = input.is_listed === "on";
 
     return new Promise((res, rej) => {
       db("products")
@@ -59,6 +59,87 @@ function actions({ db, user }) {
           res(result);
         })
         .catch((err) => rej(err));
+    });
+  }
+
+  function getRecentlyUpdatedProducts({ limit = 8 }) {
+    return new Promise((res, rej) => {
+      const cacheKey = cacheKeys.browsableProductsForLatestPosts();
+      const cached = cache.get(cacheKey);
+
+      if (cached) {
+        return res(cached);
+      }
+
+      /*
+       
+      select
+        name,
+        max(last_post_created_at)
+      from
+        (select
+          posts.created_at as last_post_created_at,
+          products.name as name
+            from posts
+            left join products
+            on posts.product_id = products.id
+            where products.is_listed = true
+            and products.is_public = true
+            order by posts.created_at desc
+        )
+      as foo
+      group by name
+      order by max desc
+      limit 8;
+
+       */
+
+      const fields = [
+          'name',
+          'slug',
+          'description',
+          'cover_image_url',
+          'logo_url',
+          'boosts_count',]
+      const query = db
+        .queryBuilder()
+        .select(
+          ...fields
+        )
+        .max('latest_post_created_at', { as: "created_at_max" })
+        .from(
+          db
+            .queryBuilder()
+            .select(
+              'posts.created_at as latest_post_created_at',
+              'products.name as name',
+              'products.slug as slug',
+              'products.description as description',
+              'products.cover_image_url as cover_image_url',
+              'products.logo_url as logo_url',
+              db("product_boosts")
+                .count()
+                .whereRaw("product_id = products.id")
+                .as("boosts_count")
+            )
+            .from('posts')
+            .leftJoin('products', 'products.id', 'posts.product_id')
+            .where({ 'products.is_listed': true, 'products.is_public': true })
+            .orderBy([{column:'posts.created_at', order: 'desc'}])
+            .as('product_with_latest_post_date_table')
+        )
+        .groupBy(fields)
+        .orderBy([{ column: 'created_at_max', order: 'desc' }])
+        .limit(limit);
+
+      query
+        .then((result) => {
+          cache.set(cacheKey, result, ttl[2]);
+          return res(result);
+        })
+        .catch((err) => {
+          return rej(err);
+        });
     });
   }
 
@@ -134,6 +215,7 @@ function actions({ db, user }) {
   return {
     getProductBySlug,
     getBrowsableProducts,
+    getRecentlyUpdatedProducts,
     getMyProducts,
     updateProduct,
     delProduct,

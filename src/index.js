@@ -398,15 +398,15 @@ app.get("/browse", (req, res) => {
       limit: 8,
     })
     .then((newestProductsResult) => {
-      productsActions
-        .getBrowsableProducts({
-          order: products.BROWSABLE_ORDER.BOOSTS,
+      return productsActions
+        .getRecentlyUpdatedProducts({
           limit: 8,
         })
-        .then((mostBoostedProductsResult) => {
+        .then((recentlyUpdatedProductsResult) => {
           const title = "Browse | Haptic";
           const description =
             "Get inspired by other build in public makers by browsing their public updates and products";
+
           res.render("browse", {
             meta: {
               ...defaultMetas,
@@ -420,10 +420,10 @@ app.get("/browse", (req, res) => {
             },
             page: page,
             newestProducts: newestProductsResult,
-            mostBoostedProducts: mostBoostedProductsResult,
-          });
+            recentlyUpdatedProducts: recentlyUpdatedProductsResult,
+          })
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
           throw err;
         });
@@ -439,10 +439,11 @@ app.get("/frame/browse/posts", (req, res) => {
   const page = getPageFromQuery(req.query);
   const postsActions = posts.actions({ db, user: req.user });
   const order = posts.BROWSABLE_ORDER.NEWEST;
+  const perPage = 18;
   postsActions
     .getBrowsablePosts({
       order,
-      paginationData: { ...posts.DEFAULT_PAGINATION_DATA, perPage: 5, currentPage: page }
+      paginationData: { ...posts.DEFAULT_PAGINATION_DATA, perPage, currentPage: page }
     })
     .then((postsResult) => {
       const title = "Browse public updates | Haptic";

@@ -105,13 +105,13 @@ block content
                 label(class="flex items-center")
                   input(type="checkbox" class="mr-2 cursor-pointer" name="is_public" id="is-public" checked=(product.is_public ? 'checked' : false))
                   span(class="label cursor-pointer") Public
-                span(class="text-sm text-gray-500") Turn this off, if you want to hide your product page from the public
+                span(class="text-sm text-gray-500") Uncheck this if you wan't to make your product page completely private (won't be discoverable on Haptic's feeds as well).
 
               div
                 label(class="flex items-center")
                   input(type="checkbox" class="mr-2 cursor-pointer" name="is_listed" id="is-listed" checked=(product.is_listed ? 'checked' : false))
                   span(class="label cursor-pointer") List on Haptic
-                span(class="text-sm text-gray-500") By having this on, you agree that we can list your product on our homepage (might take up to an hour to update caches)
+                span(class="text-sm text-gray-500") Make your product and posts discoverable on Haptic's feeds (#[span(class="label") Public] must be checked, too).
 
           div(class="p-4 bg-white rounded-md border border-gray-200 mb-4")
             button(type="submit" class="btn btn-primary w-full transition") Save

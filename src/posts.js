@@ -396,7 +396,7 @@ function actions({ db, user }) {
         return res(cachedPosts);
       }
 
-      _getAllPostsQuery(null, { order, withComments, paginationData })
+      _getAllPostsQuery(null, { order, withComments, paginationData, isProductListed: true, isProductPublic: true, })
         .then((result) => {
           // cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
           res(result);
@@ -527,7 +527,7 @@ function actions({ db, user }) {
         return res(cachedPosts);
       }
 
-      _getAllPostsQuery(productId, { withComments, limit, order, paginationData }).then(
+      _getAllPostsQuery(productId, { withComments, limit, order, paginationData, isProductPublic: !user }).then(
         (result) => {
           // cache.set(cacheKeys.productPosts(productId), result, ttl.day);
           res(result);
@@ -538,8 +538,10 @@ function actions({ db, user }) {
 
   function _getAllPostsQuery(
     productId,
-    { withComments = false, order = BROWSABLE_ORDER.NEWEST, paginationData = DEFAULT_PAGINATION_DATA } = {
+    { withComments = false, order = BROWSABLE_ORDER.NEWEST, paginationData = DEFAULT_PAGINATION_DATA, isProductListed = undefined, isProductPublic = undefined } = {
       withComments: false,
+      isProductListed: undefined,
+      isProductPublic: undefined,
       order: BROWSABLE_ORDER.NEWEST,
       paginationData: DEFAULT_PAGINATION_DATA,
     }
@@ -579,7 +581,10 @@ function actions({ db, user }) {
         .leftJoin("images", "images.post_id", "posts.id")
         .leftJoin("products", "products.id", "posts.product_id");
 
-      let where = { "products.is_listed": true, "products.is_public": true };
+      let where = {};
+      if (isProductListed !== undefined) where['products.is_listed'] = isProductListed;
+      if (isProductPublic !== undefined) where['products.is_public'] = isProductPublic;
+
       if (productId) {
         where["posts.product_id"] = productId;
       }

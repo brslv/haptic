@@ -9,6 +9,7 @@ const cacheKeys = {
   productsForUser: (userId) => `product.user.${userId}`,
   browse: (order) => `browse.${order}`,
   browsablePosts: (order) => `browsablePosts.${order}`,
+  browsableProductsForLatestPosts: () => `browsableProductsForLatestPosts`,
 };
 
 const min = 60;

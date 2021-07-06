@@ -48,8 +48,8 @@ block content
 
         aside(class="md:w-2/6 mb-16 md:mb-0 w-full")
           div(class="mb-4")
-            +page-title(class="mb-4") Top products
-            each product, idx in mostBoostedProducts
+            +page-title(class="mb-4") Recently Updated
+            each product, idx in recentlyUpdatedProducts
               div(class="pb-2")
                 +product-card-simple({
                   place: idx < 3 ? idx : null,
