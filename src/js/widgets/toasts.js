@@ -11,14 +11,14 @@ export default function toasts() {
     }
     const $root = $($tpl.html());
 
-    var color;
-    if (type === "default") color = "bg-blue-400";
-    if (type === "success") color = "bg-green-400";
-    if (type === "error") color = "bg-red-400";
-    $root
-      .children()
-      .first()
-      .addClass(color);
+    const icon =
+      type === "success"
+        ? "[data-success-icon]"
+        : type === "error"
+        ? "[data-error-icon]"
+        : null;
+
+    if (icon) $root.find(icon).removeClass("hidden");
 
     const randId = Math.random();
     $root.data("toastId", randId);

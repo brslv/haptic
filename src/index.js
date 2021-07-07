@@ -216,7 +216,8 @@ app.use((req, res, next) => {
 app.use(flash({ sessionKeyName: SID }));
 
 // helpers / middlewares
-const getPageFromQuery = query => isNaN(Number(query.page)) || Number(query.page) < 1 ? 1 : Number(query.page);
+const getPageFromQuery = (query) =>
+  isNaN(Number(query.page)) || Number(query.page) < 1 ? 1 : Number(query.page);
 const predefinedCovers = [
   "https://hpt-assets.s3.eu-central-1.amazonaws.com/cover-1.jpg",
   "https://hpt-assets.s3.eu-central-1.amazonaws.com/cover-2.jpg",
@@ -421,9 +422,9 @@ app.get("/browse", (req, res) => {
             page: page,
             newestProducts: newestProductsResult,
             recentlyUpdatedProducts: recentlyUpdatedProductsResult,
-          })
+          });
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
           throw err;
         });
@@ -443,7 +444,11 @@ app.get("/frame/browse/posts", (req, res) => {
   postsActions
     .getBrowsablePosts({
       order,
-      paginationData: { ...posts.DEFAULT_PAGINATION_DATA, perPage, currentPage: page }
+      paginationData: {
+        ...posts.DEFAULT_PAGINATION_DATA,
+        perPage,
+        currentPage: page,
+      },
     })
     .then((postsResult) => {
       const title = "Browse public updates | Haptic";
@@ -461,7 +466,7 @@ app.get("/frame/browse/posts", (req, res) => {
           },
         },
         pagination: postsResult.pagination,
-        createPaginationLink: n => `/browse?page=${n}`,
+        createPaginationLink: (n) => `/browse?page=${n}`,
         posts: [
           ...postsResult.data.map((post) => {
             const strippedMdText = removeMd(post.text);
@@ -663,7 +668,11 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
         .actions({ db, user: req.user })
         .getAllPosts(productResult.id, {
           withComments: true,
-          paginationData: { ...posts.DEFAULT_PAGINATION_DATA,  perPage: 5, currentPage: page }
+          paginationData: {
+            ...posts.DEFAULT_PAGINATION_DATA,
+            perPage: 5,
+            currentPage: page,
+          },
         })
         .then((postsResult) => {
           return db("product_tools")
@@ -685,7 +694,8 @@ app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
                 product: { ...productResult },
                 tools: [...toolsResult],
                 pagination: postsResult.pagination,
-                createPaginationLink: n => `/dashboard/product/${slug}/posts?page=${n}`,
+                createPaginationLink: (n) =>
+                  `/dashboard/product/${slug}/posts?page=${n}`,
                 posts: [
                   ...postsResult.data.map((post) => {
                     const strippedMdText = removeMd(post.text);
@@ -1066,7 +1076,14 @@ app.get("/frame/p/:slug", (req, res, next) => {
       }
 
       return postsActions
-        .getAllPosts(result.id, { withComments: true, paginationData: { ...posts.DEFAULT_PAGINATION_DATA, perPage: 5, currentPage: page } })
+        .getAllPosts(result.id, {
+          withComments: true,
+          paginationData: {
+            ...posts.DEFAULT_PAGINATION_DATA,
+            perPage: 5,
+            currentPage: page,
+          },
+        })
         .then(({ data: postsResult, pagination }) => {
           res.render("frame-product", {
             meta: {
@@ -1119,7 +1136,10 @@ app.get("/frame/p/:slug", (req, res, next) => {
 
 app.get("/p/:slug", (req, res, next) => {
   const slug = req.params.slug;
-  const page = isNaN(Number(req.query.page)) || Number(req.query.page) < 1 ? 1 : Number(req.query.page);
+  const page =
+    isNaN(Number(req.query.page)) || Number(req.query.page) < 1
+      ? 1
+      : Number(req.query.page);
   const postsActions = posts.actions({ db, user: req.user });
   const boostsActions = boosts.actions({ db });
 
@@ -1679,7 +1699,7 @@ app.post(
         if (err.code === dbErrCodes.DUP_CODE)
           return res.status(400).json({
             ok: 0,
-            err: "You've already boosted this post. 🚀",
+            err: "You've already boosted this post.",
             details: null,
           });
         next(err);
@@ -1975,7 +1995,7 @@ app.post(
         if (err.code === dbErrCodes.DUP_CODE)
           return res.status(400).json({
             ok: 0,
-            err: "You've already boosted this product. 🚀",
+            err: "You've already boosted this product.",
             details: null,
           });
         next(err);
@@ -2450,4 +2470,4 @@ app.use((err, req, res, next) => {
 
 // run this bad boy!
 app.listen(process.env.PORT);
-console.log(process.env.PORT + " is where the magic happens. 🚀");
+console.log(process.env.PORT + " is where the magic happens.");
