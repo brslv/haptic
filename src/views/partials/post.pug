@@ -65,12 +65,10 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
         block
 
     div(class="flex items-center justify-between")
-      div(
-        tabindex="0"
-        role="button"
+      button(
         class={
-          "product-btn product-btn-small text-xs": true,
-          "cursor-pointer click-scale": !disable_boost_btn,
+          "focus:outline-none product-btn product-btn-small text-xs shadow-sm": true,
+          "cursor-pointer click-scale-2": !disable_boost_btn,
           "cursor-pointer focus:ring-0 text-gray-500 hover:border-gray-200 hover:bg-transparent": disable_boost_btn
         }
         data-post-boost-btn
