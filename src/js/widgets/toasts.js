@@ -33,14 +33,20 @@ export default function toasts() {
       hideToast({ id: randId });
     }, 4000);
 
+    $root.addClass("toast");
     $els.$toastsContainer.prepend($root);
+    $root.addClass("toast-visible");
 
     function hideToast({ id }) {
       const $el = $els.$toastsContainer.find('[data-toast-id="' + id + '"]');
       if (!$el) return;
-      $el.remove();
+      $el.removeClass("toast-visible");
       $close.off("click");
     }
+
+    $root.on("animationend", () => {
+      if (!$root.hasClass("toast-visible")) $root.remove();
+    });
   }
 
   let $els = {};

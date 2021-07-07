@@ -322,22 +322,33 @@
     background-color: red;
   }
 
-  @keyframes fadeIn {
+  .toast {
+    visibility: none;
+    animation: fadeOutToBottom 0.2s;
+    will-change: transform;
+  }
+
+  .toast-visible {
+    animation: fadeInFromBottom 0.2s;
+    will-change: transform;
+  }
+
+  @keyframes fadeInFromBottom {
     from {
-      /*margin-top: -5px;*/
+      margin-bottom: -10px;
       transform: scale(0.95);
       opacity: 0;
       visibility: none;
     }
     to {
-      /*margin-top: 0px;*/
+      margin-bottom: 0px;
       transform: scale(1);
       opacity: 1;
       visibility: visible;
     }
   }
 
-  @keyframes fadeOut {
+  @keyframes fadeOutToBottom {
     from {
       margin-top: 0px;
       transform: scale(1);
@@ -345,7 +356,7 @@
       visibility: visible;
     }
     to {
-      margin-top: -5px;
+      margin-top: -10px;
       transform: scale(0.95);
       opacity: 0;
       visibility: none;
