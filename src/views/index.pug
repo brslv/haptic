@@ -12,7 +12,7 @@ mixin join-the-party-button
   span(class="text-sm text-gray-600") Takes 30 seconds to start. And it's #[span(class="text-xs font-bold bg-yellow-100 px-2 py-1 rounded-md") FREE]!
 
 mixin check({ noPadding = false } = { noPadding: false })
-  li(class={ "flex items-center": true, "pb-2": !noPadding })
+  li(class={ "flex items-center justify-center lg:justify-start": true, "pb-2": !noPadding })
     div(class="mr-2")
       +icon-in-circle({ name: 'check' })
     block
@@ -69,7 +69,7 @@ block content
         h2(class="text-xl font-medium text-gray-700 mb-8" style="max-width: 42ch;").
           Get exposure for your product on a community of makers and creators. We provide the stage. You got the mic.
 
-        ul(class="mb-8")
+        ul(class="mb-8 text-left")
           +check Go beyond simple tasks logging in public
           +check Tell a coherent story using various content types
           +check Get a beautiful product page for FREE
