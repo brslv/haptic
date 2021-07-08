@@ -1,0 +1,119 @@
+extends layouts/base.layout.pug
+
+include partials/top-bar.pug
+include components/icon-in-circle.pug
+
+mixin box({ accent, title, description, price, buttonLink, buttonLabel })
+  div(class={ "bg-white border border-gray-200 p-4 rounded-md flex-1 mr-4": true, "shadow-xl": accent })
+    h3(class="font-black text-2xl mb-4")= price
+    h2(class="font-medium text-xl")= title
+    div(class="text-gray-700 font-medium")= description
+    block
+    a(
+      href=(buttonLink)
+      class={
+        "btn text-lg text-center transition": true,
+        "btn-primary": accent,
+        "bg-yellow-100 hover:bg-yellow-200": !accent
+      }
+    )= buttonLabel
+
+mixin green-row()
+  div(class="flex items-center my-2")
+    div(class="mr-2")
+      +icon-in-circle({ name: 'check' })
+    div 
+      block
+
+mixin red-row
+  div(class="flex items-center mb-2")
+    div(class="mr-2")
+      +icon-in-circle({ name: 'x', bg: 'bg-red-500' })
+    div
+      block
+
+
+block content
+  +top-bar
+
+  div(class="container mx-auto p-4")
+    div(id="pricing")
+      div(class="container mx-auto p-4")
+        span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Transparent, fair pricing
+        h3(class="font-black text-center mx-auto text-2xl mb-28 sm:mb-16") Pick your flavor
+
+        //- Plans
+        div(class="flex flex-col md:flex-row items-start")
+
+          //- Creator Lite
+          +box({
+            title: "Creator Lite",
+            description: "Perfect if you're just starting",
+            price: 'Free',
+            buttonLink: "/login",
+            buttonLabel: "Join as Creator Lite"
+          })
+            div(class="my-8")
+              +red-row Unlimited product pages (only one)
+              +green-row Product page customizations
+              +green-row Access to all content-creation tools
+              +green-row Boost posts and products
+              +green-row Collect products
+              +green-row Leave comments and join discussions
+              +green-row Get featured on the Browse page
+
+          //- Creator
+          +box({
+            accent: true,
+            title: "Creator",
+            description: "For the pro makers",
+            price: '$10 / month',
+            buttonLink: "/login?creator=true",
+            buttonLabel: "Join as Creator"
+          })
+            div(class="my-8")
+              +green-row Unlimited product pages
+              +green-row Product page customizations
+              +green-row Access to all content-creation tools
+              +green-row Boost posts and products
+              +green-row Collect products
+              +green-row Leave comments and join discussions
+              +green-row Get featured on the Browse page
+
+        div(class="flex items-center justify-center")
+          div(class="flex items-center bg-gray-200 rounded-full px-4 py-2 inline-block mx-auto mt-8 text-sm")
+            div(class="mr-2")
+              +icon-in-circle({ name: 'key', bg: 'bg-blue-500' })
+            span You will be asked to sign up once you pick your plan
+
+
+//-
+          div(class="flex-1 w-full bg-white border border-gray-200 rounded-md p-4 md:p-8 mb-8 md:mb-0 md:mr-8 bg-clip-padding bg-opacity-70" style="backdrop-filter: blur(20px);")
+            div(class="text-xl font-black mb-4 text-yellow-300") FREE
+            h2(class="text-xl font-bold") Creator Lite
+            p(class="text-lg lg:text-xl text-gray-600 mb-4 md:mb-8") For the inspiration seekers.
+            ul
+              li(class="p-4 border-b")  One product page limit
+              //- li(class="p-4 border-b") Collect products
+              //- li(class="p-4 border-b") Boost products
+              //- li(class="p-4 border-b") Boost posts
+              //- li(class="p-4 border-b")
+              //-   span Vote in surveys
+              //-   span(class="uppercase ml-2 bg-yellow-50 rounded px-2 py-1.5 text-xs") Soon
+              //- li(class="p-4 pb-0")
+              //-   span Post comments
+              //-   span(class="uppercase ml-2 bg-yellow-50 rounded px-2 py-1.5 text-xs") Soon
+            div(class="mt-8")
+              a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200 transition") Join as Creator Lite
+          div(class="flex-1 w-full bg-white border border-gray-200 rounded-md p-4 md:p-8 bg-clip-padding bg-opacity-70" style="backdrop-filter: blur(20px);")
+            div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") 10$ / month
+            h2(class="text-xl md:text-2xl font-bold") Creator
+            p(class="text-xl text-gray-600 mb-8") For the doers.
+            ul
+              //- li(class="flex items-center p-4 border-b font-bold")
+              //-   +icon("arrow-left")(class="mr-2")
+              //-   span All from Creator Lite
+              li(class="p-4 border-b text-xl") #[span(class="underline") Unlimited] product pages
+              //- li(class="p-4 pb-0") All of Haptic's content creation tools
+            div(class="mt-8")
+              a(href="/login?creator=true" class="btn btn-primary lg:text-xl text-center py-3 transition") Join as Creator

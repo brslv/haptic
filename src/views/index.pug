@@ -1,12 +1,21 @@
 extend layouts/base.layout.pug
 
-include partials/top-bar.pug
 include partials/icon.pug
+include partials/top-bar.pug
+include partials/facade-post.pug
+include partials/login-modal.pug
+include components/icon-in-circle.pug
 
-mixin footer-link(href)
-  a(href=href class="block underline hover:no-underline")
+mixin join-the-party-button
+  a(href="/pricing" class="btn btn-primary text-lg mb-1 click-scale transition")
+    block 
+  span(class="text-sm text-gray-600") Takes 30 seconds to start. And it's #[span(class="text-xs font-bold bg-yellow-100 px-2 py-1 rounded-md") FREE]!
+
+mixin check({ noPadding = false } = { noPadding: false })
+  li(class={ "flex items-center": true, "pb-2": !noPadding })
+    div(class="mr-2")
+      +icon-in-circle({ name: 'check' })
     block
-
 
 mixin people
   div(class="mt-8 flex items-center")
@@ -21,241 +30,82 @@ mixin people
     img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/rutvik.jpg" alt="Rutvik" class="rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
     img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/shayne.jpg" alt="Shayne" class="rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
     img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/stephen.jpg" alt="Stephen" class="rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
-  p(class="text-xs text-center text-gray-600 mt-2" style="max-width: 32ch;") 150+ people are already sharing their product stories on haptic
+  p(class="text-xs text-gray-600 mt-2") 150+ people are already sharing their product stories on Haptic
 
-mixin use-case(title, icon, shapeSrc)
-  div(class="bg-white sm:bg-transparent border border-gray-200 sm:border-none relative p-8 rounded-md bg-clip-padding bg-opacity-70" style="backdrop-filter: blur(20px);")
-    img(src=`/static/images/landing/shapes/${shapeSrc}.svg` alt="Shape - blob" class="absolute -top-2 left-4" style="width: 100px; height: 100px;")
-    div(class="relative z-10")
-      +icon(icon, { width: 32, height: 32 })(class="mb-8")
-      h2(class="font-bold text-xl md:text-2xl mb-4")= title
-      if block
-        p
-          block
+mixin browse-posts-list-loading()
+  +facade-post
+  +facade-post
+  +facade-post
+  +facade-post
+  +facade-post
+  +facade-post
 
-mixin step(nr, title, imageSrc, mobileImgHeight, blobSrc, imageAttrs, blobWidth)
-  div(class="flex relative sm:bg-transparent flex-col-reverse rounded-md sm:flex-row items-start mb-32 sm:mb-20")
-    div(class="absolute")&attributes(imageAttrs)
-      img(src=`/static/images/landing/shapes/${blobSrc}.svg` alt="Shape - blob" style=`width: ${blobWidth}px;`)
-    div(class="relative z-10 border border-gray-200 bg-white transition p-4 md:p-8 text-center sm:text-left rounded-md sm:mr-10 sm:max-w-lg bg-opacity-70 bg-clip-padding" style="backdrop-filter: blur(20px);")
-      div(class="relative")
-        span(class="block text-xs font-medium text-gray-600 uppercase mb-4 mt-10 sm:mt-0") Step #{nr}
-        h4(class="text-xl md:text-2xl font-bold mb-8 bg-yellow-100 p-1 inline-block transform -rotate-1")= title
-        if block
-          block
-    div(class="mx-auto max-w-xl sm:max-w-3xl relative -mb-16 sm:mb-0 z-20")
-      img(src=`/static/images/landing/${imageSrc}.svg` alt="Application UI component" class=`block sm:hidden w-full -mt-8 sm:mt-0 h-${mobileImgHeight || 64}` style="min-width: 150px;")
-      img(src=`/static/images/landing/${imageSrc}.svg` alt="Application UI component" class="hidden sm:block w-full transition transform hover:scale-105" style="min-width: 300px; max-width: 350px;")
+block append head
+  script.
+    document.addEventListener("turbo:load", function() {
+      var $close = $('[data-close-btn]');
 
-mixin detail(title, isSoon = false)
-  li(class={"relative p-4 md:p-8 transition rounded-md": true, "bg-red-50 hover:bg-red-100": isSoon, "bg-yellow-50 hover:bg-yellow-100": !isSoon})
-    if isSoon
-      span(class="bg-red-200 absolute -top-2 -right-2 uppercase font-medium text-xs px-2 py-1.5 rounded-md") Soon
-    h2(class="font-bold text-xl md:text-2xl mb-4")= title
-    if block
-      block
+      $close.on('click', function() {
+        $(document)
+          .trigger(
+            'haptic:add-toast',
+            { content: "Building in public is always open. 🙌", type: 'error'}
+          )
+      })
+    });
 
 block content
-  div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")
-  div(class="bg-transparent" id="top")
-    div(class="mb-8 sm:mb-32")
-      +top-bar
+  div(class="flex items-center md:mb-8")
+    +top-bar
+    //- img(src="/static/images/logo/logo-main.svg" class="w-20")
 
-      // - hero
-      div(class="container p-4 mx-auto mt-32")
-        div(class="text-center relative mx-auto")
-          h1(class="text-3xl md:text-5xl pb-12 font-black")
-            span(class="relative")
-              span Humanize 
-              img(src="/static/images/landing/underline.svg" alt="Underline" class="absolute top-10 left-2 md:top-14 md:left-6 select-none" style="width: 180px")
-            span(class="relative z-10") your product
+  div(class="container-2 mx-auto p-4 mb-8")
+    div(class="flex flex-col lg:flex-row items-start")
 
-          h2(class="text-2xl text-gray-600 mx-auto pb-24" style="max-width: 28ch") You have a story. Your product, too. Share it with the world.
-  
-          div(class="flex items-center justify-center flex-col mb-24")
-            div(class="relative")
-              img(src="/static/images/landing/arrow.svg" alt="Arrow" class="absolute -top-2 -left-28 select-none")
-              a(class="btn btn-primary text-lg md:text-xl px-6 py-4 mb-1 click-scale" href="/login") Start sharing your story
-            span(class="text-sm text-gray-600") FREE, no credit cards required!
-            +people
+      //- Left
+      main(class="pr-4 flex flex-col items-center text-center lg:text-left lg:items-start flex-1 w-full mb-8 lg:mb-0")
+        h1(class="text-4xl font-black mb-4" style="max-width: 18ch;") It's how makers #[br] build products in public
 
+        h2(class="text-xl font-medium text-gray-700 mb-8" style="max-width: 42ch;").
+          Get exposure for your product on a community of makers and creators. We provide the stage. You got the mic.
 
-      div(class="flex flex-col items-center")
-        // img(src="/static/images/landing/smiling-face.svg" class="-mb-6 select-none hidden md:block")
-        div(class="hidden md:block relative overflow-hidden bg-gray-50 z-10 -mb-32 lg:-mb-64 shadow-xl rounded-md border border-gray-200 select-none transition transform" style="max-width: 90%")
-          div(class="flex items-center bg-gray-100 w-full h-12 px-4 border-b border-gray-200")
-            div(class="flex items-center mr-4")
-              div(class="w-4 h-4 rounded-full bg-red-500 mr-2")
-              div(class="w-4 h-4 rounded-full bg-yellow-400 mr-2")
-              div(class="w-4 h-4 rounded-full bg-green-500 mr-2")
-            div(class="flex-1 flex items-center px-4 bg-white rounded-md w-32 h-8 border border-gray-200")
-              span(class="text-sm font-medium") haptic.so/p/#[span(class="font-bold") your-product]
-          div(class="relative overflow-y-scroll" style="min-height: 450px; max-height: 600px; width: 100%;")
-            img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/product-image-hq-glass-header.png" alt="Haptic - product page example" class="w-full" style="max-width: 1200px;")
-        div(class="block md:hidden -mb-16")
-          div(class="relative overflow-y-scroll mx-auto shadow-lg rounded-md" style="max-height: 600px; width: 90%;")
-            img(src="/static/images/landing/product-image-hq.png" alt="Haptic - product page example" class="w-full" style="max-width: 1200px;")
+        ul(class="mb-8")
+          +check Go beyond simple tasks logging in public
+          +check Tell a coherent story using various content types
+          +check Get a beautiful product page for FREE
+          +check Join a acommunity of fellow indie makers
+          +check Gather feedback from early adopters
+          +check({ noPadding: true }) We will push you ship faster. Never build alone again.
 
-  // - features
-  div(class="relative overflow-x-hidden")
-    img(src="/static/images/landing/shapes/lines-1.svg" alt="Lines background" class="fixed mt-32 left-1/2" style="min-width: 2300px; min-height: 2300px; transform: translateX(-50%)")
-    main(class="relative mt-48 lg:mt-64 overflow-x-hidden")
-      div(class="mb-32")
-        div(class="container mx-auto p-4")
-          div(class="relative mx-auto")
-            img(src="/static/images/landing/shapes/blob-1.svg" alt="Blob shape" class="absolute -top-2 -left-24 opacity-50")
+        +join-the-party-button Join the party!
 
-            div(class="relative z-10")
-              span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1 mx-auto" style="max-width: 22ch;") Why I built Haptic?
-              h3(class="font-bold text-center mx-auto text-3xl lg:text-4xl mb-28 sm:mb-16") The idea is simple
+        +people
 
-              div(class="grid grid-cols-1 md:grid-cols-8 gap-8 mt-32")
-                div(class="col-span-8 md:col-span-4 lg:col-span-3")
-                  div(class="relative bg-white border border-gray-200 rounded-md bg-opacity-70 bg-clip-padding" style="backdrop-filter: blur(20px);")
-                    img(src="/static/images/landing/me-bw-optimized.jpg" class="absolute -top-20 left-1/2 rounded-full w-32 h-32 shadow-2xl border-4 border-gray-500" style="transform: translateX(-50%);" alt="Borislav Grigorov")
-                    div(class="mt-12 p-4 md:p-8")
-                      p(class="mb-4 md:mb-8") Hey, there! 👋
-                      p(class="mb-4 md:mb-8") I'm Borislav &mdash; full-stack developer, part time indie maker.
-                      p Let me tell you about Haptic 👉
-                      hr(class="mb-4 md:my-8 hidden")
-                div(class="col-span-8 md:col-span-4 lg:col-span-5")
-                  div(class="bg-white border border-gray-200 rounded-md bg-opacity-70 bg-clip-padding p-4 pt-6 md:p-8 md:pt-8 mb-8 relative" style="backdrop-filter: blur(20px);")
-                    span(class="text-xs uppercase text-gray-600 font-medium bg-yellow-100 px-2 py-1 rounded mb-2 absolute -top-4 left-8 shadow border border-yellow-300") The problem
-                    p(class="mb-4 md:mb-8") When I started to #BuildInPublic, I quickly realized that the general process is a mess.                
-                    p(class="mb-4 md:mb-8") I was using countless platforms to share my ups, downs and learnings. The content creation tools were limited and sometimes constraining.
-                    p(class="mb-4 md:mb-8") On top of that my posts were living in context of other personal sharings, unrelated to my #BuildInPublic journey.
-                    p(class="lg:absolute lg:-bottom-18 lg:-right-4 lg:bg-white lg:rounded-md lg:border lg:border-gray-200 lg:max-w-lg lg:p-4 bg-clip-padding bg-opacity-70" style="backdrop-filter: blur(20px);") I was unable to create tractable, coherent story around the product itself. Everything was swallowed in feeds and lost in the void.
+      //- Right
+      aside( class="relative ring-2 ring-gray-300 rounded-md flex-1 w-full")
 
-                  div(class="flex-1 bg-white border border-gray-200 rounded-md p-4 pt-6 md:p-8 md:pt-8 relative lg:mt-32 bg-clip-padding bg-opacity-70" style="backdrop-filter: blur(20px);")
-                    span(class="text-xs uppercase text-gray-600 font-medium bg-yellow-100 px-2 py-1 rounded mb-2 absolute -top-4 left-8 shadow border border-yellow-300") The solution
-                    p(class="mb-4 md:mb-8") Haptic aims to streamline the process. It provides a set of content creation tools which help you narrate a coherent story.
-                    p(class="mb-4 md:mb-8") Think of Haptic as your product's public diary.
-                    p Having it all in one place makes it easier for your audience to engage and enjoy the ride with you.
+        //- Browser top bar
+        div(class="px-4 flex bg-transparent items-center bg-gray-50 absolute z-10 top-0 left-0 h-12 border-b w-full rounded-tl-md rounded-tr-md")
 
-      div(class="relative")
-        div(class="container mx-auto p-4")
-          span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") The essence 
-          h3(class="font-bold text-center mx-auto text-3xl lg:text-4xl mb-28 sm:mb-16") How it works
+          //- Browser buttons
+          div(class="relative flex items-center mr-4")
+            div(class="flex items-center justify-center cursor-pointer w-4 h-4 rounded-full bg-red-400 mr-2" data-close-btn)
+              +icon("x", { width: 10, hegiht: 10 })
+            div(class="w-4 h-4 rounded-full bg-yellow-400 mr-2")
+            div(class="w-4 h-4 rounded-full bg-green-500 mr-2")
 
-          div(class="my-8 mb-16 flex items-center")
-            a(href="/how-to-build-in-public" title="How to build in public" class="relative z-10 bg-white hover:bg-gray-50  rounded-md border border-gray-300 px-4 py-2 text-lg text-center inline-block mx-auto click-scale shadow-sm hover:shadow-md") Read our guide on how to build in public
+        //- Browser contents
+        div(style="height: 60vh; min-width: 300px;" class="relative p-4 overflow-y-auto mt-12 rounded-md")
+          div(style="max-width: 500px;" class="mx-auto" data-browse-page)
+            turbo-frame(id="browse-posts-list" src=`/frame/browse/posts?perPage=5&hidePagination=true` target="_top")
+              +browse-posts-list-loading
+            div(class="flex items-center flex-col justify-center my-8")
+              +join-the-party-button Add your post and see it live here!
 
-          +step(1, "Create your product page", "create-product", 72, "blob-1", { class: "-top-4 -left-10 opacity-40" }, 300)
-            div(class="relative z-10")
-              p(class="mb-4") It takes 5 seconds.
-              p(class="mb-4") You'll get a unique slug for your product page on #[strong haptic.so/p/{your-slug}].
-              p This is your public url.
-          +step(2, "Build rich narratives", "icons", 48, "blob-2", { class: "-top-24 -right-10 opacity-30" }, 400)
-            p(class="mb-4") You have various tools at your disposal to share your jorney with the crowd.
-            // - p Quick update posts, long-form articles, feedback surveys, milestone celebrations, roadmaps and more.
-          +step(3, "Collect products, show some ❤️", "boost-collect", 44, "blob-3", { class: "top-10 left-10 opacity-60" }, 350)
-            p(class="mb-4") Make a collection of products that you love, built by fellow makers on haptic.
-            p Boost your most favorite ones to show its creators that you care.
+    footer(class="text-xs text-gray-500 mt-8")
+      p(class="mb-1") Built by #[a(href="https://twitter.com/Brslv" class="bg-blue-100 p-1 rounded-md shadow-sm underline hover:no-underline") @Brslv]
+      a(href="/how-to-build-in-public" class="inline-block underline hover:no-underline") How to build in public
 
-      div(class="relative mb-32")
-        div(class="container mx-auto p-4")
-          span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") There's more
-          h3(class="font-bold text-center mx-auto text-3xl lg:text-4xl mb-4") The details
-
-          div(class="text-lg lg:text-xl text-gray-600 font-medium text-center mb-28 sm:mb-16 mx-auto" style="max-width: 24ch;")
-            p Haptic aims to streamline your #BuildInPublic experience.
-            p Here's how:
-
-          ul(class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-8")
-            +detail("Build in the open")
-              p Be the inspiration for the fellow makers.
-            +detail("Make collections")
-              p Found a story worth following? Add it to your collection.
-            +detail("Boosts")
-              p Show some love - boost your favorite products.
-            +detail("Quick updates")
-              p Just share your thoughts. No stress.
-            +detail("Tools")
-              p Brag about your stack!
-            +detail("Markdown support")
-              p Because WYSIWYG is not always what you get.
-            +detail("Long-form content", true)
-              p Dive into the details.
-            +detail("(Haptic) Feedback", true)
-              p You're not sure about your logo? You need to decide on the next feature? Just ask your crowd!
-            +detail("Celebrations", true)
-              p Share your milestones.
-            +detail("Roadmaps", true)
-              p Get specific on how your ideas will come to reality.
-            +detail("Browse products", true)
-              p Browse products built publicly on Haptic. Find amazing stories. Get inspired.
-            +detail("Streaks", true)
-              p Let the compounding effect do it's magic. You just have to show up.
-            +detail("Rankings", true)
-              p Let's play the game. 🚀
-
-      div(class="mb-32")
-        div(class="container mx-auto p-4")
-          span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Popular usecases
-          h3(class="font-bold text-center mx-auto text-3xl lg:text-4xl mb-28 sm:mb-16") Who is Haptic built for
-
-          div(class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-16")
-            +use-case("Makers", "hexagon", "shape-1") For the problem-solvers, who create reusable solutions.
-            +use-case("Writers", "edit-2", "shape-2") For those, who tame the words for us.
-            +use-case("Learners", "book-open", "shape-3") For all of us, who master the chaos of knowledge.
-            +use-case("Designers", "pen-tool", "shape-4") For the people, who deliver elegant usability.
-            +use-case("Artists", "circle", "shape-5") For the creative ones, who can deeply touch our souls.
-            +use-case("You", "heart", "shape-6") For You and your story. Whoever you are. Whatever your story.
-
-          div(class="flex flex-col items-center justify-center")
-            a(class="btn btn-primary text-lg md:text-xl px-6 py-4 inline-block click-scale mb-2" href=("/login")) Start sharing your story
-            span(class="text-sm text-gray-600") FREE, no credit cards required!
-            +people
-
-      div(class="mb-32" id="pricing")
-        div(class="container mx-auto p-4")
-          span(class="text-xs text-gray-600 font-medium uppercase text-center block mb-1") Transparent, fair
-          h3(class="font-bold text-center mx-auto text-4xl mb-28 sm:mb-16") Pricing
-
-          div(class="flex flex-col md:flex-row items-start")
-            div(class="flex-1 w-full bg-white border border-gray-200 rounded-md p-4 md:p-8 mb-8 md:mb-0 md:mr-8 bg-clip-padding bg-opacity-70" style="backdrop-filter: blur(20px);")
-              div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") FREE
-              h2(class="text-xl md:text-2xl font-bold") Creator Lite
-              p(class="text-lg lg:text-xl text-gray-600 mb-4 md:mb-8") For the inspiration seekers.
-              ul
-                li(class="p-4 border-b")  One product page limit
-                //- li(class="p-4 border-b") Collect products
-                //- li(class="p-4 border-b") Boost products
-                //- li(class="p-4 border-b") Boost posts
-                //- li(class="p-4 border-b")
-                //-   span Vote in surveys
-                //-   span(class="uppercase ml-2 bg-yellow-50 rounded px-2 py-1.5 text-xs") Soon
-                //- li(class="p-4 pb-0")
-                //-   span Post comments
-                //-   span(class="uppercase ml-2 bg-yellow-50 rounded px-2 py-1.5 text-xs") Soon
-              div(class="mt-8")
-                a(href="/login" class="btn btn-primary lg:text-xl text-center py-3 bg-yellow-100 hover:bg-yellow-200 transition") Join as Creator Lite
-            div(class="flex-1 w-full bg-white border border-gray-200 rounded-md p-4 md:p-8 bg-clip-padding bg-opacity-70" style="backdrop-filter: blur(20px);")
-              div(class="text-xl md:text-2xl lg:text-4xl font-black mb-4 text-yellow-300") 10$ / month
-              h2(class="text-xl md:text-2xl font-bold") Creator
-              p(class="text-xl text-gray-600 mb-8") For the doers.
-              ul
-                //- li(class="flex items-center p-4 border-b font-bold")
-                //-   +icon("arrow-left")(class="mr-2")
-                //-   span All from Creator Lite
-                li(class="p-4 border-b text-xl") #[span(class="underline") Unlimited] product pages
-                //- li(class="p-4 pb-0") All of Haptic's content creation tools
-              div(class="mt-8")
-                a(href="/login?creator=true" class="btn btn-primary lg:text-xl text-center py-3 transition") Join as Creator
-  
-  footer(class="flex flex-col items-center justify-center border-t border-gray-200 bg-white bg-opacity-70 bg-clip-padding py-24" style="backdrop-filter: blur(20px);")
-    div()
-      div(class="flex flex-col md:flex-row text-center md:text-left")
-        div(class="mb-8 md:mb-0 md:mr-8")
-          h4(class="text-xs text-gray-600 uppercase mb-4") Articles
-          +footer-link("/how-to-build-in-public") How to build in public
-
-        div
-          h4(class="text-xs text-gray-600 uppercase mb-4") Legal
-          +footer-link("/privacy-policy") Privacy Policy
-          +footer-link("/terms-of-service") Terms of Service
-
-
-    hr(class="w-10 border-gray-300 mx-auto my-8")
-
-    p(class="text-xs") Built by #[a(href="https://twitter.com/Brslv" title="@Brslv" data-tippy-content="@Brslv on Twitter" class="text-yellow-400 underline hover:no-underline") @Brslv]
+block modals
+  if !user
+    +login-modal

@@ -4,7 +4,7 @@ mixin login-modal
   +modal("login", { style: "width: 300px;" })
     h2(class="font-medium text-gray-600 dark:text-gray-200 text-xs uppercase") Please login
     div(class="pt-8")
-      p(class="mb-4") Anonymous users cannot like/boost contents on this page.
+      p(class="mb-4") Anonymous users are not allowed to perform this action
       a(href=(creator ? "/auth/twitter?creator=true" : "/auth/twitter") class="flex items-center justify-center btn btn-twitter")
         +icon("twitter", { width: 18, height: 18, stroke: "white", fill: "white" })(class="mr-2")
         span Login with Twitter

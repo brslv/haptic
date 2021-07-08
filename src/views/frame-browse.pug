@@ -85,7 +85,7 @@ block content
                   comments: post.comments
                 }) !{post.details}
 
-            if pagination && pagination.lastPage > 1
+            if !hidePagination && pagination && pagination.lastPage > 1
               +pagination-block({ pagination, createPaginationLink })
 
 block modals

@@ -1,8 +1,8 @@
 include ./icon.pug
 
 mixin top-bar(activePage)
-    div(class="relative w-full bg-white border-b border-gray-200 mb-4")
-        div(class="container px-4 mx-auto")
+    div(class="relative w-full border-b border-gray-100 mb-4")
+        div(class="px-4")
             div(class="flex h-14 items-center justify-between")
                 a(href="/" class="click-scale hover:scale-105 transition")
                     div(class="flex items-center")
@@ -17,35 +17,35 @@ mixin top-bar(activePage)
                                 "border-b-4 border-yellow-300 primary-glow": activePage === "browse"}
                         )
                           span(class="flex items-center")
-                            +icon("grid", { width:20, height: 20 })(class="mr-2")
+                            +icon("grid", { width:16, height: 16 })(class="mr-2")
                             span(class="font-medium") Browse
                       
                       div(class="relative" data-mobile-nav-open)
-                        +icon("menu", { width: 20, height: 20 })
+                        +icon("menu", { width: 16, height: 16 })
                         if notificationsCount > 0
                           span(class="absolute -top-3 -right-2 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notificationsCount
 
                     //- mobile
 
                     div(class="hidden md:hidden text-lg absolute top-0 left-0 h-screen w-screen bg-white m-0 p-0 flex flex-col items-center justify-center z-20" data-mobile-nav)
-                      +icon("x", { width: 20, height: 20 })(class="absolute top-5 right-4" data-mobile-nav-close)
+                      +icon("x", { width: 16, height: 16 })(class="absolute top-5 right-4" data-mobile-nav-close)
                       if user
                         div(class="mb-4")
                           a(href="/dashboard" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon("box", { width:20, height: 20 })(class="mr-2")
+                            +icon("box", { width:16, height: 16 })(class="mr-2")
                             span Dashboard
                         div(class="mb-4")
                           a(href="/browse" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon("grid", { width:20, height: 20 })(class="mr-2")
+                            +icon("grid", { width:16, height: 16 })(class="mr-2")
                             span Browse
                         div(class="mb-4")
                           a(href="/collections" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon("bookmark", { width:20, height: 20 })(class="mr-2")
+                            +icon("bookmark", { width:16, height: 16 })(class="mr-2")
                             span Collections
                         div(class="mb-4")
                           a(href="/notifications" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
                             div(class="relative")
-                              +icon("mail", { width:20, height: 20 })(class="mr-2")
+                              +icon("mail", { width:16, height: 16 })(class="mr-2")
                               if notificationsCount > 0
                                 span(class="absolute -top-4 -left-4 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notificationsCount
                             span Notifications
@@ -55,16 +55,16 @@ mixin top-bar(activePage)
                             span Profile
                         div(class="mb-4")
                           a(href="/logout" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon('log-out', { width:20, height: 20 })(class="mr-2")
+                            +icon('log-out', { width:16, height: 16 })(class="mr-2")
                             span Log out
                       else
                         div(class="mb-4")
-                          a(href="/#pricing" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon("dollar-sign", { width:20, height: 20 })(class="mr-2")
+                          a(href="/pricing" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
+                            +icon("dollar-sign", { width:16, height: 16 })(class="mr-2")
                             span Pricing
                         div(class="mb-4")
                           a(href="/login" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon('log-in', { width:20, height: 20 })(class="mr-2")
+                            +icon('log-in', { width:16, height: 16 })(class="mr-2")
                             span Login
 
                     //- desktop
@@ -80,7 +80,7 @@ mixin top-bar(activePage)
                               data-tippy-content="Dashboard"
                             )
                                 span
-                                    +icon('box', { width:20, height: 20 })
+                                    +icon('box', { width:16, height: 16 })
 
                             a(
                               href="/browse"
@@ -89,7 +89,7 @@ mixin top-bar(activePage)
                               data-tippy-content="Browse"
                             )
                               span
-                                +icon("grid", { width:20, height: 20 })
+                                +icon("grid", { width:16, height: 16 })
 
                             a(
                               href="/collections"
@@ -100,7 +100,7 @@ mixin top-bar(activePage)
                               data-tippy-content="Collections"
                             )
                                 span
-                                    +icon('bookmark', { width:20, height: 20 })
+                                    +icon('bookmark', { width:16, height: 16 })
 
                             a(
                               href="/notifications"
@@ -111,7 +111,7 @@ mixin top-bar(activePage)
                               data-tippy-content=`Notifications (${notificationsCount || 0})`
                             )
                                 span(class="relative")
-                                    +icon('mail', { width:20, height: 20 })
+                                    +icon('mail', { width:16, height: 16 })
                                     if notificationsCount > 0
                                         span(class="absolute -top-3 -right-3 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notificationsCount
 
@@ -128,7 +128,7 @@ mixin top-bar(activePage)
 
                             a(href="/logout" class="h-full flex items-center hover:bg-gray-50 px-4 click-scale" data-tippy-content="Log out")
                                 span
-                                    +icon('log-out', { width:20, height: 20 })
+                                    +icon('log-out', { width:16, height: 16 })
                         else
                           a(
                             href="/browse"
@@ -136,16 +136,16 @@ mixin top-bar(activePage)
                                   "border-b-4 border-yellow-300 primary-glow": activePage === "browse"}
                           )
                             span(class="flex items-center")
-                              +icon("grid", { width:20, height: 20 })(class="mr-2")
+                              +icon("grid", { width:16, height: 16 })(class="mr-2")
                               span(class="font-medium") Browse
                           a(
-                            href="/#pricing"
+                            href="/pricing"
                             class="h-full flex items-center hover:bg-gray-50 px-4 click-scale"
                           )
                             span(class="flex items-center")
-                              +icon("dollar-sign", { width:20, height: 20 })(class="mr-2")
+                              +icon("dollar-sign", { width:16, height: 16 })(class="mr-2")
                               span(class="font-medium") Pricing
                           a(href="/login" class="h-full flex items-center hover:bg-gray-50 px-4 click-scale")
                               span(class="flex items-center")
-                                  +icon('log-in', { width:20, height: 20 })(class="mr-2")
+                                  +icon('log-in', { width:16, height: 16 })(class="mr-2")
                                   span(class="font-medium") Login

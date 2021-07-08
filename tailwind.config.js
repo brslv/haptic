@@ -17,6 +17,9 @@ module.exports = {
       },
     },
     extend: {
+      animation: {
+        "bounce-slow": "bounce 3s linear infinite",
+      },
       backgroundColor: {
         ...defaultTheme.backgroundColor,
         gray: { ...colors.warmGray, 70: "#F6F7F8" },
@@ -54,5 +57,14 @@ module.exports = {
       ringWidth: ["focus", "hover"],
     },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [
+    require("@tailwindcss/typography"),
+    ({ addComponents, theme }) => {
+      addComponents({
+        ".container-2": {
+          maxWidth: theme("screens.xl"),
+        },
+      });
+    },
+  ],
 };

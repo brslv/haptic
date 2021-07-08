@@ -387,6 +387,23 @@ app.get("/", (req, res) => {
   res.render("index", { meta: defaultMetas, isHomepage: true });
 });
 
+app.get("/pricing", (req, res) => {
+  const title =  "Pricing | Haptic";
+  const description = "Haptic's pricing model details";
+
+  res.render("pricing", {
+    meta: {
+      ...defaultMetas,
+      title,
+      description,
+      og:{
+        ...defaultMetas.og,
+        title,
+        description
+      }
+    }, isHomepage: true });
+});
+
 app.get("/browse", (req, res) => {
   const productsActions = products.actions({ db, user: req.user });
   const page = getPageFromQuery(req.query);
@@ -436,11 +453,16 @@ app.get("/browse", (req, res) => {
 });
 
 app.get("/frame/browse/posts", (req, res) => {
+  const params = req.query;
   const productsActions = products.actions({ db, user: req.user });
   const page = getPageFromQuery(req.query);
   const postsActions = posts.actions({ db, user: req.user });
   const order = posts.BROWSABLE_ORDER.NEWEST;
-  const perPage = 18;
+  const hidePagination = params.hidePagination === "true";
+  const perPage =
+    params.perPage && !isNaN(Number(params.perPage))
+      ? Number(params.perPage)
+      : 18;
   postsActions
     .getBrowsablePosts({
       order,
@@ -467,6 +489,7 @@ app.get("/frame/browse/posts", (req, res) => {
         },
         pagination: postsResult.pagination,
         createPaginationLink: (n) => `/browse?page=${n}`,
+        hidePagination,
         posts: [
           ...postsResult.data.map((post) => {
             const strippedMdText = removeMd(post.text);

@@ -30,6 +30,8 @@ import products from "./widgets/products";
 import coverImage from "./widgets/cover-image";
 import productLogo from "./widgets/product-logo";
 
+window.$ = $;
+
 turbo.beforeFetchResponse(() => {
   registerFrame("browse-posts-list");
   registerFrame("product");

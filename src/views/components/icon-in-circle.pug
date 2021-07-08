@@ -1,0 +1,8 @@
+include ../partials/icon.pug
+
+mixin icon-in-circle({ name = 'check', bg = 'bg-green-500' } = { name: 'check', bg: 'bg-green-500' })
+  div(class="flex items-center")
+    div(class={"flex items-center justify-center rounded-full p-1": true, [bg]: true})
+      +icon(name, { width: 16, height: 16, stroke: "white" })
+    block
+
