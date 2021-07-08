@@ -1,6 +1,7 @@
 include page-title.pug
 
 mixin product-card-simple({ slug, logo_url, name, boosts_count, description, user_twitter_screen_name, user_slug, place = null })
+  - var firstLetter = name.substring(0, 1).toUpperCase();
   a(href=`/p/${slug}` class="block")
     div(class="relative")
       div(
@@ -19,7 +20,8 @@ mixin product-card-simple({ slug, logo_url, name, boosts_count, description, use
                 img(src=(logo_url) class="w-8 h-8 rounded-md mr-4 border border-gray-200")
               else
                 div(class="w-8 h-8 rounded-md mr-4 bg-gray-50 border border-gray-200 flex items-center justify-center")
-                  +icon("circle", { stroke: "muted", width: 10, height: 10 })
+                  //- +icon("circle", { stroke: "muted", width: 10, height: 10 })
+                  p(class="font-bold")= firstLetter
               p(class="text-sm flex-1 font-medium flex-1 mr-2 break-all")= name
               div(class="bg-gray-100 flex items-center justify-center px-4 py-1 font-medium text-gray-800 rounded-full text-xs uppercase" data-tippy-content=`${boosts_count} ${boosts_count === '1' ? 'person has' : 'people have'} boosted "${name}"`)
                 span= boosts_count

@@ -69,6 +69,7 @@ block content
             each product, idx in newestProducts
               div(class="pb-2")
                 +product-card-simple({
+                  logo_url: product.logo_url,
                   slug: product.slug,
                   name: product.name,
                   boosts_count: product.boosts_count,
