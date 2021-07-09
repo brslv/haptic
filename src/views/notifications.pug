@@ -10,7 +10,8 @@ mixin notif({ notif })
   div(class="p-4 border border-gray-200 rounded-md bg-white mb-4 hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 transition" data-notification-id=notif.id)
     div(class="flex items-center justify-between mb-4 border-b border-gray-200 px-4 py-2 -mt-4 -mx-4")
       div(class="text-xs text-gray-600 dark:text-gray-400 mr-4")= notif.created_at_formatted
-      a(href=`/p/${notif.product_slug}` class="btn btn-small btn-plain" title="Open product page")= `${notif.product_name}`
+      if notif.product_name
+        a(href=`/p/${notif.product_slug}` class="btn btn-small btn-plain" title="Open product page")= `${notif.product_name}`
     div(class="flex items-start")
       if icon
       if notif.type === 'comment'
@@ -28,7 +29,7 @@ mixin notif({ notif })
         div(class="relative mr-4")
           img(src=notif.origin_user_twitter_profile_image_url alt="User image" class="w-12 h-12 rounded-full")
           div(class={"p-1 rounded-full flex items-center justify-center mr-2 absolute -top-2 -right-2 shadow-md": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
-            +icon("chevrons-up", { width: 14, height: 14 })
+            +icon("heart", { width: 14, height: 14 })
         p(class="flex-1")
           | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] boosted your 
           a(href=`/p/${notif.product_slug}/${notif.post_id}` class="font-bold underline hover:no-underline") post
@@ -44,9 +45,20 @@ mixin notif({ notif })
         div(class="relative mr-4")
           img(src=notif.origin_user_twitter_profile_image_url alt="User image" class="w-12 h-12 rounded-full")
           div(class={"p-1 rounded-full flex items-center justify-center mr-2 absolute -top-2 -right-2 shadow-md": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
-            +icon("chevrons-up", { width: 14, height: 14 })
+            +icon("heart", { width: 14, height: 14 })
         p(class="flex-1")
           | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] boosted your product.
+
+      if notif.type === 'comment_boosts'
+        div(class="relative mr-4")
+          img(src=notif.origin_user_twitter_profile_image_url alt="User image" class="w-12 h-12 rounded-full")
+          div(class={"p-1 rounded-full flex items-center justify-center mr-2 absolute -top-2 -right-2 shadow-md": true, " bg-gray-100": notif.is_read, "bg-yellow-100": !notif.is_read})
+            +icon("heart", { width: 14, height: 14 })
+
+        div(class="flex-1")
+          p(class="mb-2")
+            | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] boosted your comment on #[a(href=`/p/${notif.product_slug}/${notif.post_id}` class="underline hover:no-underline font-bold") this post].
+          div(class="w-full comment prose prose-sm prose-yellow border border-gray-200 border-dashed p-2 rounded-md") !{notif.comment_content}
 
 block content
   +top-bar("notifications")
@@ -80,6 +92,12 @@ block content
         div(class="mt-8")
           +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Product boosts
           each notif in notifications.productBoosts
+            +notif({notif})
+
+      if notifications && notifications.commentBoosts.length
+        div(class="mt-8")
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Comment boosts
+          each notif in notifications.commentBoosts
             +notif({notif})
 
       if notifications && notifications.productCollections.length

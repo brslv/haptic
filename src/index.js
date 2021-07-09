@@ -1741,6 +1741,7 @@ app.post(
   (req, res, next) => {
     const cid = req.params.id;
     const user = req.user;
+    const notificationsActions = notifications.actions({ db, user });
 
     if (isNaN(cid)) {
       return res.status(400).json({
@@ -1750,27 +1751,18 @@ app.post(
       });
     }
 
-    db.table("comments_boosts")
+    db.table("comment_boosts")
       .insert({ comment_id: cid, user_id: user.id })
       .then((boostResult) => {
-        return db("comments_boosts")
+        return notificationsActions.add(
+          notifications.typesMap.COMMENT_BOOSTS_TYPE,
+          { comment_id: cid }
+        );
+      })
+      .then((notificationsResult) => {
+        return db("comment_boosts")
           .select("id")
           .where({ comment_id: cid });
-
-        // return notificationsActions
-        //   .add(notifications.typesMap.POST_BOOSTS_TYPE, { post_id: id })
-        //   .then((notificationsResult) => {
-        //     return db("post_boosts")
-        //       .select("id")
-        //       .where({ post_id: id })
-        //       .then((allBoostsResult) => {
-        //         res.json({
-        //           ok: 1,
-        //           err: null,
-        //           details: { boosts: allBoostsResult },
-        //         });
-        //       });
-        //   });
       })
       .then((allBoostsResult) => {
         res.json({

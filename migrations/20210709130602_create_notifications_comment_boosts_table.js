@@ -3,11 +3,22 @@ const deferFks = require("../src/defer-fks");
 
 exports.up = function(knex) {
   return knex.schema
-    .hasTable("comment_boosts")
+    .hasTable("notifications_comment_boosts")
     .then(function(exists) {
       if (!exists) {
-        return knex.schema.createTable("comment_boosts", function(t) {
+        return knex.schema.createTable("notifications_comment_boosts", function(
+          t
+        ) {
           t.increments("id").primary();
+
+          t.integer("notification_id")
+            .unsigned()
+            .notNullable();
+          t.foreign("notification_id")
+            .references("id")
+            .inTable("notifications")
+            .onDelete("CASCADE");
+
           t.integer("comment_id")
             .unsigned()
             .notNullable();
@@ -15,14 +26,7 @@ exports.up = function(knex) {
             .references("id")
             .inTable("comments")
             .onDelete("CASCADE");
-          t.integer("user_id")
-            .unsigned()
-            .notNullable();
-          t.foreign("user_id")
-            .references("id")
-            .inTable("users")
-            .onDelete("CASCADE");
-          t.unique(["comment_id", "user_id"]);
+
           t.timestamp("created_at")
             .notNullable()
             .defaultTo(knex.fn.now());
@@ -38,5 +42,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  return knex.schema.dropTable("comment_boosts");
+  return knex.schema.dropTable("notifications_comment_boosts");
 };

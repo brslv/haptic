@@ -218,7 +218,9 @@ function actions({ db, user }) {
           .select("id")
           .first()
           .whereRaw(
-            `post_boosts.user_id = ${user.id} AND post_boosts.post_id = posts.id`
+            `post_boosts.user_id = ${
+              user ? user.id : 0
+            } AND post_boosts.post_id = posts.id`
           )
           .as("boosted")
       )
@@ -291,7 +293,9 @@ function actions({ db, user }) {
           .select("id")
           .first()
           .whereRaw(
-            `post_boosts.user_id = ${user.id} AND post_boosts.post_id = posts.id`
+            `post_boosts.user_id = ${
+              user ? user.id : 0
+            } AND post_boosts.post_id = posts.id`
           )
           .as("boosted")
       )
@@ -617,7 +621,9 @@ function actions({ db, user }) {
             .select("id")
             .first()
             .whereRaw(
-              `post_boosts.user_id = ${user.id} AND post_boosts.post_id = posts.id`
+              `post_boosts.user_id = ${
+                user ? user.id : 0
+              } AND post_boosts.post_id = posts.id`
             )
             .as("boosted")
         )

@@ -124,6 +124,7 @@ export default function comments() {
 
   function onBoost($els, e) {
     const $boost = $(e.currentTarget);
+    if ($boost.data("disabled")) return;
     const csrf = $('meta[name="csrf"]').attr("content");
     const postId = $boost.data("postId");
     const commentId = $boost.data("commentId");

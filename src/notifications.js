@@ -5,6 +5,7 @@ const { mdConverter } = require("./utils");
 const POST_BOOSTS_TYPE = "post_boosts";
 const PRODUCT_COLLECTIONS_TYPE = "product_collections";
 const PRODUCT_BOOSTS_TYPE = "product_boosts";
+const COMMENT_BOOSTS_TYPE = "comment_boosts";
 const COMMENT = "comment";
 
 const types = [
@@ -12,12 +13,14 @@ const types = [
   PRODUCT_COLLECTIONS_TYPE,
   PRODUCT_BOOSTS_TYPE,
   COMMENT,
+  COMMENT_BOOSTS_TYPE,
 ];
 const typesMap = {
   POST_BOOSTS_TYPE: POST_BOOSTS_TYPE,
   PRODUCT_COLLECTIONS_TYPE: PRODUCT_COLLECTIONS_TYPE,
   PRODUCT_BOOSTS_TYPE: PRODUCT_BOOSTS_TYPE,
   COMMENT: COMMENT,
+  COMMENT_BOOSTS_TYPE: COMMENT_BOOSTS_TYPE,
 };
 
 const dateFmt = (dateStr) => {
@@ -204,6 +207,50 @@ function actions({ db, user }) {
     });
   }
 
+  function _addCommentBoost({ comment_id }) {
+    return new Promise((res, rej) => {
+      db.transaction((trx) => {
+        db.transacting(trx)
+          .table("comments")
+          .select("id", "user_id")
+          .where({ id: comment_id })
+          .first()
+          .then((commentResult) => {
+            if (!commentResult) throw Error("Non-existing comment");
+
+            return db
+              .transacting(trx)
+              .table("notifications")
+              .insert({
+                user_id: commentResult.user_id,
+                type: COMMENT_BOOSTS_TYPE,
+                origin_user_id: user.id,
+              })
+              .returning("id")
+              .then(([notificationId]) => {
+                return db
+                  .transacting(trx)
+                  .table("notifications_comment_boosts")
+                  .insert({
+                    notification_id: notificationId,
+                    comment_id,
+                  })
+                  .then((notificationsCommentsBoostsResult) => {
+                    trx.commit().then(
+                      res({
+                        id: notificationId,
+                      })
+                    );
+                  });
+              });
+          })
+          .catch((err) => {
+            trx.rollback().then(rej(err));
+          });
+      });
+    });
+  }
+
   function add(type, data) {
     switch (type) {
       case POST_BOOSTS_TYPE:
@@ -214,6 +261,8 @@ function actions({ db, user }) {
         return _addProductBoost(data);
       case COMMENT:
         return _addComment(data);
+      case COMMENT_BOOSTS_TYPE:
+        return _addCommentBoost(data);
     }
 
     throw Error("Invalid notification type: ", type);
@@ -454,6 +503,65 @@ function actions({ db, user }) {
     });
   }
 
+  function getCommentBoosts() {
+    return new Promise((res, rej) => {
+      db.select(
+        "notifications.id",
+        "notifications.type",
+        "notifications.is_read",
+        "notifications.created_at",
+        "comments.content as comment_content",
+        "posts.id as post_id",
+        "products.slug as product_slug",
+        "user.id as user_id",
+        "user.twitter_name as user_twitter_name",
+        "user.twitter_profile_image_url as user_twitter_profile_image_url",
+        "origin_user.id as origin_user_id",
+        "origin_user.twitter_name as origin_user_twitter_name",
+        "origin_user.slug as origin_user_slug",
+        "origin_user.twitter_profile_image_url as origin_user_twitter_profile_image_url"
+      )
+        .from("notifications")
+        .leftJoin(
+          "notifications_comment_boosts",
+          "notifications_comment_boosts.notification_id",
+          "notifications.id"
+        )
+        .leftJoin(
+          "comments",
+          "notifications_comment_boosts.comment_id",
+          "comments.id"
+        )
+        .leftJoin("posts", "posts.id", "comments.post_id")
+        .leftJoin("products", "products.id", "posts.product_id")
+        .leftJoin("users as user", "notifications.user_id", "user.id")
+        .leftJoin(
+          "users as origin_user",
+          "notifications.origin_user_id",
+          "origin_user.id"
+        )
+        .where({
+          "notifications.type": "comment_boosts",
+          "notifications.user_id": user.id,
+          is_read: false,
+        })
+        .orderBy("notifications.created_at", "DESC")
+        .then((result) => {
+          const notifications = result.map((notif) => {
+            notif.created_at_formatted = dateFmt(notif.created_at);
+            return notif;
+          });
+
+          // cache.set(cacheKeys.notifications(user.id), notifications, ttl[1]);
+          res(notifications);
+        })
+        .catch((err) => {
+          console.log(err);
+          rej(err);
+        });
+    });
+  }
+
   function getAll() {
     return new Promise((res, rej) => {
       const promises = [
@@ -461,16 +569,26 @@ function actions({ db, user }) {
         getProductBoosts(),
         getPostsBoosts(),
         getComments(),
+        getCommentBoosts(),
       ];
       Promise.all(promises)
-        .then(([productCollections, productBoosts, postsBoosts, comments]) => {
-          res({
+        .then(
+          ([
             productCollections,
             productBoosts,
             postsBoosts,
             comments,
-          });
-        })
+            commentBoosts,
+          ]) => {
+            res({
+              productCollections,
+              productBoosts,
+              postsBoosts,
+              comments,
+              commentBoosts,
+            });
+          }
+        )
         .catch((err) => {
           console.log(err);
           throw err;

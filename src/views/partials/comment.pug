@@ -1,6 +1,6 @@
 include ../components/boost-btn.pug
 
-mixin comment({ id, img, type, slug, twitter_name = 'unknown', twitter_screen_name = 'User', created_at, content, boosts_count = 0, boosted = false })
+mixin comment({ id, img, type, slug, twitter_name = 'unknown', twitter_screen_name = 'User', created_at, content, boosts_count = 0, boosted = false, trigger_login_modal = false })
   div(class="flex items-start mt-4 border-t border-gray-200 -mx-4 pt-4 px-4 relative")
     img(src=img alt=`${twitter_screen_name} - profile photo` class={"w-10 h-10 rounded-full mr-2": true, "border-4 border-double border-yellow-300": type === USER_TYPES.CREATOR} data-comment-author-img)
     div
@@ -16,4 +16,9 @@ mixin comment({ id, img, type, slug, twitter_name = 'unknown', twitter_screen_na
           span(data-comment-created-at)= created_at
       div(class="comment prose prose-sm prose-yellow" data-comment-content) !{content}
       div(class="absolute top-2 right-4 mt-2")
-        +boost-btn({ boosts_count, boosted, boostsLabelAttrs: { 'data-comment-boosts-count': true } })(data-comment-id=id data-comment-boost)
+        +boost-btn({ boosts_count, boosted, boostsLabelAttrs: { 'data-comment-boosts-count': true } })(
+          data-disabled=(trigger_login_modal)
+          data-comment-id=id
+          data-comment-boost
+          data-modal-trigger=(trigger_login_modal ? 'login' : undefined)
+        )

@@ -32,15 +32,17 @@ function actions({ db, user }) {
           "users.slug as author_slug",
           "users.twitter_screen_name as author_twitter_screen_name",
           "users.twitter_profile_image_url as author_twitter_profile_image_url",
-          db("comments_boosts")
+          db("comment_boosts")
             .count()
             .whereRaw("comment_id = comments.id")
             .as("boosts_count"),
-          db("comments_boosts")
+          db("comment_boosts")
             .select("id")
             .first()
             .whereRaw(
-              `comments_boosts.user_id = ${user.id} AND comments_boosts.comment_id = comments.id`
+              `comment_boosts.user_id = ${
+                user ? user.id : 0
+              } AND comment_boosts.comment_id = comments.id`
             )
             .as("boosted")
         )
