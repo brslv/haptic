@@ -513,6 +513,7 @@ function actions({ db, user }) {
         "comments.content as comment_content",
         "posts.id as post_id",
         "products.slug as product_slug",
+        "products.name as product_name",
         "user.id as user_id",
         "user.twitter_name as user_twitter_name",
         "user.twitter_profile_image_url as user_twitter_profile_image_url",
