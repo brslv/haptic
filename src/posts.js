@@ -213,7 +213,14 @@ function actions({ db, user }) {
         db("post_boosts")
           .count()
           .whereRaw("post_id = posts.id")
-          .as("boosts_count")
+          .as("boosts_count"),
+        db("post_boosts")
+          .select("id")
+          .first()
+          .whereRaw(
+            `post_boosts.user_id = ${user.id} AND post_boosts.post_id = posts.id`
+          )
+          .as("boosted")
       )
       .table("posts_text")
       .leftJoin("posts", "posts_text.post_id", "posts.id")
@@ -279,7 +286,14 @@ function actions({ db, user }) {
         db("post_boosts")
           .count()
           .whereRaw("post_id = posts.id")
-          .as("boosts_count")
+          .as("boosts_count"),
+        db("post_boosts")
+          .select("id")
+          .first()
+          .whereRaw(
+            `post_boosts.user_id = ${user.id} AND post_boosts.post_id = posts.id`
+          )
+          .as("boosted")
       )
       .table("posts_poll")
       .leftJoin("posts", "posts_poll.post_id", "posts.id")
@@ -598,7 +612,14 @@ function actions({ db, user }) {
           db("post_boosts")
             .count()
             .whereRaw("post_id = posts.id")
-            .as("boosts_count")
+            .as("boosts_count"),
+          db("post_boosts")
+            .select("id")
+            .first()
+            .whereRaw(
+              `post_boosts.user_id = ${user.id} AND post_boosts.post_id = posts.id`
+            )
+            .as("boosted")
         )
         .leftJoin("posts_text", "posts_text.post_id", "posts.id")
         .leftJoin("posts_poll", "posts_poll.post_id", "posts.id")

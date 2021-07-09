@@ -9,6 +9,11 @@ export default function boost() {
       const newCount = isNaN(boostsCount) ? 0 : boostsCount + 1;
       $el.data("boosts-count", newCount);
       $boostsCounter.text(newCount);
+      $boostsCounter.siblings("svg").css({ fill: "#EF4444" });
+      $(document).trigger("haptic:add-toast", {
+        content: "Lovely 🥰",
+        type: "success",
+      });
     }
 
     function onFail(err) {
@@ -43,6 +48,7 @@ export default function boost() {
       const newCount = isNaN(boostsCount) ? 0 : Number(boostsCount) + 1;
       $counter.text(newCount);
       $boostsCounter.data("product-boosts-count", newCount);
+      $boostsCounter.siblings("svg").css({ fill: "#EF4444" });
     }
 
     function onFail(err) {

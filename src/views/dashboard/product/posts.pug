@@ -17,6 +17,7 @@ include ../../partials/pagination-block.pug
 block append templates
   template(data-comment-tpl)
     +comment({
+      id: -1,
       img: '',
       type: USER_TYPES.CREATOR_LITE,
       slug: '',
@@ -108,9 +109,9 @@ block content
                     twitter_name: post.user_twitter_name,
                     twitter_screen_name: post.user_twitter_screen_name,
                     date_str: post.created_at_formatted,
-                    disable_boost_btn: true,
                     boosts_count: post.boosts_count,
-                    comments: post.comments
+                    comments: post.comments,
+                    boosted: post.boosted,
                   }) !{post_text}
                 if post.type === 'poll'
                   +poll({
@@ -130,9 +131,9 @@ block content
                     twitter_name: post.user_twitter_name,
                     twitter_screen_name: post.user_twitter_screen_name,
                     date_str: post.created_at_formatted,
-                    disable_boost_btn: true,
                     boosts_count: post.boosts_count,
-                    comments: post.comments
+                    comments: post.comments,
+                    boosted: post.boosted,
                   }) !{post.details}
 
               +pagination-block({ pagination, createPaginationLink })

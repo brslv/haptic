@@ -31,7 +31,18 @@ function actions({ db, user }) {
           "users.type as author_type",
           "users.slug as author_slug",
           "users.twitter_screen_name as author_twitter_screen_name",
-          "users.twitter_profile_image_url as author_twitter_profile_image_url"
+          "users.twitter_profile_image_url as author_twitter_profile_image_url",
+          db("comments_boosts")
+            .count()
+            .whereRaw("comment_id = comments.id")
+            .as("boosts_count"),
+          db("comments_boosts")
+            .select("id")
+            .first()
+            .whereRaw(
+              `comments_boosts.user_id = ${user.id} AND comments_boosts.comment_id = comments.id`
+            )
+            .as("boosted")
         )
         .leftJoin("users", "comments.user_id", "users.id")
         .where({ "comments.post_id": postId })
@@ -44,6 +55,7 @@ function actions({ db, user }) {
                 ...comment,
                 content_md: comment.content,
                 content,
+                boosted: comment.boosted !== null,
                 created_at_formatted: dateFmt(comment.created_at),
               };
             }),

@@ -11,6 +11,7 @@ include partials/pagination-block.pug
 block append templates
   template(data-comment-tpl)
     +comment({
+      id: -1,
       img: '',
       type: USER_TYPES.CREATOR_LITE,
       slug: '',
@@ -55,6 +56,7 @@ block content
                     boosts_count: post.boosts_count,
                     trigger_login_modal: !user,
                     disable_boost_btn: !user,
+                    boosted: post.boosted,
                   }) !{post_text}
                 if post.type === 'poll'
                   +poll({
@@ -78,7 +80,8 @@ block content
                     trigger_login_modal: !user,
                     show_opts: false,
                     boosts_count: post.boosts_count,
-                    comments: post.comments
+                    comments: post.comments,
+                    boosted: post.boosted,
                   }) !{post.details}
             else
               div(class="flex items-center justify-center bg-white p-4 rounded-md border border-gray-200" style="min-height: 300px")

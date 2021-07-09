@@ -13,6 +13,7 @@ include partials/pagination-block.pug
 block append templates
   template(data-comment-tpl)
     +comment({
+      id: -1,
       img: '',
       type: USER_TYPES.CREATOR_LITE,
       slug: '',
@@ -57,6 +58,7 @@ block content
                   trigger_login_modal: !user,
                   comments: post.comments,
                   show_posted_in_tag: true,
+                  boosted: post.boosted,
                 }) !{post.text}
               
               if post.type === 'poll'
@@ -82,7 +84,8 @@ block content
                   show_opts: false,
                   show_posted_in_tag: true,
                   boosts_count: post.boosts_count,
-                  comments: post.comments
+                  comments: post.comments,
+                  boosted: post.boosted,
                 }) !{post.details}
 
             if !hidePagination && pagination && pagination.lastPage > 1

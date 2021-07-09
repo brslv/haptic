@@ -1,0 +1,4 @@
+mixin boost-btn({ boosts_count, boostsLabelAttrs, boosted })
+  button(class="flex bg-red-50 items-center btn btn-icon rounded-full p-2.5 py-1 hover:ring-1 hover:ring-red-300 hover:ring-offset-2 click-scale-2")&attributes(attributes)
+    +icon("heart", { width: 14, height: 14, stroke: 'danger', fill: boosted ? 'danger' : undefined })
+    span(class="text-red-500 text-xs ml-1")&attributes(boostsLabelAttrs)= boosts_count

@@ -6,9 +6,11 @@ export default function comments() {
       $commentBtn: $("[data-comment-btn]"),
       $form: $("[data-comment-form]"),
       $commentTpl: $("[data-comment-tpl]"),
+      $boost: $("[data-comment-boost]"),
     };
     $els.$commentBtn.on("click", (e) => onCommentBtnClick($els, e));
     $els.$form.on("submit", (e) => onFormSubmit($els, e));
+    $els.$boost.on("click", (e) => onBoost($els, e));
   }
 
   function onCommentBtnClick($els, e) {
@@ -77,6 +79,10 @@ export default function comments() {
 
           $comment.attr("id", commentId);
           $comment
+            .find("[data-comment-boost]")
+            .data("commentId", details.id)
+            .on("click", (e) => onBoost($els, e));
+          $comment
             .find("[data-comment-author-img]")
             .attr("src", authorImage)
             .addClass(
@@ -109,6 +115,41 @@ export default function comments() {
         fail: function commentFail(response) {
           $(document).trigger("haptic:add-toast", {
             content: "We had a problem publishing your comment. Please, retry.",
+            type: "error",
+          });
+        },
+      }
+    );
+  }
+
+  function onBoost($els, e) {
+    const $boost = $(e.currentTarget);
+    const csrf = $('meta[name="csrf"]').attr("content");
+    const postId = $boost.data("postId");
+    const commentId = $boost.data("commentId");
+
+    req(
+      `/comment/${commentId}/boost`,
+      {
+        csrf,
+        postId,
+      },
+      {
+        method: "post",
+        ok: (response) => {
+          const $boostsCountLabel = $boost.find("[data-comment-boosts-count]");
+
+          $boostsCountLabel.html(response.data.details.boosts.length);
+          $boost.find("svg").css({ fill: "#EF4444" });
+
+          $(document).trigger("haptic:add-toast", {
+            content: "Lovely 🥰",
+            type: "success",
+          });
+        },
+        fail: (err) => {
+          $(document).trigger("haptic:add-toast", {
+            content: err.response.data.err,
             type: "error",
           });
         },

@@ -14,6 +14,7 @@ block append scripts
 block append templates
   template(data-comment-tpl)
     +comment({
+      id: -1,
       img: '',
       type: USER_TYPES.CREATOR_LITE,
       slug: '',
@@ -51,7 +52,8 @@ block content
           boosts_count: post.boosts_count,
           disable_boost_btn: !user,
           trigger_login_modal: !user,
-          comments: post.comments
+          comments: post.comments,
+          boosted: post.boosted,
         }) !{post_text}
       if post.type === 'poll'
         +poll({
@@ -74,7 +76,8 @@ block content
           disable_boost_btn: false,
           show_opts: false,
           boosts_count: post.boosts_count,
-          comments: post.comments
+          comments: post.comments,
+          boosted: post.boosted,
         }) !{post.details}
 
 

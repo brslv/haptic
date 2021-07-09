@@ -2,7 +2,7 @@ include ./page-title.pug
 include ./icon.pug
 include ./comment.pug
 
-mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_text, img, img_url, author_id, user_type, user_slug, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false, comments = [], show_posted_in_tag = false })
+mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_text, img, img_url, author_id, user_type, user_slug, twitter_name, twitter_screen_name, date_str, show_opts = true, show_view_btn = true, disable_boost_btn = false, boosts_count = 0, trigger_login_modal = false, comments = [], show_posted_in_tag = false, boosted = false })
 
   if show_posted_in_tag && product_slug && product_name
     div(class="relative mx-4 text-sm")
@@ -65,12 +65,7 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
         block
 
     div(class="flex items-center justify-between")
-      button(
-        class={
-          "focus:outline-none product-btn product-btn-small text-xs shadow-sm": true,
-          "cursor-pointer click-scale-2": !disable_boost_btn,
-          "cursor-pointer focus:ring-0 text-gray-500 hover:border-gray-200 hover:bg-transparent": disable_boost_btn
-        }
+      +boost-btn({ boosts_count, boosted, boostsLabelAttrs: { 'data-post-boost-counter': true } })(
         data-post-boost-btn
         data-post-id=post_id
         data-disabled=disable_boost_btn
@@ -78,17 +73,31 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
         data-modal-trigger=(trigger_login_modal ? 'login' : undefined)
         data-tippy-content="Boost"
       )
-        span(class="flex justify-between")
-          span(class="flex items-center")
-            span(class="icon-container mr-2")
-              +icon("chevrons-up", { width: '18', height: '18', stroke: disable_boost_btn ? "muted" : "default" })
-          span(
-            class={
-              "pr-2 py-1 font-bold text-gray-800 rounded-full uppercase": true,
-              "text-gray-300 dark:bg-gray-600 dark:text-gray-400": disable_boost_btn
-            }
-            data-post-boost-counter
-          )= boosts_count
+      //-
+        button(
+          class={
+            "focus:outline-none product-btn product-btn-small text-xs shadow-sm": true,
+            "cursor-pointer click-scale-2": !disable_boost_btn,
+            "cursor-pointer focus:ring-0 text-gray-500 hover:border-gray-200 hover:bg-transparent": disable_boost_btn
+          }
+          data-post-boost-btn
+          data-post-id=post_id
+          data-disabled=disable_boost_btn
+          data-boosts-count=boosts_count
+          data-modal-trigger=(trigger_login_modal ? 'login' : undefined)
+          data-tippy-content="Boost"
+        )
+          span(class="flex justify-between")
+            span(class="flex items-center")
+              span(class="icon-container mr-2")
+                +icon("chevrons-up", { width: '18', height: '18', stroke: disable_boost_btn ? "muted" : "default" })
+            span(
+              class={
+                "pr-2 py-1 font-bold text-gray-800 rounded-full uppercase": true,
+                "text-gray-300 dark:bg-gray-600 dark:text-gray-400": disable_boost_btn
+              }
+              data-post-boost-counter
+            )= boosts_count
       div(class="flex items-center")
         button(class="btn btn-icon rounded-full hover:bg-gray-100 p-2 hover:ring-1 hover:ring-gray-300 hover:ring-offset-2 click-scale-2" data-comment-btn=(!!user) data-post-id=post_id data-tippy-content="Post a comment" data-modal-trigger=(!user && trigger_login_modal ? "login" : undefined))
           +icon("message-circle", { width: '18', height: '18' })(class="click-scale-2")
@@ -116,11 +125,14 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
     div(data-comments-container data-post-id=post_id)
       each comment in comments
         +comment({
+          id: comment.id,
           img: comment.author_twitter_profile_image_url,
           type: comment.author_type,
           slug: comment.author_slug,
           twitter_name: comment.author_twitter_name,
           twitter_screen_name: comment.author_twitter_screen_name,
           created_at: comment.created_at_formatted,
-          content: comment.content
+          content: comment.content,
+          boosted: comment.boosted,
+          boosts_count: comment.boosts_count
         })

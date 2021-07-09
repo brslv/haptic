@@ -1733,6 +1733,65 @@ app.post(
 );
 
 app.post(
+  "/comment/:id/boost",
+  ajaxOnly,
+  authOnly,
+  express.json(),
+  csrfProtected,
+  (req, res, next) => {
+    const cid = req.params.id;
+    const user = req.user;
+
+    if (isNaN(cid)) {
+      return res.status(400).json({
+        ok: 0,
+        err: `Invalid product id: ${cid}. 🧐 Should be numeric.`,
+        details: null,
+      });
+    }
+
+    db.table("comments_boosts")
+      .insert({ comment_id: cid, user_id: user.id })
+      .then((boostResult) => {
+        return db("comments_boosts")
+          .select("id")
+          .where({ comment_id: cid });
+
+        // return notificationsActions
+        //   .add(notifications.typesMap.POST_BOOSTS_TYPE, { post_id: id })
+        //   .then((notificationsResult) => {
+        //     return db("post_boosts")
+        //       .select("id")
+        //       .where({ post_id: id })
+        //       .then((allBoostsResult) => {
+        //         res.json({
+        //           ok: 1,
+        //           err: null,
+        //           details: { boosts: allBoostsResult },
+        //         });
+        //       });
+        //   });
+      })
+      .then((allBoostsResult) => {
+        res.json({
+          ok: 1,
+          err: null,
+          details: { boosts: allBoostsResult },
+        });
+      })
+      .catch((err) => {
+        if (err.code === dbErrCodes.DUP_CODE)
+          return res.status(400).json({
+            ok: 0,
+            err: "You've already boosted this comment.",
+            details: null,
+          });
+        next(err);
+      });
+  }
+);
+
+app.post(
   "/post/:pid/:type",
   ajaxOnly,
   authOnly,
