@@ -52,10 +52,10 @@ const dbErrCodes = {
   DUP_CODE: "23505",
 };
 const defaultMetas = {
-  title: "Haptic - Humanize your product",
+  title: "Haptic - It's how makers build products in public",
   description: "You have a story. Your product, too. Share it with the world.",
   og: {
-    title: "Haptic - Humanize your product",
+    title: "Haptic - It's how makers build products in public",
     image: `${ROOT_URL}/static/images/landing/social-image.png`,
   },
   twitter: {
@@ -388,7 +388,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/pricing", (req, res) => {
-  const title =  "Pricing | Haptic";
+  const title = "Pricing | Haptic";
   const description = "Haptic's pricing model details";
 
   res.render("pricing", {
@@ -396,12 +396,14 @@ app.get("/pricing", (req, res) => {
       ...defaultMetas,
       title,
       description,
-      og:{
+      og: {
         ...defaultMetas.og,
         title,
-        description
-      }
-    }, isHomepage: true });
+        description,
+      },
+    },
+    isHomepage: true,
+  });
 });
 
 app.get("/browse", (req, res) => {
