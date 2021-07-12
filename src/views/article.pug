@@ -7,6 +7,9 @@ block content
   +top-bar
   article(class="article -mt-8")
     div(class="bg-white border-b border-gray-100 py-16 mb-8")
+      if articleImage
+        div(class="px-4")
+          img(src=articleImage alt=title class="mx-auto border border-gray-200 shadow-xl rounded-lg mb-16" style="max-height: 650px;")
       div(class="container mx-auto p-4")
         h1(class="font-black text-3xl md:text-4xl" style="max-width: 42ch")= title
         if description
@@ -14,10 +17,12 @@ block content
     div(class="container p-4 mx-auto flex flex-col-reverse md:flex-row items-start")
       div(class="w-full md:w-4/6 md:mr-4")
         div(class="prose prose-yellow text-lg") !{content}
-        div(class="bg-white border border-gray-100 rounded-md shadow-sm p-4 text-center my-8")
-          div(class="mx-auto" style="max-width: 38ch;")
-            p(class="text-xl md:text-3xl font-bold my-8") Start building your product in public on Haptic now
-          a(href="/pricing" class="btn btn-primary text-lg md:text-xl mb-8 inline-block") Take me to my dashboard
+        if suggest
+          div(class="p-4 bg-white border border-gray-200 rounded-md mt-8")
+            h4 Further reading:
+            each post in suggest
+              a(href=post.link class="inline-block underline hover:no-underline")= post.title
+        div !{cta}
       aside(class="w-full md:w-2/6 mb-12")
         +page-title(class="mb-4")= sideSectionTitle
         div(class="bg-white p-4 rounded-md shadow-sm border border-gray-100") 

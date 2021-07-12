@@ -341,6 +341,23 @@ const { router } = createBullBoard([
 app.use("/queues", authOnly, adminOnly, router); // @TODO: make admin only
 
 // articles
+
+// shortcodes
+const cta = `
+<div class="bg-white border border-gray-100 rounded-md shadow-sm p-4 text-center my-8">
+  <div class="mx-auto" style="max-width: 38ch;">
+    <p class="text-xl md:text-3xl font-bold my-8"> Start building your product in public on Haptic now</p>
+    <a href="/pricing" class="btn btn-primary no-underline text-gray-800 text-lg md:text-xl mb-8 inline-block">Take me to my dashboard</a>
+  </div>
+</div>
+  `;
+
+function processArticleShortcodes(content) {
+  // process cta
+  content = content.replace(/{{-cta-}}/gi, cta);
+  return content;
+}
+
 app.get("/how-to-build-in-public", async (req, res) => {
   const title = "How to build in public";
   const description =
@@ -358,6 +375,7 @@ app.get("/how-to-build-in-public", async (req, res) => {
             description,
           },
         },
+        articleImage: `${ROOT_URL}/static/images/articles/how-to-build-in-public/article-image.jpg`,
         title,
         description,
         content: mdConverter.makeHtml(content),
@@ -372,12 +390,82 @@ app.get("/how-to-build-in-public", async (req, res) => {
 - Choose a platform.
 - <a href="/login">Use Haptic to narrate a coherent and tractable story.</a>
         `),
+        cta,
+        suggest: [
+          {
+            link: "/20-plus-build-in-public-post-ideas-with-examples",
+            title: "20+ build in public post ideas (with examples)",
+          },
+        ],
       });
     })
     .catch((err) => {
       throw err;
     });
 });
+
+app.get(
+  "/20-plus-build-in-public-post-ideas-with-examples",
+  async (req, res) => {
+    const title = "20+ build in public post ideas (with examples)";
+    const description =
+      "You can use them as a source of inspiration, as a checklist or simply as a way to further explore the space of creating content for the narrative around your startup or idea.";
+    loadArticleFile("20-plus-build-in-public-post-ideas-with-examples.md")
+      .then((content) => {
+        return res.render("article", {
+          meta: {
+            ...defaultMetas,
+            title: `${title} | Haptic`,
+            description,
+            og: {
+              ...defaultMetas.og,
+              image: `${ROOT_URL}/static/images/articles/20-plus-build-in-public-post-ideas-with-examples/social-image.png`,
+              description,
+            },
+          },
+          articleImage: `${ROOT_URL}/static/images/articles/20-plus-build-in-public-post-ideas-with-examples/article-image.jpg`,
+          title,
+          description,
+          content: mdConverter.makeHtml(processArticleShortcodes(content)),
+          sideSectionTitle: "Insights",
+          sideSectionContent: mdConverter.makeHtml(`
+- Daily reflections
+- Weekly/monthly/yearly reviews
+- Hardships
+- Roadmaps, next steps and conquering the world
+- Ask and get feedback - polls and surveys
+- Shoutouts - mention people and groups that helped you
+- Marketing endeavors
+- Acquisition strategies
+- Retention strategies
+- Teach it
+- What keeps you motivated to build?
+- The ways you manage to stay productive
+- Share your resources
+- Hiring
+- Design decisions
+- Technical decisions
+- Idea validation, PMF, Customer development
+- The philosophy behind your product
+- Mutual feadback
+- Personal challanges - gonna do x for y days 
+- Thought experiements - what if's?
+- Changelogs
+        `),
+          cta,
+          suggest: [
+            {
+              link: "/how-to-build-in-public",
+              title: "How to build in public",
+            },
+          ],
+        });
+      })
+      .catch((err) => {
+        throw err;
+      });
+  }
+);
 
 // setup routes
 app.get("/", (req, res) => {
