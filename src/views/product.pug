@@ -102,7 +102,11 @@ block content
           div
             div(class="flex items-start")
               a(href=`/u/${product.user_slug}` title="View profile")
-                img(src=product.user_twitter_profile_image_url alt=`Photo of the creator of ${product.name}` class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": product.user_type === USER_TYPES.CREATOR})
+                +user-avatar({
+                  src: product.user_twitter_profile_image_url,
+                  alt: `Photo of ${product.name}`,
+                  creator: product.user_type === USER_TYPES.CREATOR
+                })
               div
                 h2(class="font-bold")
                   a(href=`/u/${product.user_slug}` class="underline hover:no-underline" title="View profile")= product.user_twitter_name
