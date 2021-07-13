@@ -55,45 +55,83 @@ function loadNotificationsQueue({ db }) {
 }
 
 function loadEmailsQueue({ db, isProd }) {
+  const EMAIL_TYPES = {
+    WELCOME: "welcome",
+    NEW_COMMENT: "new_comment",
+  };
   const queue = new Queue("emails-queue", process.env.REDIS_URL);
 
   // consumer
   queue.process(async function processJob(job) {
     // don't send emails when in non-prod env.
-    if (!isProd)
+    if (!isProd) {
       return Promise.resolve({
         ok: 1,
         details: "not send because non-prod env",
       });
+    }
 
     const data = job.data;
     const details = data.details;
     const emailSender = emails.createEmailSender({ db, isProd });
-    const emailData = {
-      to: details.email,
-      body: details.content,
-      commentAuthorName: details.commentAuthorName,
-      postUrl: details.postUrl,
-    };
-    const opts = {
-      checkAllowedByUser: true,
-    };
 
-    return emailSender
-      .sendCommentNotification(emailData, opts)
-      .then((response) => {
-        return { ok: 1, response };
-      })
-      .catch((err) => {
-        console.log(err);
-        throw err;
-      });
+    if (details.type === EMAIL_TYPES.NEW_COMMENT) {
+      const emailData = {
+        to: details.email,
+        body: details.content,
+        commentAuthorName: details.commentAuthorName,
+        postUrl: details.postUrl,
+      };
+      const opts = {
+        checkAllowedByUser: true,
+      };
+
+      return emailSender
+        .sendCommentNotification(emailData, opts)
+        .then((response) => {
+          return { ok: 1, response };
+        })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        });
+    }
+
+    if (details.type === EMAIL_TYPES.WELCOME) {
+      const emailData = {
+        to: details.email,
+        name: details.name,
+      };
+
+      return emailSender
+        .sendWelcome(emailData)
+        .then((response) => {
+          return { ok: 1, response };
+        })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        });
+    }
   });
 
   // producers
+
+  async function _emailWelcome({ email, name }) {
+    const jobData = {
+      details: {
+        type: EMAIL_TYPES.WELCOME,
+        email,
+        name,
+      },
+    };
+    await queue.add(jobData);
+  }
+
   async function _emailComment({ email, postUrl, commentAuthorName, content }) {
     const jobData = {
       details: {
+        type: EMAIL_TYPES.NEW_COMMENT,
         email,
         postUrl,
         commentAuthorName,
@@ -104,6 +142,7 @@ function loadEmailsQueue({ db, isProd }) {
   }
 
   const jobs = {
+    emailWelcome: _emailWelcome,
     emailComment: _emailComment,
   };
 

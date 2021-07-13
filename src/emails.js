@@ -17,6 +17,16 @@ function createEmailSender({ db }) {
     });
   }
 
+  function sendWelcome({ to, name }) {
+    return _sendEmail(to, "welcome", {
+      name: name,
+      product_url: process.env.ROOT_URL,
+      product_name: "Haptic",
+      company_name: "Haptic.so",
+      company_address: "Sofia, Bulgaria",
+    });
+  }
+
   function sendCommentNotification(
     { to, body, commentAuthorName, postUrl },
     opts = {
@@ -78,11 +88,16 @@ function createEmailSender({ db }) {
   }
 
   return {
+    sendWelcome,
     sendCommentNotification,
   };
 }
 
 function actions({ db, emailsQueue }) {
+  function emailWelcome({ email, name }) {
+    return emailsQueue.jobs.emailWelcome({ email, name });
+  }
+
   function emailComment({ emailTo, commentData }) {
     return db("users")
       .select("id", "twitter_name")
@@ -116,6 +131,7 @@ function actions({ db, emailsQueue }) {
   }
 
   return {
+    emailWelcome,
     emailComment,
   };
 }

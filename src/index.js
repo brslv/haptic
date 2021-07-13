@@ -84,6 +84,14 @@ const rollbar = new Rollbar({
 const db = knex(dbConfig[process.env.NODE_ENV]);
 attachPaginate();
 
+// JOBS / QUEUES
+const notificationsQueue = queues.loadNotificationsQueue({ db });
+const emailsQueue = queues.loadEmailsQueue({ db, isProd: IS_PROD });
+const { router } = createBullBoard([
+  new BullAdapter(notificationsQueue.queue),
+  new BullAdapter(emailsQueue.queue),
+]);
+
 passport.serializeUser(function(user, done) {
   done(null, user);
 });
@@ -117,7 +125,7 @@ passport.use(
       callbackURL: process.env.TWITTER_API_CALLBACK_URL,
     },
     function(accessToken, refreshToken, profile, done) {
-      const emails = profile.emails;
+      const profileEmails = profile.emails;
       const twitterData = profile._json;
       db.select()
         .table("users")
@@ -125,14 +133,17 @@ passport.use(
         .first()
         .then((result) => {
           if (!result) {
+            // registration
+            const emailsActions = emails.actions({ db, emailsQueue });
+            const userEmail =
+              profileEmails && profileEmails[0] && profileEmails[0].value
+                ? profileEmails[0].value
+                : undefined;
             db("users")
               .insert({
                 bio: twitterData.description,
                 slug: twitterData.screen_name,
-                email:
-                  emails && emails[0] && emails[0].value
-                    ? emails[0].value
-                    : undefined,
+                email: userEmail,
                 twitter_id: twitterData.id,
                 twitter_name: twitterData.name,
                 twitter_screen_name: twitterData.screen_name,
@@ -143,6 +154,12 @@ passport.use(
               })
               .returning("*")
               .then((insertedUser) => {
+                if (userEmail) {
+                  emailsActions.emailWelcome({
+                    email: userEmail,
+                    name: twitterData.twitter_name,
+                  });
+                }
                 done(null, insertedUser[0]);
               })
               .catch((err) => {
@@ -150,6 +167,7 @@ passport.use(
                 done(err, null);
               });
           } else {
+            // login
             // return the user
             db("users")
               .update({
@@ -338,13 +356,6 @@ const injectEnv = (req, res, next) => {
 };
 app.use(injectEnv);
 
-// JOBS / QUEUES
-const notificationsQueue = queues.loadNotificationsQueue({ db });
-const emailsQueue = queues.loadEmailsQueue({ db, isProd: IS_PROD });
-const { router } = createBullBoard([
-  new BullAdapter(notificationsQueue.queue),
-  new BullAdapter(emailsQueue.queue),
-]);
 app.use("/queues", authOnly, adminOnly, router); // @TODO: make admin only
 
 // articles
