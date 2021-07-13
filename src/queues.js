@@ -106,7 +106,18 @@ function loadEmailsQueue({ db, isProd }) {
       return emailSender
         .sendWelcome(emailData)
         .then((response) => {
-          return { ok: 1, response };
+          if (response === null) { // no errors 
+            return db("users")
+              .update({ welcome_email_sent: true })
+              .where({ email: emailData.to, twitter_name: emailData.name })
+              .then(() => {
+                return { ok: 1, response };
+              }).catch((err) => {
+                return { ok: 1, response: `Could not update welcome_email_sent property on user: { email: ${emailData.to}, name: ${emailData.name} }` };
+              });
+          } else {
+            return { ok: 1, response };
+          }
         })
         .catch((err) => {
           console.log(err);

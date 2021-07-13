@@ -132,9 +132,9 @@ passport.use(
         .where({ twitter_id: twitterData.id })
         .first()
         .then((result) => {
+          const emailsActions = emails.actions({ db, emailsQueue });
           if (!result) {
             // registration
-            const emailsActions = emails.actions({ db, emailsQueue });
             const userEmail =
               profileEmails && profileEmails[0] && profileEmails[0].value
                 ? profileEmails[0].value
@@ -174,11 +174,11 @@ passport.use(
                 twitter_profile_image_url: twitterData.profile_image_url_https,
               })
               .where({ id: result.id })
-              .returning("twitter_profile_image_url")
-              .then((updateResult) => {
+              .returning(["twitter_profile_image_url"])
+              .then(([updateResult]) => {
                 done(null, {
                   ...result,
-                  twitter_profile_image_url: updateResult[0],
+                  twitter_profile_image_url: updateResult.twitter_profile_image_url,
                 });
               });
           }
