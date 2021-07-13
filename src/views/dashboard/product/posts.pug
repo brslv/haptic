@@ -160,6 +160,26 @@ block content
               input(class="input mb-2" placeholder="E.g. React" id="tools-input" data-product-tools-input)
               button(type="submit" class="hidden") Submit
 
+
+  //- a new posting experience
+    div(class="fixed top-0 left-0 w-full h-full bg-gray-100 bg-opacity-40 bg-clip-padding" style="backdrop-filter: blur(20px);")
+      div(class="container mx-auto relative h-full")
+        div(class="absolute bottom-0 left-0 w-full p-8 bg-white rounded-tl-xl rounded-tr-xl border border-gray-200" style="height: 98%")
+          div(class="relative")
+            div(class="absolute top-0 right-0 bg-gray-100 rounded-full p-2 cursor-pointer")
+              +icon("x", { width: 16, height: 16 })
+          div(class="text-lg pt-8 prose mx-auto" contenteditable)
+            p.
+              Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+            p.
+              The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+          div(class="fixed bototm-0 left-0 w-full")
+            div(class="container mx-auto p-8")
+              div(class="bg-white border border-gray-200 rounded-lg p-4")
+                button(class="btn btn-primary") Publish
+
+
+
 block modals
   +modal('edit-post', {}, {
     class: 'mx-auto',
