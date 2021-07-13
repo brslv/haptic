@@ -307,7 +307,14 @@ const loadNotifications = (req, res, next) => {
   notificationsActions
     .getAll()
     .then((notificationsResult) => {
-      res.locals.notifications = notificationsResult;
+      res.locals.notifications = Object.keys(notificationsResult)
+        .reduce((acc, n) => {
+          return [...acc, ...notificationsResult[n]];
+        }, [])
+        .sort((a, b) => {
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
+
       res.locals.notificationsCount = Object.values(notificationsResult).reduce(
         (acc, curr) => {
           return (acc += curr.length);
