@@ -53,7 +53,8 @@ const dbErrCodes = {
 };
 const defaultMetas = {
   title: "Haptic - It's how makers build products in public",
-  description: "You have a story. Your product, too. Share it with the world.",
+  description:
+    "Get exposure for your product on a community of makers and creators. We provide the stage. You got the mic.",
   og: {
     title: "Haptic - It's how makers build products in public",
     image: `${ROOT_URL}/static/images/landing/social-image.png`,
@@ -178,7 +179,8 @@ passport.use(
               .then(([updateResult]) => {
                 done(null, {
                   ...result,
-                  twitter_profile_image_url: updateResult.twitter_profile_image_url,
+                  twitter_profile_image_url:
+                    updateResult.twitter_profile_image_url,
                 });
               });
           }
