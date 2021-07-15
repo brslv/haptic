@@ -55,11 +55,7 @@ mixin post-type-btn({trigger, icon, iconClass, disabled, tooltip, text}, attr = 
     //- span(class="hidden block absolute -top-2 -right-1 rounded-full bg-gray-100 dark:bg-gray-700 w-5 h-5 icon-container flex items-center justify-center border border-gray-300 dark:border-gray-500" data-close=trigger)
     //-   +icon("x", { width: 14, height: 14 })
 
-block append scripts
-  +require-module('posts')
-
 block content
-  +top-bar
   div(class="container mx-auto px-4")
     +product-header(product, links, 'posts')
     div(class="flex flex-col md:flex-row items-start pt-4")

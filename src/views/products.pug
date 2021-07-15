@@ -25,8 +25,7 @@ mixin controls
 block content
   div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")
   div(class="relative")
-    +top-bar("browse")
-    div(class="container p-4 mx-auto")
+    div(class="container")
       if products && products.length
         +controls
         div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4")

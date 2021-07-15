@@ -78,9 +78,8 @@ mixin notif({ notif, last = false })
             div(class="w-full comment prose prose-sm prose-yellow border border-gray-200 border-dashed p-2 rounded-md") !{notif.comment_content}
 
 block content
-  +top-bar("notifications")
-  div(class="container p-4 mx-auto")
-    div(class="md:w-2/3 mx-auto")
+  div(class="container")
+    div(class="w-full xl:w-2/3")
       div(class="flex items-center mb-4")
         +page-title(class="mr-4") Notifications
         if notifications && notifications.length

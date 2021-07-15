@@ -22,7 +22,7 @@ module.exports = {
       },
       backgroundColor: {
         ...defaultTheme.backgroundColor,
-        gray: { ...colors.warmGray, 30: "#faf9f9", 70: "#F6F7F8" },
+        gray: { ...colors.warmGray, 30: "#eee", 70: "#F6F7F8" },
       },
       borderColor: {
         ...defaultTheme.borderColor,

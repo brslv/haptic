@@ -1,6 +1,7 @@
 include ../partials/toast.pug 
 include ../partials/require-module.pug
 include ../partials/poll-option-bar.pug
+include ../components/side-nav-item.pug
 
 doctype html
 html(lang="en" id="html" class="")
@@ -97,10 +98,10 @@ html(lang="en" id="html" class="")
           smartlook('init', 'ecf8f98811b9db56f88b69c5a41fa82a5fdc452b');
 
     block head
-  body(class={"dark:bg-gray-800 bg-gray-50": true, "bg-white": isHomepage} id="body")
-    //- div(class="fixed top-0 left-0 w-full h-full" id="bg")
+  body(class={"bg-white": true, "bg-white": isHomepage} id="body")
+    div(class="fixed top-0 left-0 w-full h-full" id="bg")
     div(class="text-gray-800 dark:text-gray-200 relative mb-8" id="root")
-      div(class="z-20 border border-gray-100 hidden fixed bottom-0 right-0 m-8 p-4 rounded-md bg-white shadow-2xl text-sm dark:bg-gray-800 dark:border-gray-700" id="cookies-consent")
+      div(class="z-20 border border-gray-100 hidden fixed bottom-0 right-0 m-8 p-4 rounded-md bg-white shadow-2xl text-sm" id="cookies-consent")
         p(class="w-60 mb-4").
           By using haptic.so, you agree to it's use of cookies. #[a(href="/cookie-policy" title="Cookie Policy") Learn more].
         
@@ -108,8 +109,35 @@ html(lang="en" id="html" class="")
         button(class="btn btn-primary w-full" id="cookies-consent-ok-btn").
           OK
 
+      div(class="container-2 p-4 mx-auto")
 
-      block content
+        // - logo on mobile
+        div(class="block mx-auto md:hidden mb-4")
+          a(href="/" class="click-scale hover:scale-105 transition")
+            div(class="flex items-center")
+              img(src="/static/images/logo/logo-main.svg" class="Light Haptic logo" class="mb-2 h-8 logo-dark")
+
+        div(class="grid grid-cols-8 gap-4")
+
+          // - side nav
+          nav(class="hidden md:block md:col-span-2 xl:col-span-2")
+            // - navigation
+            div(class="lg:h-screen lg:sticky top-2" id="sticky-nav")
+              // - logo on desktop
+              a(href="/" class="inline-block mb-4 click-scale hover:scale-105 transition")
+                div(class="flex items-center")
+                  img(src="/static/images/logo/logo-main.svg" class="Light Haptic logo" class="mb-2 h-8 logo-dark")
+
+              div
+                +side-nav-item({ href: `/publish`, icon: 'plus', button: true, active: activePage === "publish" }) Publish update
+                +side-nav-item({ href: `/notifications`, icon: 'mail', active: activePage === "notifications" }) Notifications
+                +side-nav-item({ href: `/dashboard`, icon: 'box', active: activePage === "dashboard" }) Dashboard
+                +side-nav-item({ href: `/browse`, icon: 'grid', active: activePage === "browse" }) Browse
+                +side-nav-item({ href: `/dashboard/profile`, icon: 'user', active: activePage === "profile" }) Profile
+          
+          // - main container
+          main(class="col-span-8 md:col-span-6 xl:col-span-6")
+            block content
 
       block templates
         //- toasts

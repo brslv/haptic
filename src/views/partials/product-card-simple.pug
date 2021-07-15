@@ -2,7 +2,7 @@ include page-title.pug
 
 mixin product-card-simple({ slug, logo_url, name, boosts_count, description, user_twitter_screen_name, user_slug, place = null })
   - var firstLetter = name.substring(0, 1).toUpperCase();
-  - var descriptionShort = description && description.length > 30 ? description.substring(0, 30) + '...' : description;
+  - var descriptionShort = description && description.length > 37 ? description.substring(0, 37) + '...' : description;
   a(href=`/p/${slug}` class="block")
     div(class="relative")
       div(

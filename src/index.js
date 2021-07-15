@@ -514,6 +514,16 @@ app.get("/pricing", (req, res) => {
   });
 });
 
+app.get("/publish", authOnly, (req, res) => {
+  const productsActions = products.actions({ db, user: req.user });
+  productsActions.getMyProducts().then((myProductsResult) => {
+    res.render("publish", {
+      meta: { ...defaultMetas },
+      myProducts: myProductsResult,
+    });
+  });
+});
+
 app.get("/browse", (req, res) => {
   const productsActions = products.actions({ db, user: req.user });
   const page = getPageFromQuery(req.query);
@@ -542,31 +552,26 @@ app.get("/browse", (req, res) => {
             .orderBy("id", "desc")
             .limit(10)
             .then((usersResponse) => {
-              return productsActions
-                .getMyProducts()
-                .then((myProductsResult) => {
-                  const title = "Browse | Haptic";
-                  const description =
-                    "Get inspired by other build in public makers by browsing their public updates and products";
+              const title = "Browse | Haptic";
+              const description =
+                "Get inspired by other build in public makers by browsing their public updates and products";
 
-                  res.render("browse", {
-                    meta: {
-                      ...defaultMetas,
-                      title,
-                      description,
-                      og: {
-                        ...defaultMetas.og,
-                        title,
-                        description,
-                      },
-                    },
-                    page: page,
-                    myProducts: myProductsResult,
-                    newestUsers: usersResponse,
-                    newestProducts: newestProductsResult,
-                    recentlyUpdatedProducts: recentlyUpdatedProductsResult,
-                  });
-                });
+              res.render("browse", {
+                meta: {
+                  ...defaultMetas,
+                  title,
+                  description,
+                  og: {
+                    ...defaultMetas.og,
+                    title,
+                    description,
+                  },
+                },
+                page: page,
+                newestUsers: usersResponse,
+                newestProducts: newestProductsResult,
+                recentlyUpdatedProducts: recentlyUpdatedProductsResult,
+              });
             });
         })
         .catch((err) => {

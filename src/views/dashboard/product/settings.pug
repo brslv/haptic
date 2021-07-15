@@ -12,7 +12,6 @@ mixin predefCoverImg(url, productSlug)
 block content
   - var formErrors = flash && flash.data && flash.data[0] && flash.data[0].errors || {};
   - var cover = product.cover_image_url || predefinedCovers[0];
-  +top-bar
   div(class="mx-2")
     div(class="-mb-24 border border-gray-200 mx-auto rounded-lg" style="max-width: 980px; height: 410px;")
       div(
