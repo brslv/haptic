@@ -22,7 +22,7 @@ module.exports = {
       },
       backgroundColor: {
         ...defaultTheme.backgroundColor,
-        gray: { ...colors.warmGray, 70: "#F6F7F8" },
+        gray: { ...colors.warmGray, 30: "#faf9f9", 70: "#F6F7F8" },
       },
       borderColor: {
         ...defaultTheme.borderColor,
@@ -60,9 +60,13 @@ module.exports = {
   plugins: [
     require("@tailwindcss/typography"),
     ({ addComponents, theme }) => {
+      const screens = theme("screens", {});
       addComponents({
         ".container-2": {
-          maxWidth: theme("screens.xl"),
+          "@apply container": {},
+          [`@media (min-width: ${theme("screens.xl")})`]: {
+            maxWidth: theme("screens.xl"),
+          },
         },
       });
     },

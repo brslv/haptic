@@ -531,25 +531,43 @@ app.get("/browse", (req, res) => {
           limit: 8,
         })
         .then((recentlyUpdatedProductsResult) => {
-          const title = "Browse | Haptic";
-          const description =
-            "Get inspired by other build in public makers by browsing their public updates and products";
+          return db("users")
+            .select(
+              "twitter_name",
+              "slug",
+              "bio",
+              "twitter_profile_image_url",
+              "type"
+            )
+            .orderBy("id", "desc")
+            .limit(10)
+            .then((usersResponse) => {
+              return productsActions
+                .getMyProducts()
+                .then((myProductsResult) => {
+                  const title = "Browse | Haptic";
+                  const description =
+                    "Get inspired by other build in public makers by browsing their public updates and products";
 
-          res.render("browse", {
-            meta: {
-              ...defaultMetas,
-              title,
-              description,
-              og: {
-                ...defaultMetas.og,
-                title,
-                description,
-              },
-            },
-            page: page,
-            newestProducts: newestProductsResult,
-            recentlyUpdatedProducts: recentlyUpdatedProductsResult,
-          });
+                  res.render("browse", {
+                    meta: {
+                      ...defaultMetas,
+                      title,
+                      description,
+                      og: {
+                        ...defaultMetas.og,
+                        title,
+                        description,
+                      },
+                    },
+                    page: page,
+                    myProducts: myProductsResult,
+                    newestUsers: usersResponse,
+                    newestProducts: newestProductsResult,
+                    recentlyUpdatedProducts: recentlyUpdatedProductsResult,
+                  });
+                });
+            });
         })
         .catch((err) => {
           console.log(err);
