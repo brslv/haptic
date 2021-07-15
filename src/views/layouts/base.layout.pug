@@ -88,6 +88,14 @@ html(lang="en" id="html" class="")
 
       script(src="/static/js/bundle.js")
 
+      script(type='text/javascript').
+        window.smartlook||(function(d) {
+          var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
+          var c=d.createElement('script');o.api=new Array();c.async=true;c.type='text/javascript';
+          c.charset='utf-8';c.src='https://rec.smartlook.com/recorder.js';h.appendChild(c);
+          })(document);
+          smartlook('init', 'ecf8f98811b9db56f88b69c5a41fa82a5fdc452b');
+
     block head
   body(class={"dark:bg-gray-800": true, "bg-white": isHomepage} id="body")
     div(class="fixed top-0 left-0 w-full h-full" id="bg")
