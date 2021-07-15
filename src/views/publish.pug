@@ -5,18 +5,12 @@ mixin product-picker({ product })
     img(class="w-10 h-10 rounded-md border border-gray-200 mr-2" src=product.logo_url)
     p(class="text-sm font-medium")= product.name
 
+block append head_scripts
+  script(src="/static/js/editor/bundle.js")
+
+block append scripts
+  script.
+    window.state = !{JSON.stringify(myProducts)};
+
 block content
-  if myProducts
-    div(class="flex flex-wrap -m-1")
-      each product in myProducts
-        +product-picker({ product })
-        +product-picker({ product })
-        +product-picker({ product })
-        +product-picker({ product })
-        +product-picker({ product })
-        +product-picker({ product })
-        +product-picker({ product })
-        +product-picker({ product })
-        +product-picker({ product })
-        +product-picker({ product })
-  div(id="react-editor")
+  div(id="react-editor" class="relative")

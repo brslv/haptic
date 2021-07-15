@@ -333,6 +333,11 @@
     will-change: transform;
   }
 
+  .quick-update-container::-webkit-scrollbar {
+    width: 0; /* Remove scrollbar space */
+    background: transparent; /* Optional: just make scrollbar invisible */
+  }
+
   @keyframes fadeInFromBottom {
     from {
       margin-bottom: -10px;

@@ -5,9 +5,9 @@ import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 
 export default {
-  input: "./src/js/index.js",
+  input: "./src/js/editor/index.js",
   output: {
-    file: "./public/js/bundle.js",
+    file: "./public/js/editor/bundle.js",
     name: "bundle.js",
     format: "iife",
   },
