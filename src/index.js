@@ -158,7 +158,7 @@ passport.use(
                 if (userEmail) {
                   emailsActions.emailWelcome({
                     email: userEmail,
-                    name: twitterData.twitter_name,
+                    name: twitterData.name,
                   });
                 }
                 done(null, insertedUser[0]);
