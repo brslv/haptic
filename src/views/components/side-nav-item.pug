@@ -1,6 +1,6 @@
 include ../partials/icon.pug
 
-mixin side-nav-item({ href, icon, button, active = false })
+mixin side-nav-item({ href, icon, button, active = false, counter = null })
   div
     a(
       href=href
@@ -10,8 +10,13 @@ mixin side-nav-item({ href, icon, button, active = false })
         "bg-gray-100": active
       }
     )
-      span(class="flex items-center")
+      span(class="relative flex items-center")
         if icon
           +icon(icon)(class="mr-2")
+          if counter
+            div(
+              class="px-2.5 py-1.5 absolute -top-3 -left-3 bg-yellow-300 rounded-full text-xs font-medium flex items-center justify-center"
+              style="min-width: 20px; min-height: 20px;"
+            )= counter
         span
           block

@@ -1,4 +1,4 @@
-extend layouts/base.layout.pug
+extend layouts/with-nav.layout.pug
 
 include partials/top-bar.pug
 include partials/page-title.pug
@@ -11,9 +11,9 @@ include partials/comment.pug
 include partials/facade-post.pug
 include components/user-avatar.pug
 
-mixin user-card(user)
-  a(href=`/u/${user.slug}` class="w-full hover:ring-2 rounded-md hover:ring-gray-300 hover:ring-offset-2 transition")
-    div(class="flex items-center border-b border-gray-200 hover:border-transparent px-4 py-2")
+mixin user-card(user, { bottom_border = true })
+  a(href=`/u/${user.slug}` class="w-full rounded-md hover:bg-gray-50 transition")
+    div(class={ "flex items-center px-4 py-2": true, "border-b border-gray-200": bottom_border })
       div(class="border border-gray-200 rounded-full mr-2")
         +user-avatar({
           src: user.twitter_profile_image_url,
@@ -48,18 +48,19 @@ block append templates
       content: ''
     })
 
-block content
+block main
   div(class="relative")
     div(class="container")
       div(class="grid grid-cols-8 gap-4")
         //- Left
-        main(class="col-span-8 xl:col-span-5")
+        main(class="col-span-8 sm:col-span-6 sm:col-start-2 lg:col-span-5")
+          +page-title(class="mb-4") Latest updates
           turbo-frame(id="browse-posts-list" src=`/frame/browse/posts?page=${page}` target="_top")
             +browse-posts-list-loading
 
 
         //- right
-        aside(class="col-span-3 hidden xl:block")
+        aside(class="col-span-3 hidden lg:block")
           div(class="mb-4")
             +page-title(class="mb-4") Recently Updated Products
             div(class="bg-white border border-gray-200 rounded-md")
@@ -70,7 +71,8 @@ block content
                   slug: product.slug,
                   name: product.name,
                   boosts_count: product.boosts_count,
-                  description: product.description
+                  description: product.description,
+                  bottom_border: idx < recentlyUpdatedProducts.length - 1
                 })
             div(class="flex items-end justify-end mt-2")
               a(href="/products?ord=boosts" class="btn btn-plain btn-small transition click-scale") View most boosted
@@ -84,7 +86,8 @@ block content
                   slug: product.slug,
                   name: product.name,
                   boosts_count: product.boosts_count,
-                  description: product.description
+                  description: product.description,
+                  bottom_border: idx < newestProducts.length - 1
                 })
             div(class="flex items-end justify-end mt-2")
               a(href="/products?ord=newest" class="btn btn-plain btn-small transition click-scale") View latest
@@ -93,8 +96,8 @@ block content
             +page-title(class="mb-3") Recently joined makers
             div(class="bg-white rounded-md border border-gray-200")
               div(class="flex flex-row flex-wrap xl:flex-col")
-                each user in newestUsers
-                  +user-card(user)
+                each user, idx in newestUsers
+                  +user-card(user, { bottom_border: idx < newestUsers.length - 1 })
 
 block modals
   if !user

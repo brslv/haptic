@@ -12,6 +12,22 @@
     );
   }
 
+  .hpt-select__control {
+    @apply border border-solid rounded-md border-gray-200 hover:border-yellow-300 cursor-pointer outline-none transition !important;
+  }
+  .hpt-select__control--is-focused {
+    @apply outline-none border-none ring-2 ring-yellow-300 !important;
+  }
+  .hpt-select__option {
+    @apply cursor-pointer !important;
+  }
+  .hpt-select__option--is-focused {
+    @apply text-gray-800 bg-yellow-100 !important;
+  }
+  .hpt-select__option--is-selected {
+    @apply text-gray-800 bg-yellow-300 !important;
+  }
+
   .turbo-progress-bar {
     @apply bg-yellow-400;
     height: 5px;
@@ -133,7 +149,7 @@
   }
 
   .btn-plain {
-    @apply bg-white border border-gray-200 transition;
+    @apply bg-white hover:shadow-sm border border-gray-200 transition;
   }
 
   .btn-default {

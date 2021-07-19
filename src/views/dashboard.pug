@@ -1,4 +1,4 @@
-extends layouts/base.layout.pug
+extends layouts/with-nav.layout.pug
 
 include partials/top-bar.pug
 include partials/modal.pug
@@ -12,15 +12,15 @@ include partials/csrf.pug
 block append scripts
   +require-module('dashboard')
 
-block content
+block main
   //- +top-bar("dashboard")
   
   div(class="container")
     section
-      +page-title(class="mb-4") Products
+      +page-title(class="mb-4") My Products
       +flash-msg(flash)
 
-      div(class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3")
+      div(class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3")
         each product in products
           +product-card({
             place: null,

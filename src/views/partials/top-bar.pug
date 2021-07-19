@@ -1,151 +1,35 @@
 include ./icon.pug
+include ./mobile-nav.pug
 
 mixin top-bar(activePage)
-    div(class="relative bg-white w-full border-b border-gray-200 mb-4")
-        div(class="px-4")
-            div(class="flex h-14 items-center justify-between")
-                a(href="/" class="click-scale hover:scale-105 transition")
-                    div(class="flex items-center")
-                        img(src="/static/images/logo/logo-main.svg" alt="Dark Haptic logo" class="h-8 logo-dark")
-                        img(src="/static/images/logo/logo-main-light.svg" class="Light Haptic logo" class="h-8 logo-light")
-                nav
-                    div(class="h-14 flex md:hidden items-center justify-center")
-                      if !user
-                        a(
-                          href="/browse"
-                          class={"h-full flex items-center hover:bg-gray-50 px-4 mr-4 click-scale": true,
-                                "border-b-4 border-yellow-300 primary-glow": activePage === "browse"}
-                        )
-                          span(class="flex items-center")
-                            +icon("grid", { width:16, height: 16 })(class="mr-2")
-                            span(class="font-medium") Browse
-                      
-                      div(class="relative" data-mobile-nav-open)
-                        +icon("menu", { width: 16, height: 16 })
-                        if notificationsCount > 0
-                          span(class="absolute -top-3 -right-2 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notificationsCount
+  +mobile-nav
+  div(class="relative bg-white w-full mb-4")
+    div(class="px-4")
+      div(class="flex h-14 items-center justify-center md:justify-between")
+        a(href="/" class="click-scale hover:scale-105 transition")
+            div(class="flex items-center")
+                img(src="/static/images/logo/logo-main.svg" alt="Dark Haptic logo" class="h-8 logo-dark")
+                img(src="/static/images/logo/logo-main-light.svg" class="Light Haptic logo" class="h-8 logo-light")
 
-                    //- mobile
-
-                    div(class="hidden md:hidden text-lg absolute top-0 left-0 h-screen w-screen bg-white m-0 p-0 flex flex-col items-center justify-center z-20" data-mobile-nav)
-                      +icon("x", { width: 16, height: 16 })(class="absolute top-5 right-4" data-mobile-nav-close)
-                      if user
-                        div(class="mb-4")
-                          a(href="/dashboard" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon("box", { width:16, height: 16 })(class="mr-2")
-                            span Dashboard
-                        div(class="mb-4")
-                          a(href="/browse" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon("grid", { width:16, height: 16 })(class="mr-2")
-                            span Browse
-                        div(class="mb-4")
-                          a(href="/collections" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon("bookmark", { width:16, height: 16 })(class="mr-2")
-                            span Collections
-                        div(class="mb-4")
-                          a(href="/notifications" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            div(class="relative")
-                              +icon("mail", { width:16, height: 16 })(class="mr-2")
-                              if notificationsCount > 0
-                                span(class="absolute -top-4 -left-4 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notificationsCount
-                            span Notifications
-                        div(class="mb-4")
-                          a(href="/dashboard/profile" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            img(class={"rounded-full w-8 h-8 mr-2": true, "w-9 h-9 border-4 border-double border-yellow-300": user.type === USER_TYPES.CREATOR } src=`${user.twitter_profile_image_url}` alt=`${user.twitter_name} profile image`)
-                            span Profile
-                        div(class="mb-4")
-                          a(href="/logout" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon('log-out', { width:16, height: 16 })(class="mr-2")
-                            span Log out
-                      else
-                        div(class="mb-4")
-                          a(href="/pricing" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon("dollar-sign", { width:16, height: 16 })(class="mr-2")
-                            span Pricing
-                        div(class="mb-4")
-                          a(href="/login" class="flex items-center w-xl bg-gray-100 rounded-full px-4 py-2 click-scale")
-                            +icon('log-in', { width:16, height: 16 })(class="mr-2")
-                            span Login
-
-                    //- desktop
-
-                    div(class="hidden md:flex items-center h-14 relative")
-                        if user
-                            a(
-                              href="/dashboard"
-                              class={
-                                "h-full flex items-center hover:bg-gray-50 px-4 click-scale": true,
-                                "border-b-4 border-yellow-300 primary-glow": activePage === "dashboard"
-                              }
-                              data-tippy-content="Dashboard"
-                            )
-                                span
-                                    +icon('box', { width:16, height: 16 })
-
-                            a(
-                              href="/browse"
-                              class={"h-full flex items-center hover:bg-gray-50 px-4 click-scale": true,
-                                    "border-b-4 border-yellow-300 primary-glow": activePage === "browse"}
-                              data-tippy-content="Browse"
-                            )
-                              span
-                                +icon("grid", { width:16, height: 16 })
-
-                            a(
-                              href="/collections"
-                              class={
-                                "h-full flex items-center hover:bg-gray-50 px-4 click-scale": true,
-                                "border-b-4 border-yellow-300 primary-glow": activePage === "collections"
-                              }
-                              data-tippy-content="Collections"
-                            )
-                                span
-                                    +icon('bookmark', { width:16, height: 16 })
-
-                            a(
-                              href="/notifications"
-                              class={
-                                "h-full flex items-center hover:bg-gray-50 px-4 click-scale": true,
-                                "border-b-4 border-yellow-300 primary-glow": activePage === "notifications"
-                              }
-                              data-tippy-content=`Notifications (${notificationsCount || 0})`
-                            )
-                                span(class="relative")
-                                    +icon('mail', { width:16, height: 16 })
-                                    if notificationsCount > 0
-                                        span(class="absolute -top-3 -right-3 p-1 bg-yellow-300 rounded-full flex items-center justify-center text-xs" style="min-width: 23px;")= notificationsCount
-
-                            a(
-                              href="/dashboard/profile"
-                              class={
-                                "h-full flex items-center hover:bg-gray-50 px-4 click-scale": true,
-                                "border-b-4 border-yellow-300 primary-glow": activePage === "profile"
-                              }
-                              data-tippy-content="Profile settings"
-                            )
-                                span(class="relative")
-                                  img(class={"rounded-full w-8 h-8": true, "w-9 h-9 border-4 border-double border-yellow-300": user.type === USER_TYPES.CREATOR } src=`${user.twitter_profile_image_url}` alt=`${user.twitter_name} profile image`)
-
-                            a(href="/logout" class="h-full flex items-center hover:bg-gray-50 px-4 click-scale" data-tippy-content="Log out")
-                                span
-                                    +icon('log-out', { width:16, height: 16 })
-                        else
-                          a(
-                            href="/browse"
-                            class={"h-full flex items-center hover:bg-gray-50 px-4 click-scale": true,
-                                  "border-b-4 border-yellow-300 primary-glow": activePage === "browse"}
-                          )
-                            span(class="flex items-center")
-                              +icon("grid", { width:16, height: 16 })(class="mr-2")
-                              span(class="font-medium") Browse
-                          a(
-                            href="/pricing"
-                            class="h-full flex items-center hover:bg-gray-50 px-4 click-scale"
-                          )
-                            span(class="flex items-center")
-                              +icon("dollar-sign", { width:16, height: 16 })(class="mr-2")
-                              span(class="font-medium") Pricing
-                          a(href="/login" class="h-full flex items-center hover:bg-gray-50 px-4 click-scale")
-                              span(class="flex items-center")
-                                  +icon('log-in', { width:16, height: 16 })(class="mr-2")
-                                  span(class="font-medium") Login
+        nav
+          //- desktop
+          div(class="hidden md:flex items-center h-14 relative")
+            a(
+              href="/browse"
+              class={"px-4 py-2 hover:bg-gray-50 rounded-md flex items-center px-4 click-scale": true,
+                    "border-b-4 border-yellow-300 primary-glow": activePage === "browse"}
+            )
+              span(class="flex items-center")
+                +icon("grid", { width:16, height: 16 })(class="mr-2")
+                span(class="font-medium") Browse
+            a(
+              href="/pricing"
+              class="px-4 py-2 hover:bg-gray-50 rounded-md flex items-center px-4 click-scale"
+            )
+              span(class="flex items-center")
+                +icon("dollar-sign", { width:16, height: 16 })(class="mr-2")
+                span(class="font-medium") Pricing
+            a(href="/login" class="px-4 py-2 bg-yellow-50 hover:bg-yellow-100 rounded-md flex items-center px-4 click-scale")
+              span(class="flex items-center")
+                +icon('log-in', { width:16, height: 16 })(class="mr-2")
+                span(class="font-medium") Login

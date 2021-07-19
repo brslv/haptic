@@ -1,4 +1,4 @@
-extends layouts/base.layout.pug
+extends layouts/with-nav.layout.pug
 
 include partials/icon.pug
 include partials/top-bar.pug
@@ -21,9 +21,9 @@ block append templates
       content: ''
     })
 
-block content
+block main
   - var post_text = post.text;
-  div(class="container")
+  div
     div(class="lg:w-2/3")
       div(class="mb-4 inline-block")
         a(href=`/p/${product.slug}` class="btn btn-small btn-plain flex items-center")

@@ -55,6 +55,7 @@ module.exports = {
       ringOffsetWidth: ["focus", "hover"],
       ringOpacity: ["focus", "hover"],
       ringWidth: ["focus", "hover"],
+      borderStyle: ["focus"],
     },
   },
   plugins: [
@@ -64,8 +65,11 @@ module.exports = {
       addComponents({
         ".container-2": {
           "@apply container": {},
-          [`@media (min-width: ${theme("screens.xl")})`]: {
-            maxWidth: theme("screens.xl"),
+          // [`@media (min-width: ${theme("screens.xl")})`]: {
+          //   maxWidth: theme("screens.xl"),
+          // },
+          [`@media (min-width: 1200px)`]: {
+            maxWidth: "1200px",
           },
         },
       });

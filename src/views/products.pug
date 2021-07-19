@@ -1,4 +1,4 @@
-extend layouts/base.layout.pug
+extend layouts/with-nav.layout.pug
 
 include partials/top-bar.pug
 include partials/page-title.pug
@@ -9,36 +9,37 @@ include partials/login-modal.pug
 
 mixin controls
   div(class="flex items-center mb-4")
-    div(class="w-full flex items-start sm:items-center flex-col sm:flex-row")
-      div(class="flex items-center flex-1")
-        +page-title(class="mb-4 sm:mr-4 sm:mb-0") Products
-        a(href=`/browse` class="no-wrap btn btn-small btn-plain flex items-center")
+    div(class="w-full flex items-start sm:items-center flex-col sm:flex-row justify-between")
+      div(class="flex items-center flex-1 mb-4 sm:mb-0")
+        +page-title(class="mr-4") Products
+        a(href=`/browse` class="hidden no-wrap btn btn-small btn-plain sm:flex items-center")
           +icon("arrow-left", { width: 16, height: 16 })(class="mr-2")
-          span= `Go to browse`
+          span Home
       div(class="flex items-center justify-between")
         div
         div(class="flex items-center")
           +page-title(class="hidden sm:block mr-4") Filter
+          a(href=`/browse` class="sm:hidden no-wrap btn btn-small btn-plain flex items-center mr-2")
+            +icon("arrow-left", { width: 16, height: 16 })(class="mr-2")
+            span Home
           button(data-browse-ord-boosts class={"btn btn-plain btn-small mr-2": true, "btn-active-ring": ord === 'boosts'}) Boosts
           button(data-browse-ord-newest class={"btn btn-plain btn-small": true, "btn-active-ring": ord === 'newest'}) Newest
 
-block content
-  div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")
+block main
   div(class="relative")
-    div(class="container")
-      if products && products.length
-        +controls
-        div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4")
-          each product, idx in products
-            +product-card({
-              place: type === 'products' && ord === 'boosts' && idx < 3 ? idx : null,
-              slug: product.slug,
-              name: product.name,
-              logo_url: product.logo_url,
-              cover_url: product.cover_image_url,
-              boosts_count: product.boosts_count,
-              description: product.description
-            })
+    if products && products.length
+      +controls
+      div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4")
+        each product, idx in products
+          +product-card({
+            place: type === 'products' && ord === 'boosts' && idx < 3 ? idx : null,
+            slug: product.slug,
+            name: product.name,
+            logo_url: product.logo_url,
+            cover_url: product.cover_image_url,
+            boosts_count: product.boosts_count,
+            description: product.description
+          })
 
 block modals
   if !user

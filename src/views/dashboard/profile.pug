@@ -1,11 +1,11 @@
-extends ../layouts/base.layout.pug
+extends ../layouts/with-nav.layout.pug
 
 include ../partials/top-bar.pug
 include ../partials/page-title.pug
 include ../partials/csrf.pug
 include ../partials/flash-msg.pug
 
-block content
+block main
   - var formErrors = flash && flash.data && flash.data[0] && flash.data[0].errors || {};
   div(class="container")
     div(class="flex items-center mb-4")
@@ -16,7 +16,7 @@ block content
 
     div(class="flex items-start md:flex-row flex-col")
       // - left
-      div(class="w-full md:w-2/3 md:mr-4")
+      div(class="w-full mb-4 md:mb-0 md:w-2/3 md:mr-4")
         div(class="container mx-auto")
           form(action=`${form.action}` method="POST" id="profile-form")
             +csrf
@@ -52,6 +52,7 @@ block content
                 span(class="text-sm text-gray-500") Get notified when someone comments on your posts or replies to your comments
 
             button(type="submit" class="btn btn-primary") Update
+
       // - right
       div(class="flex-1 container mx-auto")
         div(class="p-4 bg-white rounded-md border border-gray-200 mb-4")

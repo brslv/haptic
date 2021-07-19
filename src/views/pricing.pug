@@ -1,6 +1,5 @@
-extends layouts/base.layout.pug
+extends layouts/with-top-nav.layout.pug
 
-include partials/top-bar.pug
 include components/icon-in-circle.pug
 
 mixin box({ accent, title, description, price, buttonLink, buttonLabel, last })
@@ -33,9 +32,7 @@ mixin red-row
       block
 
 
-block content
-  +top-bar
-
+block main
   div(class="container mx-auto p-4")
     div(id="pricing")
       div(class="container mx-auto p-4")
@@ -80,13 +77,6 @@ block content
               +green-row Collect products
               +green-row Leave comments and join discussions
               +green-row Get featured on the Browse page
-
-        div(class="flex items-center justify-center")
-          div(class="flex items-center bg-gray-200 rounded-full px-4 py-2 inline-block mx-auto mt-8 text-sm")
-            div(class="mr-2")
-              +icon-in-circle({ name: 'key', bg: 'bg-blue-500' })
-            span You will be asked to sign up once you pick your plan
-
 
 //-
           div(class="flex-1 w-full bg-white border border-gray-200 rounded-md p-4 md:p-8 mb-8 md:mb-0 md:mr-8 bg-clip-padding bg-opacity-70" style="backdrop-filter: blur(20px);")

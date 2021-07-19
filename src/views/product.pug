@@ -1,4 +1,4 @@
-extends layouts/base.layout.pug
+extends layouts/with-nav.layout.pug
 
 include partials/top-bar.pug
 include partials/post.pug
@@ -24,13 +24,12 @@ block append templates
 block append head
   meta(name="turbo-cache-control" content="no-cache")
 
-block content
+block main
   - var cover = product.cover_image_url || predefinedCovers[0];
-  
 
-  div(class="container")
-    div(class="mx-2 mb-4 md:mb-0")
-      div(class="hidden md:block bg-white md:-mb-14 border border-gray-200 mx-auto rounded-lg bg-opacity-60 bg-clip-padding" style=`max-width: 980px; height: 410px; background-image: url("${cover}"); background-size: cover; background-position: center;`)
+  div
+    div(class="-mx-2 lg:-mx-4 mb-4 md:mb-0")
+      div(class="bg-white -mb-14 border border-gray-200 mx-auto rounded-lg bg-opacity-60 bg-clip-padding" style=`max-width: 1200px; height: 410px; background-image: url("${cover}"); background-size: cover; background-position: center;`)
     // - header
     div(class="container mx-auto px-4 py-8 rounded-md mb-4 bg-white border border-gray-200 relative bg-opacity-70 bg-clip-padding" style="backdrop-filter: blur(20px);")
       if product.logo_url
@@ -53,9 +52,9 @@ block content
           div(class="font-medium text-xl text-gray-600") No product description, yet.
 
     // - content
-    div(class="flex flex-col-reverse md:flex-row items-start")
+    div(class="flex flex-col-reverse lg:flex-row items-start")
 
-      main(id="product-main" class="mr-0 w-full md:w-4/6 md:mr-4")
+      section(id="product-main" class="mr-0 w-full lg:w-4/6 lg:mr-4")
         turbo-frame(id=`product` src=`/frame/p/${product.slug}?page=${page}` target="_top")
           +facade-post
           +facade-post
@@ -65,7 +64,7 @@ block content
           +facade-post
 
 
-      aside(class="md:w-2/6 mb-16 w-full md:mb-0")
+      aside(class="lg:w-2/6 mb-2 w-full lg:mb-0")
         div(class="p-4 bg-white rounded-md mb-4 border border-gray-200")
           span(class="flex items-center font-medium text-sm mb-4")
             span(class="mr-2") Show some love
@@ -79,15 +78,15 @@ block content
                         +icon("chevrons-up")
                       span(class="mr-4")= `Boost`
                     span(class="px-4 py-1 bg-yellow-300 font-medium text-gray-800 rounded-full text-xs uppercase" data-product-boost-counter)= boosts.length
-              li(class="w-full mb-2")
-                div(tabindex="0" role="button" class="product-btn click-scale" data-product-collect-btn data-product-slug=product.slug data-tippy-content="Add this product to your collection" data-disabled=(!user ? 'disabled' : undefined) data-modal-trigger=(!user ? 'login' : undefined))
-                  span(class="flex justify-between")
-                    span(class="flex items-center")
-                      span(class="mr-4")
-                        +icon("bookmark")
-                      span(class="mr-4") Collect
+              //- li(class="w-full mb-2")
+              //-   div(tabindex="0" role="button" class="product-btn click-scale" data-product-collect-btn data-product-slug=product.slug data-tippy-content="Add this product to your collection" data-disabled=(!user ? 'disabled' : undefined) data-modal-trigger=(!user ? 'login' : undefined))
+              //-     span(class="flex justify-between")
+              //-       span(class="flex items-center")
+              //-         span(class="mr-4")
+              //-           +icon("bookmark")
+              //-         span(class="mr-4") Collect
               if product.website
-                hr(class="my-4 border-dashed")
+                //- hr(class="my-4 border-dashed")
                 li(class="w-full")
                   a(href=product.website target="_blank" rel="noopener" class="product-btn click-scale")
                     span(class="flex justify-between")
@@ -96,7 +95,7 @@ block content
                           +icon("external-link")
                         span(class="mr-4") Visit website
 
-        div(class="p-4 bg-white border border-gray-200 rounded-md mb-4")
+        div(class="p-4 bg-gray-50 lg:bg-white border border-gray-200 rounded-md mb-4")
           span(class="font-medium text-sm mb-4 block") Creator
           div
             div(class="flex items-start")

@@ -1,4 +1,4 @@
-extends layouts/base.layout.pug
+extends layouts/with-nav.layout.pug
 
 include partials/top-bar.pug
 include partials/modal.pug
@@ -10,41 +10,38 @@ include partials/empty-list-message.pug
 block append scripts
   +require-module('collections')
 
-block content
-  +top-bar("collections")
-  
-  div(class="container mx-auto p-4")
-    section
-      +page-title(class="mb-4") Collected products
-      +flash-msg(flash)
+block main
+  section
+    +page-title(class="mb-4") Collected products
+    +flash-msg(flash)
 
-      if collections.length
-        div(class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" data-collections-list)
-          each product in collections
-            a(href=`/p/${product.slug}` data-collected-product-root data-ctx-menu-container class="click-scale")
-              div(class="relative bg-white border border-gray-200 hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 transition-all h-full rounded-md p-4" style="min-height: 100px;")
-                +icon("bookmark", { width: 18, height: 18, stroke: 'primary', fill: 'primary' })(class="absolute -top-1 left-2")
+    if collections.length
+      div(class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" data-collections-list)
+        each product in collections
+          a(href=`/p/${product.slug}` data-collected-product-root data-ctx-menu-container class="click-scale")
+            div(class="relative bg-white border border-gray-200 hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 transition-all h-full rounded-md p-4" style="min-height: 100px;")
+              +icon("bookmark", { width: 18, height: 18, stroke: 'primary', fill: 'primary' })(class="absolute -top-1 left-2")
 
-                div(class="flex items-center justify-between pb-4")
-                  h1(class="text-xl font-bold")= product.name
-                  div(class="relative inline-block ml-4")
-                    button(data-ctx-menu-trigger=`actions_${product.id}` class="btn btn-icon btn-small icon-container rounded-full hover:bg-gray-100 p-2 click-scale-2" data-tippy-content="Actions")
-                      +icon('more-horizontal', { width: '18', height: '18' })
-                    div(data-ctx-menu=`actions_${product.id}` class="hidden absolute top-8 -right-2 bg-white shadow-xl rounded-md border border-gray-100" style="min-width: 150px;")
-                      +page-title(class="px-4 py-2 inline-block w-full") Actions
-                      div(class="py-2 pb-4 px-4")
-                        button(data-ctx-action="delete-collected-item" data-product-slug=product.slug class="flex items-center btn btn-danger w-full text-sm")
-                          span(class="icon-container mr-2")
-                            +icon("trash-2", { stroke: "white", width: '18', height: '18' })
-                          span Delete
+              div(class="flex items-center justify-between pb-4")
+                h1(class="text-xl font-bold")= product.name
+                div(class="relative inline-block ml-4")
+                  button(data-ctx-menu-trigger=`actions_${product.id}` class="btn btn-icon btn-small icon-container rounded-full hover:bg-gray-100 p-2 click-scale-2" data-tippy-content="Actions")
+                    +icon('more-horizontal', { width: '18', height: '18' })
+                  div(data-ctx-menu=`actions_${product.id}` class="hidden absolute top-8 -right-2 bg-white shadow-xl rounded-md border border-gray-100" style="min-width: 150px;")
+                    +page-title(class="px-4 py-2 inline-block w-full") Actions
+                    div(class="py-2 pb-4 px-4")
+                      button(data-ctx-action="delete-collected-item" data-product-slug=product.slug class="flex items-center btn btn-danger w-full text-sm")
+                        span(class="icon-container mr-2")
+                          +icon("trash-2", { stroke: "white", width: '18', height: '18' })
+                        span Delete
 
-                if product.description
-                  p= product.description
+              if product.description
+                p= product.description
 
-      div(class={"hidden": collections.length > 0, "text-gray-500":true} data-collections-no-items-msg)
-        +empty-list-message
-          span No collected items
-          div
-            a(href="/browse" title="Browse products" class="underline hover:no-underline") Browse products on Haptic
-        // - button(class="btn btn-primary click-scale") Browse products
+    div(class={"hidden": collections.length > 0, "text-gray-500":true} data-collections-no-items-msg)
+      +empty-list-message
+        span No collected items
+        div
+          a(href="/browse" title="Browse products" class="underline hover:no-underline") Browse products on Haptic
+      // - button(class="btn btn-primary click-scale") Browse products
 

@@ -319,7 +319,7 @@ const authOnly = (req, res, next) => {
 };
 const guestsOnly = (req, res, next) => {
   if (!req.user) next();
-  else res.redirect("/dashboard");
+  else res.redirect("/browse");
 };
 const loadNotifications = (req, res, next) => {
   if (!req.user) return next();
@@ -1591,7 +1591,14 @@ app.get(
       if (req.session.creator) {
         res.redirect("/checkout");
       } else {
-        res.redirect("/dashboard");
+        const productsActions = products.actions({ db, user: req.user });
+        productsActions.getMyProducts().then((myProductsResult) => {
+          if (!myProductsResult.length) {
+            res.redirect("/dashboard");
+          } else {
+            res.redirect("/");
+          }
+        });
       }
     });
   }
