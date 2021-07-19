@@ -1,6 +1,13 @@
-import React, { useState, useReducer, useEffect, useCallback } from "react";
+import React, {
+  useRef,
+  useState,
+  useReducer,
+  useEffect,
+  useCallback,
+} from "react";
 import ContentEditable from "react-contenteditable";
 import { hasChosenProduct } from "./utils";
+import TextareaAutosize from "react-textarea-autosize";
 
 const TOOLS = {
   QUICK_UPDATE: "quick_update",
@@ -29,7 +36,7 @@ const initialState = {
   selectedTool: null,
 };
 
-const App = () => {
+export default function EditorApp() {
   const [outerState, setOuterState] = useState(window.state);
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -41,12 +48,10 @@ const App = () => {
   );
 
   const onContentToolSelected = (tool) => {
-    document.body.classList.add("overflow-hidden");
     dispatch({ type: "select_tool", payload: tool });
   };
 
   const onToolClose = () => {
-    document.body.classList.remove("overflow-hidden");
     dispatch({ type: "select_tool", payload: null });
   };
 
@@ -60,7 +65,7 @@ const App = () => {
   useEffect(() => console.log({ state }), [state]);
 
   return (
-    <div>
+    <div className="lg:w-2/3">
       <div className="mb-4 flex items-center">
         <div className="mr-4">
           <div className="block text-xs uppercase text-gray-600 font-medium">
@@ -77,7 +82,7 @@ const App = () => {
       </div>
 
       <div className="mb-4">
-        {hasChosenProduct(state.chosenProduct) ? (
+        {hasChosenProduct(state.chosenProduct) && !state.selectedTool ? (
           <ContentToolPicker onSelect={onContentToolSelected} />
         ) : null}
       </div>
@@ -87,7 +92,7 @@ const App = () => {
       ) : null}
     </div>
   );
-};
+}
 
 function ProductPicker({ chosenProduct, products, onChange }) {
   const onChooseProduct = (e) => {
@@ -121,34 +126,38 @@ function ContentToolPicker({ onSelect }) {
   };
 
   return (
-    <div className="flex items-start">
-      <ContentToolBtn
-        iconName="file-text"
-        title="Quick Update"
-        description="Perfect for simple updates, announcements, or quick thoughts"
-        onClick={() => onClick(TOOLS.QUICK_UPDATE)}
-      />
-      <ContentToolBtn
-        iconName="bar-chart-2"
-        title="Poll"
-        description="Ask a question and get quick feedback"
-        onClick={() => onClick(TOOLS.POLL)}
-      />
+    <div className="flex items-start flex-col md:flex-row">
+      <div className="mb-2 md:mr-2 md:mb-0 flex-1 w-full">
+        <ContentToolBtn
+          iconName="file-text"
+          title="Quick Update"
+          description="Perfect for simple updates, announcements, or quick thoughts"
+          onClick={() => onClick(TOOLS.QUICK_UPDATE)}
+        />
+      </div>
+      <div className="mb-2 md:mr-2 md:mb-0 flex-1 w-full">
+        <ContentToolBtn
+          iconName="bar-chart-2"
+          title="Poll"
+          description="Ask a question and get quick feedback"
+          onClick={() => onClick(TOOLS.POLL)}
+        />
+      </div>
     </div>
   );
 }
 
 function ContentToolBtn({ iconName, title, description, onClick }) {
   const cn =
-    "click-scale flex-1 btn bg-white text-left flex items-start font-medium border border-gray-200 p-4 rounded-md hover:ring-2 hover:ring-gray-200 hover:ring-offset-2 transition mr-2";
+    "click-scale w-full btn bg-white text-left flex items-start font-medium border border-gray-200 p-4 rounded-md hover:ring-2 hover:ring-gray-200 hover:ring-offset-2 transition";
   return (
     <button className={cn} onClick={onClick}>
       <Icon
         name={iconName}
-        className="mr-4"
         width={32}
         height={32}
         strokeWidth={1}
+        className="mr-4"
       />
       <span className="flex flex-col flex-start justify-start">
         <span className="text-lg">{title}</span>
@@ -159,51 +168,29 @@ function ContentToolBtn({ iconName, title, description, onClick }) {
 }
 
 function QuickUpdateTool({ onClose }) {
-  return (
-    <React.Fragment>
-      <div
-        className="fixed top-0 left-0 w-screen h-screen bg-white bg-opacity-50 bg-clip-padding"
-        style={{ backdropFilter: "blur(20px)" }}
-      />
-      <div
-        className="shadow-xl fixed bottom-0 left-1/2 w-full bg-white mx-auto rounded-tl-xl rounded-tr-xl border border-gray-200 p-8 text-lg"
-        style={{
-          maxWidth: 960,
-          width: "95%",
-          height: "98%",
-          transform: "translateX(-50%)",
-        }}
-      >
-        <div className="absolute top-4 right-4">
-          <button
-            className="btn p-2 rounded-full bg-gray-50 click-scale-2"
-            onClick={onClose}
-          >
-            <Icon name="x" width="16" height="16" />
-          </button>
-        </div>
+  const ref = useRef(null);
+  useEffect(() => {
+    if (ref && ref.current) {
+      ref.current.focus();
+    }
+  }, [ref.current]);
 
-        <div
-          className="mb-8 max-w-md mx-auto overflow-hidden"
-          style={{ height: "98%" }}
-        >
-          <div
-            className="overflow-y-scroll"
-            style={{
-              boxSizing: "content-box",
-              height: "100%",
-              width: "100%",
-              paddingRight: 17,
-            }}
-          >
-            <textarea
-              style={{ height: "100%", width: "100%", marginRight: -17 }}
-              className="outline-none resize-none quick-update-container"
-            />
-          </div>
-        </div>
-      </div>
-    </React.Fragment>
+  useEffect(() => {
+    function onKeyUp(e) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keyup", onKeyUp);
+    return () => window.removeEventListener("keyup", onKeyUp);
+  });
+
+  return (
+    <div className="relative bg-white border border-gray-200 p-4 rounded-md">
+      <TextareaAutosize
+        autoFocus
+        placeholder="Start typing..."
+        className="text-lg quick-update-textarea outline-none resize-none w-full"
+      />
+    </div>
   );
 }
 
@@ -255,5 +242,3 @@ function Icon(
     </svg>
   );
 }
-
-export default App;

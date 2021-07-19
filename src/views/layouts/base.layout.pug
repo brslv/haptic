@@ -87,8 +87,6 @@ html(lang="en" id="html" class="")
       script(src="https://unpkg.com/tippy.js@6")
       script(src="https://unpkg.com/axios/dist/axios.min.js")
 
-      script(src="/static/js/bundle.js")
-
       script(type='text/javascript').
         window.smartlook||(function(d) {
           var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
@@ -97,6 +95,7 @@ html(lang="en" id="html" class="")
           })(document);
           smartlook('init', 'ecf8f98811b9db56f88b69c5a41fa82a5fdc452b');
 
+    script(src="/static/js/bundle.js")
     block head
   body(class={"bg-white": true, "bg-white": isHomepage} id="body")
     div(class="fixed top-0 left-0 w-full h-full" id="bg")

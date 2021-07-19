@@ -490,7 +490,7 @@ app.get(
 // setup routes
 app.get("/", (req, res) => {
   if (req.user) {
-    return res.redirect("/dashboard");
+    return res.redirect("/browse");
   }
   res.render("index", { meta: defaultMetas, isHomepage: true });
 });

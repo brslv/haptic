@@ -333,7 +333,7 @@
     will-change: transform;
   }
 
-  .quick-update-container::-webkit-scrollbar {
+  .quick-update-textarea::-webkit-scrollbar {
     width: 0; /* Remove scrollbar space */
     background: transparent; /* Optional: just make scrollbar invisible */
   }
