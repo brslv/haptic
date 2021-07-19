@@ -22,7 +22,7 @@ module.exports = {
       },
       backgroundColor: {
         ...defaultTheme.backgroundColor,
-        gray: { ...colors.warmGray, 70: "#F6F7F8" },
+        gray: { ...colors.warmGray, 30: "#eee", 70: "#F6F7F8" },
       },
       borderColor: {
         ...defaultTheme.borderColor,
@@ -55,14 +55,22 @@ module.exports = {
       ringOffsetWidth: ["focus", "hover"],
       ringOpacity: ["focus", "hover"],
       ringWidth: ["focus", "hover"],
+      borderStyle: ["focus"],
     },
   },
   plugins: [
     require("@tailwindcss/typography"),
     ({ addComponents, theme }) => {
+      const screens = theme("screens", {});
       addComponents({
         ".container-2": {
-          maxWidth: theme("screens.xl"),
+          "@apply container": {},
+          // [`@media (min-width: ${theme("screens.xl")})`]: {
+          //   maxWidth: theme("screens.xl"),
+          // },
+          [`@media (min-width: 1200px)`]: {
+            maxWidth: "1200px",
+          },
         },
       });
     },

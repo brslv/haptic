@@ -1,0 +1,43 @@
+extend base.layout.pug
+
+include ../partials/mobile-nav.pug
+include ../components/side-nav-item.pug
+
+block content
+  div(class="p-4 mx-auto container-2")
+    // - logo on mobile
+    div(class="w-full flex items-center justify-center md:hidden mb-4")
+      a(href="/" class="click-scale hover:scale-105 transition")
+        div(class="flex items-center")
+          img(src="/static/images/logo/logo-main.svg" class="Light Haptic logo" class="h-8 logo-dark")
+
+    div(class="grid grid-cols-10 gap-4")
+      +mobile-nav
+
+      // - desktop nav
+      nav(class="hidden md:block md:col-span-2 xl:col-span-2")
+        // - navigation
+        div(class="lg:sticky top-4" id="sticky-nav")
+          // - logo on desktop
+          a(href="/" class="inline-block mb-4 click-scale hover:scale-105 transition")
+            div(class="flex items-center")
+              img(src="/static/images/logo/logo-main.svg" class="Light Haptic logo" class="mb-2 h-8 logo-dark")
+
+          div
+            //- +side-nav-item({ href: `/publish`, icon: 'plus', button: true, active: activePage === "publish" }) Publish update
+            if !user
+              div(class="mb-4")
+                +side-nav-item({ href: `/login`, icon: 'log-in', button: true }) Login
+              +side-nav-item({ href: `/`, icon: 'home', active: activePage === "home" }) Home
+              +side-nav-item({ href: `/browse`, icon: 'grid', active: activePage === "browse" }) Browse
+              +side-nav-item({ href: `/pricing`, icon: 'dollar-sign', active: activePage === "pricing" }) Pricing
+            if user && notifications
+              +side-nav-item({ href: `/`, icon: 'home', active: activePage === "home" }) Home
+              +side-nav-item({ href: `/dashboard`, icon: 'box', active: activePage === "dashboard" }) Dashboard
+              +side-nav-item({ href: `/notifications`, icon: 'mail', active: activePage === "notifications", counter: notifications.length }) Notifications
+              +side-nav-item({ href: `/dashboard/profile`, icon: 'user', active: activePage === "profile" }) Profile
+              +side-nav-item({ href: `/logout`, icon: 'log-out' }) Log out
+      
+      // - main container
+      main(class="col-span-10 md:col-span-8")
+        block main

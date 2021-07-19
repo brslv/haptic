@@ -319,7 +319,7 @@ const authOnly = (req, res, next) => {
 };
 const guestsOnly = (req, res, next) => {
   if (!req.user) next();
-  else res.redirect("/dashboard");
+  else res.redirect("/browse");
 };
 const loadNotifications = (req, res, next) => {
   if (!req.user) return next();
@@ -490,7 +490,7 @@ app.get(
 // setup routes
 app.get("/", (req, res) => {
   if (req.user) {
-    return res.redirect("/dashboard");
+    return res.redirect("/browse");
   }
   res.render("index", { meta: defaultMetas, isHomepage: true });
 });
@@ -514,6 +514,16 @@ app.get("/pricing", (req, res) => {
   });
 });
 
+app.get("/publish", authOnly, (req, res) => {
+  const productsActions = products.actions({ db, user: req.user });
+  productsActions.getMyProducts().then((myProductsResult) => {
+    res.render("publish", {
+      meta: { ...defaultMetas },
+      myProducts: myProductsResult,
+    });
+  });
+});
+
 app.get("/browse", (req, res) => {
   const productsActions = products.actions({ db, user: req.user });
   const page = getPageFromQuery(req.query);
@@ -531,25 +541,38 @@ app.get("/browse", (req, res) => {
           limit: 8,
         })
         .then((recentlyUpdatedProductsResult) => {
-          const title = "Browse | Haptic";
-          const description =
-            "Get inspired by other build in public makers by browsing their public updates and products";
+          return db("users")
+            .select(
+              "twitter_name",
+              "slug",
+              "bio",
+              "twitter_profile_image_url",
+              "type"
+            )
+            .orderBy("id", "desc")
+            .limit(10)
+            .then((usersResponse) => {
+              const title = "Browse | Haptic";
+              const description =
+                "Get inspired by other build in public makers by browsing their public updates and products";
 
-          res.render("browse", {
-            meta: {
-              ...defaultMetas,
-              title,
-              description,
-              og: {
-                ...defaultMetas.og,
-                title,
-                description,
-              },
-            },
-            page: page,
-            newestProducts: newestProductsResult,
-            recentlyUpdatedProducts: recentlyUpdatedProductsResult,
-          });
+              res.render("browse", {
+                meta: {
+                  ...defaultMetas,
+                  title,
+                  description,
+                  og: {
+                    ...defaultMetas.og,
+                    title,
+                    description,
+                  },
+                },
+                page: page,
+                newestUsers: usersResponse,
+                newestProducts: newestProductsResult,
+                recentlyUpdatedProducts: recentlyUpdatedProductsResult,
+              });
+            });
         })
         .catch((err) => {
           console.log(err);
@@ -1568,7 +1591,14 @@ app.get(
       if (req.session.creator) {
         res.redirect("/checkout");
       } else {
-        res.redirect("/dashboard");
+        const productsActions = products.actions({ db, user: req.user });
+        productsActions.getMyProducts().then((myProductsResult) => {
+          if (!myProductsResult.length) {
+            res.redirect("/dashboard");
+          } else {
+            res.redirect("/");
+          }
+        });
       }
     });
   }

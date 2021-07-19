@@ -1,4 +1,4 @@
-extend layouts/base.layout.pug
+extend layouts/with-nav.layout.pug
 
 include partials/top-bar.pug
 include partials/page-title.pug
@@ -9,6 +9,20 @@ include partials/poll.pug
 include partials/login-modal.pug
 include partials/comment.pug
 include partials/facade-post.pug
+include components/user-avatar.pug
+
+mixin user-card(user, { bottom_border = true })
+  a(href=`/u/${user.slug}` class="w-full rounded-md hover:bg-gray-50 transition")
+    div(class={ "flex items-center px-4 py-2": true, "border-b border-gray-200": bottom_border })
+      div(class="border border-gray-200 rounded-full mr-2")
+        +user-avatar({
+          src: user.twitter_profile_image_url,
+          alt: `Profile photo of ${user.twitter_name}`,
+          creator: user.type === USER_TYPES.CREATOR,
+          small: true,
+          rightMargin: false,
+        })
+      p(class="text-sm font-medium break-all")= user.twitter_name
 
 mixin browse-posts-list-loading()
   +facade-post
@@ -34,54 +48,56 @@ block append templates
       content: ''
     })
 
-block content
-  div(class="absolute top-0 left-0 w-full h-1/4 gradient-bg")
+block main
   div(class="relative")
-    +top-bar("browse")
-    div(class="container p-4 mx-auto")
-      div(class="flex flex-col-reverse md:flex-row items-start")
+    div(class="container")
+      div(class="grid grid-cols-8 gap-4")
         //- Left
-        main(class="mr-0 w-full md:w-4/6 md:mr-4")
-          +page-title(class="mb-4") Latest posts
-          
+        main(class="col-span-8 sm:col-span-6 sm:col-start-2 lg:col-span-5")
+          +page-title(class="mb-4") Latest updates
           turbo-frame(id="browse-posts-list" src=`/frame/browse/posts?page=${page}` target="_top")
             +browse-posts-list-loading
 
 
         //- right
-        aside(class="md:w-2/6 mb-16 md:mb-0 w-full")
+        aside(class="col-span-3 hidden lg:block")
           div(class="mb-4")
-            +page-title(class="mb-4") Recently Updated
-            each product, idx in recentlyUpdatedProducts
-              div(class="pb-2")
+            +page-title(class="mb-4") Recently Updated Products
+            div(class="bg-white border border-gray-200 rounded-md")
+              each product, idx in recentlyUpdatedProducts
                 +product-card-simple({
                   place: idx < 3 ? idx : null,
                   logo_url: product.logo_url,
                   slug: product.slug,
                   name: product.name,
                   boosts_count: product.boosts_count,
-                  description: product.description
+                  description: product.description,
+                  bottom_border: idx < recentlyUpdatedProducts.length - 1
                 })
-            div(class="mt-3")
-              a(href="/products?ord=boosts" class="flex justify-center items-center btn btn-default transition click-scale")
-                span(class="mr-2") View most boosted
-                +icon("arrow-right", { width: 16, height: 16 })
+            div(class="flex items-end justify-end mt-2")
+              a(href="/products?ord=boosts" class="btn btn-plain btn-small transition click-scale") View most boosted
 
-          div
+          div(class="mb-4")
             +page-title(class="mb-4") Latest products
-            each product, idx in newestProducts
-              div(class="pb-2")
+            div(class="bg-white border border-gray-200 rounded-md")
+              each product, idx in newestProducts
                 +product-card-simple({
                   logo_url: product.logo_url,
                   slug: product.slug,
                   name: product.name,
                   boosts_count: product.boosts_count,
-                  description: product.description
+                  description: product.description,
+                  bottom_border: idx < newestProducts.length - 1
                 })
-            div(class="mt-3")
-              a(href="/products?ord=newest" class="flex justify-center items-center btn btn-default transition click-scale")
-                span(class="mr-2") View latest
-                +icon("arrow-right", { width: 16, height: 16 })
+            div(class="flex items-end justify-end mt-2")
+              a(href="/products?ord=newest" class="btn btn-plain btn-small transition click-scale") View latest
+
+          div(class="h-screen sticky top-2")
+            +page-title(class="mb-3") Recently joined makers
+            div(class="bg-white rounded-md border border-gray-200")
+              div(class="flex flex-row flex-wrap xl:flex-col")
+                each user, idx in newestUsers
+                  +user-card(user, { bottom_border: idx < newestUsers.length - 1 })
 
 block modals
   if !user

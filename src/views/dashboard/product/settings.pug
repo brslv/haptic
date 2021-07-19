@@ -1,4 +1,4 @@
-extends ../../layouts/base.layout.pug
+extends ../../layouts/with-nav.layout.pug
 
 include ../../partials/top-bar.pug
 include ../../partials/product-header.pug
@@ -9,11 +9,10 @@ include ../../partials/modal.pug
 mixin predefCoverImg(url, productSlug)
   button(data-predefined-cover-btn data-image-url=(url) data-product-slug=(productSlug) class="w-8 h-8 rounded-full hover:shadow-lg ring-opacity-50 click-scale-2 hover:opacity-80 transition" style=`background-position: center; background-size: cover; background-image: url("${url}")`)&attributes(attributes)
 
-block content
+block main
   - var formErrors = flash && flash.data && flash.data[0] && flash.data[0].errors || {};
   - var cover = product.cover_image_url || predefinedCovers[0];
-  +top-bar
-  div(class="mx-2")
+  div
     div(class="-mb-24 border border-gray-200 mx-auto rounded-lg" style="max-width: 980px; height: 410px;")
       div(
         class="w-full h-full rounded-lg"

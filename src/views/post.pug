@@ -1,4 +1,4 @@
-extends layouts/base.layout.pug
+extends layouts/with-nav.layout.pug
 
 include partials/icon.pug
 include partials/top-bar.pug
@@ -7,9 +7,6 @@ include partials/poll.pug
 include partials/require-module.pug
 include partials/login-modal.pug
 include partials/comment.pug
-
-block append scripts
-  +require-module('post')
 
 block append templates
   template(data-comment-tpl)
@@ -24,11 +21,10 @@ block append templates
       content: ''
     })
 
-block content
+block main
   - var post_text = post.text;
-  +top-bar
-  div(class="container mx-auto p-4")
-    div(class="md:w-2/3 mx-auto")
+  div
+    div(class="lg:w-2/3")
       div(class="mb-4 inline-block")
         a(href=`/p/${product.slug}` class="btn btn-small btn-plain flex items-center")
           +icon("arrow-left", { width: 16, height: 16 })(class="mr-2")

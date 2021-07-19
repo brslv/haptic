@@ -1,4 +1,4 @@
-extends layouts/base.layout.pug
+extends layouts/with-nav.layout.pug
 
 include partials/icon.pug
 include partials/top-bar.pug
@@ -25,9 +25,8 @@ block append head_scripts
       successEl.classList.remove("hidden");
     }
 
-block content
-  +top-bar
-  div(class="container max-w-lg mx-auto p-4")
+block main
+  div(class="container")
     +page-title Checkout
 
     if user.type === USER_TYPES.CREATOR

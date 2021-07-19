@@ -1,0 +1,16 @@
+extend layouts/with-nav.layout.pug
+
+mixin product-picker({ product })
+  button(class="w-64 m-1 flex items-center p-2 bg-white border border-gray-200 hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 transition rounded-md")
+    img(class="w-10 h-10 rounded-md border border-gray-200 mr-2" src=product.logo_url)
+    p(class="text-sm font-medium")= product.name
+
+block append head_scripts
+  script(src="/static/js/editor/bundle.js")
+
+block append scripts
+  script.
+    window.state = !{JSON.stringify(myProducts)};
+
+block main
+  div(id="react-editor" class="relative")

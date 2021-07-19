@@ -1,4 +1,4 @@
-extend layouts/base.layout.pug
+extend layouts/with-top-nav.layout.pug
 
 include partials/icon.pug
 include partials/top-bar.pug
@@ -13,7 +13,7 @@ mixin join-the-party-button
 
 mixin check({ noPadding = false } = { noPadding: false })
   li(class={ "flex items-center justify-center lg:justify-start": true, "pb-2": !noPadding })
-    div(class="mr-2")
+    div(class="mr-2 hidden md:block")
       +icon-in-circle({ name: 'check' })
     block
 
@@ -28,8 +28,8 @@ mixin people
     img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/matthias.jpg" alt="Matthias" class="rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
     img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/rinas.png" alt="Rinas" class="rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
     img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/rutvik.jpg" alt="Rutvik" class="rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
-    img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/shayne.jpg" alt="Shayne" class="rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
-    img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/stephen.jpg" alt="Stephen" class="rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
+    img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/shayne.jpg" alt="Shayne" class="hidden md:block rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
+    img(src="https://hpt-assets.s3.eu-central-1.amazonaws.com/haptic-user-avatars/stephen.jpg" alt="Stephen" class="hidden md:block rounded-full select-none  w-10 h-10  border-2 border-white  -ml-3")
   p(class="text-xs text-gray-600 mt-2") 150+ people are already sharing their product stories on Haptic
 
 mixin browse-posts-list-loading()
@@ -54,22 +54,18 @@ block append head
       })
     });
 
-block content
-  div(class="flex items-center md:mb-8")
-    +top-bar
-    //- img(src="/static/images/logo/logo-main.svg" class="w-20")
-
+block main
   div(class="container-2 mx-auto p-4 mb-8")
     div(class="flex flex-col lg:flex-row items-start")
 
       //- Left
-      main(class="pr-4 flex flex-col items-center text-center lg:text-left lg:items-start flex-1 w-full mb-8 lg:mb-0")
+      main(class="md:pr-4 flex flex-col items-center text-center lg:text-left lg:items-start flex-1 w-full mb-8 lg:mb-0")
         h1(class="text-4xl font-black mb-4" style="max-width: 18ch;") It's how makers #[br] build products in public
 
         h2(class="text-xl font-medium text-gray-700 mb-8" style="max-width: 42ch;").
           Get exposure for your product on a community of makers and creators. We provide the stage. You got the mic.
 
-        ul(class="mb-8 text-left")
+        ul(class="mb-8 md:text-left")
           +check Go beyond simple tasks logging in public
           +check Tell a coherent story using various content types
           +check Get a beautiful product page for FREE

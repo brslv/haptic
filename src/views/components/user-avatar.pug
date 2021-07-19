@@ -1,7 +1,12 @@
-mixin user-avatar({ src, alt = 'User photo', creator = false })
+mixin user-avatar({ src, alt = 'User photo', creator = false, small = false, rightMargin = true })
   img(
     src=src
     onerror="this.onerror = null; this.src='https://hpt-assets.s3.eu-central-1.amazonaws.com/default-user-avatar.svg'"
     alt=alt
-    class={"w-12 h-12 rounded-full mr-2": true, "border-4 border-double border-yellow-300": creator}
+    class={
+      "rounded-full": true, "border-4 border-double border-yellow-300": creator,
+      "w-12 h-12": !small,
+      "w-8 h-8": small,
+      "mr-2": rightMargin
+    }
   )&attributes(attributes)

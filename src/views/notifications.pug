@@ -1,4 +1,4 @@
-extends layouts/base.layout.pug
+extends layouts/with-nav.layout.pug
 
 include partials/top-bar.pug
 include partials/page-title.pug
@@ -8,7 +8,7 @@ include partials/empty-list-message.pug
 include components/user-avatar.pug
 
 mixin notif({ notif, last = false })
-  div(class="bg-transparent hover:ring-2 rounded-md hover:ring-gray-300 hover:ring-offset-2 transition" data-notification-id=notif.id)
+  div(class="bg-transparent rounded-md transition" data-notification-id=notif.id)
     div(class={ "p-4 border-gray-200": true, "border-b": !last })
       div(class="flex items-start")
         if notif.type === 'comment'
@@ -77,71 +77,59 @@ mixin notif({ notif, last = false })
               | #[a(href=`/u/${notif.origin_user_slug}` title=user.origin_user_twitter_name class="underline hover:no-underline font-bold")= notif.origin_user_twitter_name] boosted your comment on #[a(href=`/p/${notif.product_slug}/${notif.post_id}` class="underline hover:no-underline font-bold") this post].
             div(class="w-full comment prose prose-sm prose-yellow border border-gray-200 border-dashed p-2 rounded-md") !{notif.comment_content}
 
-block content
-  +top-bar("notifications")
-  div(class="container p-4 mx-auto")
-    div(class="md:w-2/3 mx-auto")
-      div(class="flex items-center mb-4")
-        +page-title(class="mr-4") Notifications
-        if notifications && notifications.length
-            form(action="/mark-notifications-read" method="POST")
-              +csrf
-              button(type="submit" class="btn btn-primary btn-small click-scale") Mark as read
+block main
+  div(class="w-full xl:w-2/3")
+    div(class="flex items-center mb-4")
+      +page-title(class="mr-4") Notifications
+      if notifications && notifications.length
+          form(action="/mark-notifications-read" method="POST")
+            +csrf
+            button(type="submit" class="btn btn-primary btn-small click-scale") Mark as read
 
-      +flash-msg(flash)
-      
-      if !notifications || !notifications.length
+    +flash-msg(flash)
+    
+    if !notifications || !notifications.length
+      +empty-list-message
+        span No notifications found
+
+    
+    if notifications && notifications.length
+      div(class="bg-white border border-gray-200 rounded-md")
+        each notif, i in notifications
+          +notif({ notif, last: notifications.length === i + 1 })
+
+    // -
+      if !notifications || (!notifications.comments.length && !notifications.postsBoosts.length && !notifications.productBoosts.length && !notifications.productCollections.length && !notifications.commentBoosts.length)
         +empty-list-message
           span No notifications found
+    
+    //- 
+      if notifications && notifications.comments.length
+        div
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Comments
+          each notif in notifications.comments
+            +notif({notif})
 
-      
-      if notifications && notifications.length
-        div(class="bg-white border border-gray-200 rounded-md")
-          each notif, i in notifications
-            +notif({ notif, last: notifications.length === i + 1 })
+      if notifications && notifications.postsBoosts.length
+        div(class="mt-8")
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Post boosts
+          each notif in notifications.postsBoosts
+            +notif({notif})
 
-      // -
-        if !notifications || (!notifications.comments.length && !notifications.postsBoosts.length && !notifications.productBoosts.length && !notifications.productCollections.length && !notifications.commentBoosts.length)
-          +empty-list-message
-            span No notifications found
-      
-      //- 
-        if notifications && notifications.comments.length
-          div
-            +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Comments
-            each notif in notifications.comments
-              +notif({notif})
+      if notifications && notifications.productBoosts.length
+        div(class="mt-8")
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Product boosts
+          each notif in notifications.productBoosts
+            +notif({notif})
 
-        if notifications && notifications.postsBoosts.length
-          div(class="mt-8")
-            +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Post boosts
-            each notif in notifications.postsBoosts
-              +notif({notif})
+      if notifications && notifications.commentBoosts.length
+        div(class="mt-8")
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Comment boosts
+          each notif in notifications.commentBoosts
+            +notif({notif})
 
-        if notifications && notifications.productBoosts.length
-          div(class="mt-8")
-            +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Product boosts
-            each notif in notifications.productBoosts
-              +notif({notif})
-
-        if notifications && notifications.commentBoosts.length
-          div(class="mt-8")
-            +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Comment boosts
-            each notif in notifications.commentBoosts
-              +notif({notif})
-
-        if notifications && notifications.productCollections.length
-          div(class="mt-8")
-            +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Product collections
-            each notif in notifications.productCollections
-              +notif({notif})
-
-      // div(class="flex items-center justify-between mb-4")
-      //   +page-title(class="bg-gray-200 px-4 py-1 rounded-full") Read
-      // if notifications && notifications.read && notifications.read.length
-      //   each notif in notifications.read
-      //     +notif({ notif })
-      // else
-      //   +empty-list-message
-      //     span No notifications found
-        // p(class="text-gray-500") No notifications here
+      if notifications && notifications.productCollections.length
+        div(class="mt-8")
+          +page-title(class="bg-gray-200 px-4 py-1 rounded-full mb-4") Product collections
+          each notif in notifications.productCollections
+            +notif({notif})
