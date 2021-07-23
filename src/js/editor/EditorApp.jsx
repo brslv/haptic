@@ -5,10 +5,10 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import ContentEditable from "react-contenteditable";
 import { hasChosenProduct } from "./utils";
-import TextareaAutosize from "react-textarea-autosize";
+import ContentEditable from "react-contenteditable";
 import Select from "react-select";
+import { useImageUpload } from "./ImageUpload/ImageUploadProvider";
 
 const TOOLS = {
   QUICK_UPDATE: "quick_update",
@@ -49,6 +49,7 @@ const initialState = {
 export default function EditorApp() {
   const [outerState, setOuterState] = useState(window.state);
   const [state, dispatch] = useReducer(reducer, initialState);
+  const imageUpload = useImageUpload();
 
   const onProductChange = useCallback(
     (id) => {
@@ -79,10 +80,16 @@ export default function EditorApp() {
     label: product.name,
   }));
 
+  const onImagesUpload = (e) => {
+    imageUpload.selectFiles(e);
+  };
+
+  const onImageRemove = (image) => imageUpload.removeImage(image);
+
   return (
-    <div className="lg:w-2/3">
-      <div className="block text-xs uppercase text-gray-600 font-medium mb-4">
-        <span class="block mb-2 md:inline-block md:mb-0">Publish</span>
+    <div>
+      <div className="mb-4 uppercase text-xs font-medium">
+        <Title className="block md:inline-block">Publish</Title>
         <span className="mr-2 md:mx-2">
           <Select
             className="inline-block w-32"
@@ -93,7 +100,7 @@ export default function EditorApp() {
             styles={selectStyles}
           />
         </span>
-        <span> in </span>
+        <Title> in </Title>
         <span className="mx-2">
           <Select
             className="inline-block w-32"
@@ -109,13 +116,28 @@ export default function EditorApp() {
       </div>
 
       {state.chosenProduct && state.selectedTool === TOOLS.QUICK_UPDATE ? (
-        <QuickUpdateTool />
+        <QuickUpdateTool
+          imagesState={imageUpload.state}
+          onImagesUpload={onImagesUpload}
+          onImageRemove={onImageRemove}
+        />
       ) : null}
     </div>
   );
 }
 
-function QuickUpdateTool() {
+function Title({ children, className, ...rest }) {
+  return (
+    <span
+      className={`text-xs uppercase text-gray-600 font-medium mb-2 md:mb-0 ${className}`}
+      {...rest}
+    >
+      {children}
+    </span>
+  );
+}
+
+function QuickUpdateTool({ imagesState, onImagesUpload, onImageRemove }) {
   const ref = useRef(null);
   useEffect(() => {
     if (ref && ref.current) {
@@ -123,14 +145,141 @@ function QuickUpdateTool() {
     }
   }, [ref.current]);
 
+  const focusOnEditor = (e) => {
+    if (ref && ref.current) ref.current.focus();
+  };
+
+  const imageUploadBtnRef = useRef(null);
+  function onImageUploadBtnClick() {
+    imageUploadBtnRef &&
+      imageUploadBtnRef.current &&
+      imageUploadBtnRef.current.click();
+  }
+
+  const imagesLength = imagesState.previewImages.length;
+  const IMG_HEIGHT_ON_MULTIPLE_IMAGES = 180;
+  const IMG_HEIGHT_SINGLE_IMAGE = 350;
+  const IMG_MIN_WIDTH_ON_MULTIPLE_IMAGES = 140;
+  const IMG_MIN_WIDTH_SINGLE_IMAGE = "100%";
+
   return (
-    <div className="relative">
-      <TextareaAutosize
-        autoFocus
-        minRows={3}
-        placeholder="Start typing..."
-        className="text-lg outline-none resize-none w-full focus:ring-2 focus:ring-yellow-300 bg-white border border-gray-200 focus:border-none p-4 rounded-md transition"
-      />
+    <div
+      className="relative border border-gray-200 rounded-md"
+      onClick={focusOnEditor}
+    >
+      <form className="hidden">
+        <input
+          ref={imageUploadBtnRef}
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={onImagesUpload}
+          className="hidden"
+        />
+      </form>
+      <div className="max-w-md mx-auto" style={{ minHeight: `100px` }}>
+        {imagesState.previewImages && imagesState.previewImages.length ? (
+          <div className="flex flex-wrap items-start mx-2 mt-10">
+            {imagesState.previewImages.map((image) => {
+              const progress = imagesState.progressInfos.find(
+                (p) => p.id === image.id
+              ) || { percentage: 0 };
+              const status = imagesState.statusses.find(
+                (s) => s.id === image.id
+              ) || { ok: true };
+
+              return (
+                // image preview
+                <div
+                  key={image.url}
+                  style={{
+                    height:
+                      imagesLength > 1
+                        ? IMG_HEIGHT_ON_MULTIPLE_IMAGES
+                        : IMG_HEIGHT_SINGLE_IMAGE,
+                    minWidth:
+                      imagesLength > 1
+                        ? IMG_MIN_WIDTH_ON_MULTIPLE_IMAGES
+                        : IMG_MIN_WIDTH_SINGLE_IMAGE,
+                  }}
+                  className={`relative flex flex-1 border ${
+                    !status.ok ? "border-red-500" : "border-gray-200"
+                  } rounded-md m-2 p-1 h-full justify-center items-center overflow bg-transparent`}
+                >
+                  <div className="flex items-center justify-center overflow-hidden relative rounded-md max-h-full">
+                    <img
+                      src={image.url}
+                      data-zoomable
+                      alt={`Uploaded image by user`}
+                      className={`flex-shrink-0 min-w-full min-h-full cursor-pointer ${
+                        progress.percentage < 100 && status.ok
+                          ? "animate animate-pulse"
+                          : ""
+                      }`}
+                    />
+                  </div>
+                  {!status.ok ? (
+                    <div className="absolute bottom-0 left-0 w-full p-1">
+                      <div className="bg-red-50 border border-red-200 p-1 rounded-md text-xs">
+                        {status.err}
+                      </div>
+                    </div>
+                  ) : null}
+                  {progress.percentage < 100 && status.ok ? (
+                    <div className="absolute bottom-0 left-0 w-full">
+                      <div
+                        style={{ height: 2 }}
+                        className="relative bg-transparent w-full"
+                      >
+                        <div
+                          className="h-full bg-green-500 rounded-md"
+                          style={{ width: `${progress.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+                  <button
+                    onClick={() => onImageRemove(image)}
+                    className="absolute top-2 left-2 click-scale-2 focus:outline-none flex items-center justify-center rounded-full w-6 h-6 bg-gray-50 border border-gray-200 hover:bg-red-50 hover:border-red-200 transition"
+                  >
+                    <Icon name="x" width={12} height={12} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
+
+        <ContentEditable
+          innerRef={ref}
+          autoFocus
+          html={""}
+          disabled={false}
+          className="outline-none px-4 pt-8 pb-16"
+        />
+      </div>
+      <div
+        className="px-2 py-1.5 rounded-xl flex items-center justify-center absolute -bottom-10 left-1/2 bg-white border border-gray-200"
+        style={{ transform: "translateX(-50%)" }}
+      >
+        <button className="focus:ring-2 ring-yellow-300 btn mr-2 flex items-center justify-center flex-col transition bg-yellow-50 hover:bg-yellow-300 rounded-xl">
+          <Icon name="plus" width={18} height={18} className="mb-0.5" />
+          <span>Publish</span>
+        </button>
+        <div className="flex items-center">
+          <button
+            onClick={onImageUploadBtnClick}
+            className="btn flex flex-col items-center justify-center mr-2 transition hover:bg-gray-50 whitespace-nowrap rounded-xl"
+          >
+            <Icon name="image" width={18} height={18} className="mb-0.5" />
+            <span>Upload image</span>
+          </button>
+          <button className="btn flex flex-col items-center justify-center transition hover:bg-gray-50 whitespace-nowrap rounded-xl">
+            <Icon name="eye" width={18} height={18} className="mb-0.5" />
+            <span>Preview</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

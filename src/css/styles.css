@@ -161,7 +161,7 @@
   }
 
   .btn-primary {
-    @apply bg-yellow-300 hover:bg-yellow-400 text-gray-800 dark:text-gray-800 hover:text-gray-800 dark:hover:text-gray-800;
+    @apply hover:shadow-sm bg-yellow-300 hover:bg-yellow-400 text-gray-800 hover:text-gray-800 border border-yellow-400;
   }
 
   .btn-primary:focus {

@@ -47,6 +47,7 @@ export default function imageZoom() {
   }
 
   turbo.load(() => {
+    $(document).on("hpt:init-zoomable", loadImageZoom);
     loadImageZoom();
     onFrameLoaded("browse-posts-list", loadImageZoom);
     onFrameLoaded("product", loadImageZoom);

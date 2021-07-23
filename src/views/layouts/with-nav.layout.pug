@@ -24,14 +24,14 @@ block content
               img(src="/static/images/logo/logo-main.svg" class="Light Haptic logo" class="mb-2 h-8 logo-dark")
 
           div
-            //- +side-nav-item({ href: `/publish`, icon: 'plus', button: true, active: activePage === "publish" }) Publish update
             if !user
               div(class="mb-4")
                 +side-nav-item({ href: `/login`, icon: 'log-in', button: true }) Login
               +side-nav-item({ href: `/`, icon: 'home', active: activePage === "home" }) Home
               +side-nav-item({ href: `/browse`, icon: 'grid', active: activePage === "browse" }) Browse
               +side-nav-item({ href: `/pricing`, icon: 'dollar-sign', active: activePage === "pricing" }) Pricing
-            if user && notifications
+            if user
+              +side-nav-item({ href: `/publish`, icon: 'plus', button: true, active: activePage === "publish" }) Publish update
               +side-nav-item({ href: `/`, icon: 'home', active: activePage === "home" }) Home
               +side-nav-item({ href: `/dashboard`, icon: 'box', active: activePage === "dashboard" }) Dashboard
               +side-nav-item({ href: `/notifications`, icon: 'mail', active: activePage === "notifications", counter: notifications.length }) Notifications

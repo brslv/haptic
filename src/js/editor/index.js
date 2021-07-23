@@ -1,12 +1,21 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import ImageUploadProvider from "./ImageUpload/ImageUploadProvider";
 import EditorApp from "./EditorApp";
 
 const root = document.querySelector("#react-editor");
 
+function Boot() {
+  return (
+    <ImageUploadProvider>
+      <EditorApp />
+    </ImageUploadProvider>
+  );
+}
+
 if (root) {
   console.log("load react app");
-  ReactDOM.render(<EditorApp />, root);
+  ReactDOM.render(<Boot />, root);
 }
 
 document.addEventListener("turbo:load", () => {
@@ -14,7 +23,7 @@ document.addEventListener("turbo:load", () => {
 
   if (root) {
     console.log("load react app");
-    ReactDOM.render(<EditorApp />, root);
+    ReactDOM.render(<Boot />, root);
   }
 });
 

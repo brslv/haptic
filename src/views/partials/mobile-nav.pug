@@ -9,15 +9,14 @@ mixin mobile-nav
     nav(class="z-20 w-full fixed bottom-0 left-0 p-4 hidden" data-mobile-nav)
       div(class="w-screen h-screen bg-gray-100 fixed top-0 left-0 bg-clip-padding bg-opacity-30" style="backdrop-filter: blur(20px);")
       div(class="flex flex-col items-center justify-center")
-        // - +side-nav-item({ href: `/publish`, icon: 'plus', button: true, active: activePage === "publish" }) Publish update
-        
         if !user
           div(class="mb-4")
             +side-nav-item({ href: `/login`, icon: 'log-in', button: true }) Login
           +side-nav-item({ href: `/`, icon: 'home', active: activePage === "home" }) Home
           +side-nav-item({ href: `/browse`, icon: 'grid', active: activePage === "browse" }) Browse
           +side-nav-item({ href: `/pricing`, icon: 'dollar-sign', active: activePage === "pricing" }) Pricing
-        if user && notifications
+        if user
+          +side-nav-item({ href: `/publish`, icon: 'plus', button: true, active: activePage === "publish" }) Publish update
           +side-nav-item({ href: `/`, icon: 'home', active: activePage === "home" }) Home
           +side-nav-item({ href: `/dashboard`, icon: 'box', active: activePage === "dashboard" }) Dashboard
           +side-nav-item({ href: `/notifications`, icon: 'mail', active: activePage === "notifications", counter: notifications.length }) Notifications
