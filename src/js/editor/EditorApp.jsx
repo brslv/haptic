@@ -7,8 +7,10 @@ import React, {
 } from "react";
 import { hasChosenProduct } from "./utils";
 import ContentEditable from "react-contenteditable";
+import TextareaAutosize from "react-textarea-autosize";
 import Select from "react-select";
 import { useImageUpload } from "./ImageUpload/ImageUploadProvider";
+import { mdConverter } from "./utils";
 
 const TOOLS = {
   QUICK_UPDATE: "quick_update",
@@ -32,6 +34,11 @@ function reducer(state, action) {
         ...state,
         selectedTool: action.payload,
       };
+    case "quick_update_change":
+      return {
+        ...state,
+        quickUpdateText: action.payload,
+      };
     default:
       throw new Error(`Invalid action type: ${action.type}`);
   }
@@ -44,6 +51,7 @@ const selectStyles = {
 const initialState = {
   chosenProduct: null,
   selectedTool: TOOLS.QUICK_UPDATE,
+  quickUpdateText: "",
 };
 
 export default function EditorApp() {
@@ -84,13 +92,16 @@ export default function EditorApp() {
     imageUpload.selectFiles(e);
   };
 
+  const onQuickUpdateChange = ({ target }) =>
+    dispatch({ type: "quick_update_change", payload: target.value });
+
   const onImageRemove = (image) => imageUpload.removeImage(image);
 
   return (
     <div>
       <div className="mb-4 uppercase text-xs font-medium">
         <Title className="block md:inline-block">Publish</Title>
-        <span className="mr-2 md:mx-2">
+        {/*<span className="mr-2 md:mx-2">
           <Select
             className="inline-block w-32"
             classNamePrefix="hpt-select"
@@ -99,7 +110,7 @@ export default function EditorApp() {
             onChange={(option) => onToolChange(option.value)}
             styles={selectStyles}
           />
-        </span>
+        </span>*/}
         <Title> in </Title>
         <span className="mx-2">
           <Select
@@ -120,6 +131,8 @@ export default function EditorApp() {
           imagesState={imageUpload.state}
           onImagesUpload={onImagesUpload}
           onImageRemove={onImageRemove}
+          onChange={onQuickUpdateChange}
+          text={state.quickUpdateText}
         />
       ) : null}
     </div>
@@ -137,8 +150,15 @@ function Title({ children, className, ...rest }) {
   );
 }
 
-function QuickUpdateTool({ imagesState, onImagesUpload, onImageRemove }) {
+function QuickUpdateTool({
+  imagesState,
+  onImagesUpload,
+  onImageRemove,
+  onChange,
+  text,
+}) {
   const ref = useRef(null);
+  const [isPreviewing, setIsPreviewing] = useState(false);
   useEffect(() => {
     if (ref && ref.current) {
       ref.current.focus();
@@ -156,6 +176,8 @@ function QuickUpdateTool({ imagesState, onImagesUpload, onImageRemove }) {
       imageUploadBtnRef.current.click();
   }
 
+  const onPreview = () => setIsPreviewing((prev) => !prev);
+
   const imagesLength = imagesState.previewImages.length;
   const IMG_HEIGHT_ON_MULTIPLE_IMAGES = 180;
   const IMG_HEIGHT_SINGLE_IMAGE = 350;
@@ -164,7 +186,7 @@ function QuickUpdateTool({ imagesState, onImagesUpload, onImageRemove }) {
 
   return (
     <div
-      className="relative border border-gray-200 rounded-md"
+      className="relative border border-gray-200 rounded-md mb-20 sm:mb-0"
       onClick={focusOnEditor}
     >
       <form className="hidden">
@@ -238,25 +260,33 @@ function QuickUpdateTool({ imagesState, onImagesUpload, onImageRemove }) {
                       </div>
                     </div>
                   ) : null}
-                  <button
-                    onClick={() => onImageRemove(image)}
-                    className="absolute top-2 left-2 click-scale-2 focus:outline-none flex items-center justify-center rounded-full w-6 h-6 bg-gray-50 border border-gray-200 hover:bg-red-50 hover:border-red-200 transition"
-                  >
-                    <Icon name="x" width={12} height={12} />
-                  </button>
+                  {!isPreviewing ? (
+                    <button
+                      onClick={() => onImageRemove(image)}
+                      className="absolute top-2 left-2 click-scale-2 focus:outline-none flex items-center justify-center rounded-full w-6 h-6 bg-gray-50 border border-gray-200 hover:bg-red-50 hover:border-red-200 transition"
+                    >
+                      <Icon name="x" width={12} height={12} />
+                    </button>
+                  ) : null}
                 </div>
               );
             })}
           </div>
         ) : null}
 
-        <ContentEditable
-          innerRef={ref}
-          autoFocus
-          html={""}
-          disabled={false}
-          className="outline-none px-4 pt-8 pb-16"
-        />
+        <div className="px-4 pt-8 pb-16 w-full">
+          {!isPreviewing ? (
+            <TextareaAutosize
+              minRows={2}
+              value={text}
+              onChange={onChange}
+              className="outline-none border-none w-full textarea focus:ring-0"
+              autoFocus
+            />
+          ) : (
+            <QuickUpdatePreview content={mdConverter.makeHtml(text)} />
+          )}
+        </div>
       </div>
       <div
         className="px-2 py-1.5 rounded-xl flex items-center justify-center absolute -bottom-10 left-1/2 bg-white border border-gray-200"
@@ -274,13 +304,30 @@ function QuickUpdateTool({ imagesState, onImagesUpload, onImageRemove }) {
             <Icon name="image" width={18} height={18} className="mb-0.5" />
             <span>Upload image</span>
           </button>
-          <button className="btn flex flex-col items-center justify-center transition hover:bg-gray-50 whitespace-nowrap rounded-xl">
-            <Icon name="eye" width={18} height={18} className="mb-0.5" />
-            <span>Preview</span>
+          <button
+            onClick={onPreview}
+            className="btn flex flex-col items-center justify-center transition hover:bg-gray-50 whitespace-nowrap rounded-xl"
+          >
+            <Icon
+              name={isPreviewing ? "eye-off" : "eye"}
+              width={18}
+              height={18}
+              className="mb-0.5"
+            />
+            <span>{isPreviewing ? "Edit" : "Preview"}</span>
           </button>
         </div>
       </div>
     </div>
+  );
+}
+
+function QuickUpdatePreview({ content }) {
+  return (
+    <div
+      className="prose prose-yellow"
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
   );
 }
 
