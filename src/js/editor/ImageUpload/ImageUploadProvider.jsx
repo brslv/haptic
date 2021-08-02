@@ -26,12 +26,27 @@ export default function ImageUploadProvider({ children }) {
 
   function selectFiles(event) {
     let images = [];
+    const targetFiles = [...event.target.files];
+    const tooManyImages = () => {
+      const event = new CustomEvent(
+      'haptic:add-toast');
+      event.___td = { type: 'error', content: 'You can upload up to 5 files' };
+      document.dispatchEvent(event);
+    };
 
-    const files = [...event.target.files].map((fileData, idx) => ({
+    const currImgCount = state.imageInfos.length;
+    const toBeUplCount = targetFiles.length;
+    const freeSlots = 5 - currImgCount;
+    const pickCount = freeSlots > toBeUplCount ? toBeUplCount : freeSlots;
+
+    if (freeSlots === 0) return tooManyImages(); // don't upload
+    if (freeSlots < toBeUplCount) tooManyImages(); // upload the pickCount, but show that the limit is 5
+    
+    const files = targetFiles.slice(0, pickCount).map((fileData, idx) => ({
       id: generateId(),
       fileData,
     }));
-
+    
     for (let i = 0; i < files.length; i++) {
       const currFile = files[i];
       images.push({
@@ -89,7 +104,6 @@ export default function ImageUploadProvider({ children }) {
     }
 
     Promise.all(uploadSingleImagePromises).then(() => {
-      document.dispatchEvent(new CustomEvent("hpt:init-zoomable"));
       setState((prev) => ({
         ...prev,
         selectedFiles: [],

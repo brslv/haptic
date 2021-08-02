@@ -1,28 +1,28 @@
-const { cache, cacheKeys, ttl } = require("./cache");
-const comments = require("./comments");
+const { cache, cacheKeys, ttl } = require("./cache")
+const comments = require("./comments")
 
-const TEXT_TYPE = "text";
-const POLL_TYPE = "poll";
-const UNKNOWN_TYPE = "unkown";
+const TEXT_TYPE = "text"
+const POLL_TYPE = "poll"
+const UNKNOWN_TYPE = "unkown"
 
 const DEFAULT_PAGINATION_DATA = {
   perPage: 10,
   currentPage: 1,
-  isLengthAware: true,
-};
+  isLengthAware: true
+}
 
-const types = [TEXT_TYPE, POLL_TYPE];
+const types = [TEXT_TYPE, POLL_TYPE]
 
 const BROWSABLE_ORDER = {
   BOOSTS: [
     { column: "boosts_count", order: "desc" },
-    { column: "posts.created_at", order: "desc" },
+    { column: "posts.created_at", order: "desc" }
   ],
-  NEWEST: [{ column: "posts.created_at", order: "desc" }],
-};
+  NEWEST: [{ column: "posts.created_at", order: "desc" }]
+}
 
 function actions({ db, user }) {
-  function _publishText(product, text, image) {
+  function _publishText(product, text, images) {
     return new Promise((res, rej) => {
       db.transaction((trx) => {
         // insert in posts
@@ -32,8 +32,8 @@ function actions({ db, user }) {
           .insert({ type: TEXT_TYPE, product_id: product.id, user_id: user.id })
           .returning("id")
           .then(function postInsertResult(result) {
-            const id = result[0];
-            return id;
+            const id = result[0]
+            return id
           })
           .then(function postTextInsert(postId) {
             // insert in posts_text
@@ -42,52 +42,60 @@ function actions({ db, user }) {
               .transacting(trx)
               .insert({
                 post_id: postId,
-                text,
+                text
               })
               .returning("id")
               .then(function postTextInsertSuccess([postTextId]) {
-                if (image) {
-                  // insert image then commit
-                  return db("images")
-                    .transacting(trx)
-                    .insert({ post_id: postId, url: image })
-                    .returning("id")
-                    .then((imageResult) => {
-                      trx.commit().then(() => {
-                        _getPostText(postId)
-                          .then((post) => {
-                            res(post);
+                if (images && images.length) {
+                  const imagesPromises = []
+                  images.forEach((image) => {
+                    imagesPromises.push(
+                      db("images")
+                        .transacting(trx)
+                        .insert({ post_id: postId, url: image })
+                        .returning("id")
+                        .then((imageResult) => {
+                          trx.commit().then(() => {
+                            _getPostText(postId)
+                              .then((post) => {
+                                res(post)
+                              })
+                              .catch((err) => {
+                                throw err
+                              })
                           })
-                          .catch((err) => {
-                            throw err;
-                          });
-                      });
-                    })
-                    .catch((err) => {
-                      throw err;
-                    });
+                        })
+                        .catch((err) => {
+                          throw err
+                        })
+                    )
+                    return Promise.all(imagesPromises)
+                  })
+                  return Promise.resolve(true)
+                  // insert image then commit
+                  //
                 } else {
                   // no image - commit trx
                   trx.commit().then(() => {
                     _getPostText(postId)
                       .then((post) => {
-                        res(post);
+                        res(post)
                       })
                       .catch((err) => {
-                        throw err;
-                      });
-                  });
+                        throw err
+                      })
+                  })
                 }
               })
               .catch((err) => {
-                throw err;
-              });
+                throw err
+              })
           })
           .catch((err) => {
-            trx.rollback().then(() => rej(err));
-          });
-      });
-    });
+            trx.rollback().then(() => rej(err))
+          })
+      })
+    })
   }
 
   // TODO: image is not yet implemented
@@ -109,15 +117,15 @@ function actions({ db, user }) {
               .insert({
                 post_id: postId,
                 question,
-                details,
+                details
               })
               .returning("id")
               .then(function postPollInsertSuccess([postPollId]) {
-                return { postPollId, postId };
+                return { postPollId, postId }
               })
               .catch((err) => {
-                throw err;
-              });
+                throw err
+              })
           })
           .then(({ postPollId, postId }) => {
             // insert poll options
@@ -126,23 +134,23 @@ function actions({ db, user }) {
                 .transacting(trx)
                 .insert({
                   text: option,
-                  post_id: postId,
+                  post_id: postId
                 })
-                .returning("id");
-            });
+                .returning("id")
+            })
 
             return Promise.all(pollOptionsPromises)
               .then(function pollOptionsInsertSuccess(result) {
                 return {
                   postId,
                   postPollId,
-                  pollOptionsIds: result.map((idInArray) => idInArray[0]),
-                };
+                  pollOptionsIds: result.map((idInArray) => idInArray[0])
+                }
               })
               .catch((err) => {
-                console.log(err);
-                throw Error("Could not insert poll options");
-              });
+                console.log(err)
+                throw Error("Could not insert poll options")
+              })
           })
           .then(({ postId, postPollId, pollOptionsIds }) => {
             // console.log({ postId, postPollId, pollOptionsIds });
@@ -158,34 +166,34 @@ function actions({ db, user }) {
                   trx.commit().then(() => {
                     _getPostPoll(postId)
                       .then((post) => {
-                        res(post);
+                        res(post)
                       })
                       .catch((err) => {
-                        throw err;
-                      });
-                  });
+                        throw err
+                      })
+                  })
                 })
                 .catch((err) => {
-                  throw err;
-                });
+                  throw err
+                })
             } else {
               // no image - commit trx
               trx.commit().then(() => {
                 _getPostPoll(postId)
                   .then((post) => {
-                    res(post);
+                    res(post)
                   })
                   .catch((err) => {
-                    throw err;
-                  });
-              });
+                    throw err
+                  })
+              })
             }
           })
           .catch((err) => {
-            trx.rollback().then(() => rej(err));
-          });
-      });
-    });
+            trx.rollback().then(() => rej(err))
+          })
+      })
+    })
   }
 
   function _getPostText(
@@ -193,7 +201,7 @@ function actions({ db, user }) {
     userId,
     { withComments = false } = { withComments: false }
   ) {
-    const commentsActions = comments.actions({ db, user });
+    const commentsActions = comments.actions({ db, user })
     const query = db
       .select(
         "posts.id",
@@ -228,10 +236,10 @@ function actions({ db, user }) {
       .leftJoin("posts", "posts_text.post_id", "posts.id")
       .leftJoin("users", "posts.user_id", "users.id")
       .leftJoin("images", "images.post_id", "posts.id")
-      .where({ "posts_text.post_id": postId });
+      .where({ "posts_text.post_id": postId })
 
     if (userId) {
-      query.where({ "posts.user_id": userId });
+      query.where({ "posts.user_id": userId })
     }
 
     return query
@@ -243,23 +251,23 @@ function actions({ db, user }) {
             .then((commentsResult) => {
               return {
                 ...result,
-                comments: commentsResult,
-              };
+                comments: commentsResult
+              }
             })
             .catch((err) => {
-              console.log(err);
-              throw err;
-            });
+              console.log(err)
+              throw err
+            })
         } else {
-          return result;
+          return result
         }
       })
       .then((result) => {
-        return result;
+        return result
       })
       .catch((err) => {
-        return err;
-      });
+        return err
+      })
   }
 
   function _getPostPoll(
@@ -267,7 +275,7 @@ function actions({ db, user }) {
     userId,
     { withComments = false } = { withComments: false }
   ) {
-    const commentsActions = comments.actions({ db, user });
+    const commentsActions = comments.actions({ db, user })
     const query = db
       .select(
         "posts.id",
@@ -303,10 +311,10 @@ function actions({ db, user }) {
       .leftJoin("posts", "posts_poll.post_id", "posts.id")
       .leftJoin("users", "posts.user_id", "users.id")
       .leftJoin("images", "images.post_id", "posts.id")
-      .where({ "posts_poll.post_id": postId });
+      .where({ "posts_poll.post_id": postId })
 
     if (userId) {
-      query.where({ "posts.user_id": userId });
+      query.where({ "posts.user_id": userId })
     }
 
     return query
@@ -319,9 +327,9 @@ function actions({ db, user }) {
           .then(function pollOptionsSuccess(pollOptions) {
             return {
               result,
-              pollOptions,
-            };
-          });
+              pollOptions
+            }
+          })
       })
       .then(({ result, pollOptions }) => {
         return db("poll_votes")
@@ -342,30 +350,33 @@ function actions({ db, user }) {
             "poll_options.id"
           )
           .leftJoin("users", "poll_votes.user_id", "users.id")
-          .whereIn("poll_votes.poll_option_id", pollOptions.map((o) => o.id))
+          .whereIn(
+            "poll_votes.poll_option_id",
+            pollOptions.map((o) => o.id)
+          )
           .then(function pollVotesSuccess(pollVotes) {
-            const allVotesCount = pollVotes.length;
+            const allVotesCount = pollVotes.length
 
             pollOptions = pollOptions.map((opt) => {
               const votesCount = pollVotes.reduce((count, vote) => {
-                if (vote.poll_options_id === opt.id) count += 1;
-                return count;
-              }, 0);
+                if (vote.poll_options_id === opt.id) count += 1
+                return count
+              }, 0)
 
-              opt.votes_count = votesCount;
-              const percent = (votesCount / allVotesCount) * 100;
+              opt.votes_count = votesCount
+              const percent = (votesCount / allVotesCount) * 100
               opt.votes_percent =
-                Math.round((percent + Number.EPSILON) * 100) / 100;
+                Math.round((percent + Number.EPSILON) * 100) / 100
 
-              return opt;
-            });
+              return opt
+            })
 
             return {
               result,
               pollOptions,
-              pollVotes,
-            };
-          });
+              pollVotes
+            }
+          })
       })
       .then(({ result, pollOptions, pollVotes }) => {
         if (withComments) {
@@ -376,19 +387,19 @@ function actions({ db, user }) {
                 ...result,
                 comments: commentsResult,
                 poll_options: pollOptions,
-                poll_votes: pollVotes,
-              };
+                poll_votes: pollVotes
+              }
             })
             .catch((err) => {
-              console.log(err);
-              throw err;
-            });
+              console.log(err)
+              throw err
+            })
         } else {
           return {
             ...result,
             poll_options: pollOptions,
-            poll_votes: pollVotes,
-          };
+            poll_votes: pollVotes
+          }
         }
       })
       .then((result) => {
@@ -396,26 +407,26 @@ function actions({ db, user }) {
           ...result,
           user_has_voted: result.poll_votes.some(
             (vote) => user && vote.user_id === user.id
-          ),
-        };
+          )
+        }
       })
       .then((result) => {
-        return result;
+        return result
       })
       .catch((err) => {
-        return err;
-      });
+        return err
+      })
   }
 
   function getBrowsablePosts({
     order = BROWSABLE_ORDER.BOOSTS,
     withComments = true,
-    paginationData = DEFAULT_PAGINATION_DATA,
+    paginationData = DEFAULT_PAGINATION_DATA
   }) {
     return new Promise((res, rej) => {
-      const cachedPosts = cache.get(cacheKeys.browsablePosts(order));
+      const cachedPosts = cache.get(cacheKeys.browsablePosts(order))
       if (cachedPosts) {
-        return res(cachedPosts);
+        return res(cachedPosts)
       }
 
       _getAllPostsQuery(null, {
@@ -423,15 +434,15 @@ function actions({ db, user }) {
         withComments,
         paginationData,
         isProductListed: true,
-        isProductPublic: true,
+        isProductPublic: true
       })
         .then((result) => {
           // cache.set(cacheKeys.browsablePosts(order), result, ttl[5]);
-          res(result);
+          res(result)
         })
         .catch((err) => {
-          rej(err);
-        });
+          rej(err)
+        })
 
       // db.transaction().then((trx) => {
       //   db.transacting(trx)
@@ -500,22 +511,22 @@ function actions({ db, user }) {
       //       trx.rollback().then(() => rej(err));
       //     });
       // });
-    });
+    })
   }
 
   function getPost(type, { postId, userId }, options = {}) {
     switch (type) {
       case TEXT_TYPE: {
-        return _getPostText(postId, userId, options);
+        return _getPostText(postId, userId, options)
       }
       case POLL_TYPE: {
-        return _getPostPoll(postId, userId, options);
+        return _getPostPoll(postId, userId, options)
       }
       case UNKNOWN_TYPE: {
-        return _getUnknownTypePost(postId, userId, options);
+        return _getUnknownTypePost(postId, userId, options)
       }
       default:
-        return Promise.reject(Error("Invalid post type."));
+        return Promise.reject(Error("Invalid post type."))
     }
   }
 
@@ -528,16 +539,16 @@ function actions({ db, user }) {
         .then((result) => {
           getPost(result.type, { postId, userId }, options)
             .then((post) => {
-              res(post);
+              res(post)
             })
             .catch((err) => {
-              rej(err);
-            });
+              rej(err)
+            })
         })
         .catch((err) => {
-          rej(err);
-        });
-    });
+          rej(err)
+        })
+    })
   }
 
   function getAllPosts(
@@ -546,18 +557,18 @@ function actions({ db, user }) {
       withComments = false,
       limit = null,
       order = BROWSABLE_ORDER.NEWEST,
-      paginationData = DEFAULT_PAGINATION_DATA,
+      paginationData = DEFAULT_PAGINATION_DATA
     } = {
       withComments: false,
       limit: null,
       order: BROWSABLE_ORDER.NEWEST,
-      paginationData: DEFAULT_PAGINATION_DATA,
+      paginationData: DEFAULT_PAGINATION_DATA
     }
   ) {
     return new Promise((res, rej) => {
-      const cachedPosts = cache.get(cacheKeys.productPosts(productId));
+      const cachedPosts = cache.get(cacheKeys.productPosts(productId))
       if (cachedPosts) {
-        return res(cachedPosts);
+        return res(cachedPosts)
       }
 
       _getAllPostsQuery(productId, {
@@ -565,12 +576,17 @@ function actions({ db, user }) {
         limit,
         order,
         paginationData,
-        isProductPublic: !user ? true : undefined,
-      }).then((result) => {
-        // cache.set(cacheKeys.productPosts(productId), result, ttl.day);
-        res(result);
-      });
-    });
+        isProductPublic: !user ? true : undefined
+      })
+        .then((result) => {
+          // cache.set(cacheKeys.productPosts(productId), result, ttl.day);
+          res(result)
+        })
+        .catch((err) => {
+          console.log(err)
+          rej(err)
+        })
+    })
   }
 
   function _getAllPostsQuery(
@@ -580,16 +596,16 @@ function actions({ db, user }) {
       order = BROWSABLE_ORDER.NEWEST,
       paginationData = DEFAULT_PAGINATION_DATA,
       isProductListed = undefined,
-      isProductPublic = undefined,
+      isProductPublic = undefined
     } = {
       withComments: false,
       isProductListed: undefined,
       isProductPublic: undefined,
       order: BROWSABLE_ORDER.NEWEST,
-      paginationData: DEFAULT_PAGINATION_DATA,
+      paginationData: DEFAULT_PAGINATION_DATA
     }
   ) {
-    const commentsActions = comments.actions({ db, user });
+    const commentsActions = comments.actions({ db, user })
     return new Promise((res, rej) => {
       const query = db("posts")
         .select(
@@ -610,9 +626,6 @@ function actions({ db, user }) {
           "users.twitter_name as user_twitter_name",
           "users.twitter_profile_image_url as user_twitter_profile_image_url",
           "users.twitter_screen_name as user_twitter_screen_name",
-          "images.id as image_id",
-          "images.url as image_url",
-          "images.created_at as image_created_at",
           db("post_boosts")
             .count()
             .whereRaw("post_id = posts.id")
@@ -630,32 +643,31 @@ function actions({ db, user }) {
         .leftJoin("posts_text", "posts_text.post_id", "posts.id")
         .leftJoin("posts_poll", "posts_poll.post_id", "posts.id")
         .leftJoin("users", "posts.user_id", "users.id")
-        .leftJoin("images", "images.post_id", "posts.id")
-        .leftJoin("products", "products.id", "posts.product_id");
+        .leftJoin("products", "products.id", "posts.product_id")
 
-      let where = {};
+      let where = {}
       if (isProductListed !== undefined)
-        where["products.is_listed"] = isProductListed;
+        where["products.is_listed"] = isProductListed
       if (isProductPublic !== undefined)
-        where["products.is_public"] = isProductPublic;
+        where["products.is_public"] = isProductPublic
 
       if (productId) {
-        where["posts.product_id"] = productId;
+        where["posts.product_id"] = productId
       }
-      query.where(where);
+      query.where(where)
 
       if (order) {
-        query.orderBy(order);
+        query.orderBy(order)
       }
 
       query
         .paginate(paginationData)
         .then((postsResultWithPagination) => {
           if (withComments) {
-            let commentsPromises = [];
+            let commentsPromises = []
             postsResultWithPagination.data.forEach((post) => {
-              commentsPromises.push(commentsActions.getComments(post.id));
-            });
+              commentsPromises.push(commentsActions.getComments(post.id))
+            })
             return Promise.all(commentsPromises)
               .then((commentsResult) => {
                 return {
@@ -663,85 +675,114 @@ function actions({ db, user }) {
                   data: [
                     ...postsResultWithPagination.data.map((post, idx) => ({
                       ...post,
-                      comments: commentsResult[idx],
-                    })),
-                  ],
-                };
+                      comments: commentsResult[idx]
+                    }))
+                  ]
+                }
               })
               .catch((err) => {
-                console.log(err);
-                throw err;
-              });
+                console.log(err)
+                throw err
+              })
           } else {
-            return postsResultWithPagination;
+            return postsResultWithPagination
           }
         })
         .then((postsWithCommentsAndPaginationResult) => {
+          const enrichedPosts = postsWithCommentsAndPaginationResult.data.map(
+            (post) => {
+              const id = post.id
+              return new Promise((res, rej) => {
+                db("images")
+                  .select(
+                    "images.id as image_id",
+                    "images.url as image_url",
+                    "images.created_at as image_created_at"
+                  )
+                  .where("post_id", id)
+                  .then((imagesData) => {
+                    res({ ...post, images: imagesData })
+                  })
+                  .catch((err) => {
+                    console.log(err)
+                    rej(err)
+                  })
+              })
+            }
+          )
+          return new Promise((res, rej) => {
+            Promise.all(enrichedPosts).then((data) => {
+              res({ ...postsWithCommentsAndPaginationResult, data })
+            })
+          })
+        })
+        .then((postsWithCommentsAndImagesAndPaginationResult) => {
           // enrich the poll with options and answers
 
-          const enrichedPosts = postsWithCommentsAndPaginationResult.data
-            .map((post) => {
-              if (post.type === "poll") {
-                return new Promise((res, rej) => {
-                  _getPostPoll(post.id).then((pollPostResult) => {
-                    return res({ ...post, ...pollPostResult });
-                  });
-                });
-              } else return post;
-            })
-            .reduce((acc, post) => {
-              acc.push(
-                new Promise((resolve) => {
-                  if (post instanceof Promise) {
-                    post.then((result) => {
-                      resolve(result);
-                    });
-                  } else {
-                    resolve(post);
-                  }
-                })
-              );
-              return acc;
-            }, []);
+          const enrichedPosts =
+            postsWithCommentsAndImagesAndPaginationResult.data
+              .map((post) => {
+                if (post.type === "poll") {
+                  return new Promise((res, rej) => {
+                    _getPostPoll(post.id).then((pollPostResult) => {
+                      return res({ ...post, ...pollPostResult })
+                    })
+                  })
+                } else return post
+              })
+              .reduce((acc, post) => {
+                acc.push(
+                  new Promise((resolve) => {
+                    if (post instanceof Promise) {
+                      post.then((result) => {
+                        resolve(result)
+                      })
+                    } else {
+                      resolve(post)
+                    }
+                  })
+                )
+                return acc
+              }, [])
 
           return new Promise((res, rej) => {
             Promise.all(enrichedPosts).then((data) => {
-              res({ ...postsWithCommentsAndPaginationResult, data });
-            });
-          });
+              res({ ...postsWithCommentsAndImagesAndPaginationResult, data })
+            })
+          })
         })
         .then((finalPostsResult) => {
-          res(finalPostsResult);
+          res(finalPostsResult)
         })
         .catch((err) => {
-          console.error(err);
-          rej(err);
-        });
-    });
+          console.error(err)
+          rej(err)
+        })
+    })
   }
 
   function publish(type, product, data) {
-    cache.del(cacheKeys.productPosts(product.id));
-    cache.del(cacheKeys.browsablePosts(BROWSABLE_ORDER.BOOSTS));
-    cache.del(cacheKeys.browsablePosts(BROWSABLE_ORDER.NEWEST));
+    cache.del(cacheKeys.productPosts(product.id))
+    cache.del(cacheKeys.browsablePosts(BROWSABLE_ORDER.BOOSTS))
+    cache.del(cacheKeys.browsablePosts(BROWSABLE_ORDER.NEWEST))
     switch (type) {
       case TEXT_TYPE: {
-        return _publishText(product, data.text, data.image);
-        break;
+        return _publishText(product, data.text, data.images)
+        break
       }
       case POLL_TYPE: {
-        return _publishPoll(product, data);
-        break;
+        return _publishPoll(product, data)
+        break
       }
     }
   }
 
   function updatePost(type, postId, data) {
-    if (data.productId) cache.del(cacheKeys.productPosts(data.productId));
+    if (data.productId) cache.del(cacheKeys.productPosts(data.productId))
     switch (type) {
       case "text": {
-        return _updateTextPost(postId, data);
-        break;
+        return _updateTextPost(postId, data)
+        break
       }
     }
   }
@@ -754,9 +795,9 @@ function actions({ db, user }) {
           .update({ text: data.text }) // update the post
           .where({ post_id: postId })
           .then((result) => {
-            if (!result) throw Error("Couldn't update post " + postId);
-            cache.del(cacheKeys.productPosts(result.product_id));
-            return result;
+            if (!result) throw Error("Couldn't update post " + postId)
+            cache.del(cacheKeys.productPosts(result.product_id))
+            return result
           })
           .then((updateResult) => {
             // find the post's images
@@ -768,11 +809,11 @@ function actions({ db, user }) {
               .first()
               .then((imagesResult) => {
                 if (imagesResult) {
-                  return imagesResult.id;
+                  return imagesResult.id
                 } else {
-                  return null;
+                  return null
                 }
-              });
+              })
           })
           .then((imageId) => {
             if (!data.image && imageId) {
@@ -783,8 +824,8 @@ function actions({ db, user }) {
                 .where({ post_id: postId, id: imageId })
                 .del()
                 .then((result) => {
-                  trx.commit().then(() => res(true));
-                });
+                  trx.commit().then(() => res(true))
+                })
             }
 
             // update/add the image if any images are being passed through "data.image"
@@ -796,14 +837,14 @@ function actions({ db, user }) {
                 .where({ id: imageId })
                 .then((updateImageResult) => {
                   if (updateImageResult) {
-                    trx.commit().then(() => res(true));
+                    trx.commit().then(() => res(true))
                   } else {
-                    throw new Error("Image update failed.");
+                    throw new Error("Image update failed.")
                   }
                 })
                 .catch((err) => {
-                  throw err;
-                });
+                  throw err
+                })
             } else {
               // the post doesn't have any images, so add the image
               db.transacting(trx)
@@ -811,21 +852,21 @@ function actions({ db, user }) {
                 .insert({ url: data.image, post_id: postId })
                 .then((insertImageResult) => {
                   if (insertImageResult) {
-                    trx.commit().then(() => res(true));
+                    trx.commit().then(() => res(true))
                   } else {
-                    throw new Error("Image insert failed.");
+                    throw new Error("Image insert failed.")
                   }
                 })
                 .catch((err) => {
-                  throw err;
-                });
+                  throw err
+                })
             }
           })
           .catch((err) => {
-            trx.rollback().then(() => rej(err));
-          });
-      });
-    });
+            trx.rollback().then(() => rej(err))
+          })
+      })
+    })
   }
 
   function removePost(postId) {
@@ -838,15 +879,15 @@ function actions({ db, user }) {
           .first()
           .then((postResult) => {
             if (!postResult) {
-              throw new Error("Invalid post id: " + postId);
+              throw new Error("Invalid post id: " + postId)
             }
 
             if (user.id !== postResult.user_id) {
-              throw new Error("Wrong post owner.");
+              throw new Error("Wrong post owner.")
             }
-            cache.del(cacheKeys.productPosts(postResult.product_id));
+            cache.del(cacheKeys.productPosts(postResult.product_id))
 
-            return true;
+            return true
           })
           .then(() => {
             return db
@@ -856,18 +897,18 @@ function actions({ db, user }) {
               .where({ id: postId })
               .del()
               .then((postDelResult) => {
-                trx.commit().then(() => res(postDelResult));
+                trx.commit().then(() => res(postDelResult))
               })
               .catch((err) => {
-                console.log(err);
-                trx.rollback().then(() => rej(err));
-              });
+                console.log(err)
+                trx.rollback().then(() => rej(err))
+              })
           })
           .catch((err) => {
-            trx.rollback().then(() => rej(err));
-          });
-      });
-    });
+            trx.rollback().then(() => rej(err))
+          })
+      })
+    })
   }
 
   function vote(postId, optionId) {
@@ -876,12 +917,12 @@ function actions({ db, user }) {
         .insert({ post_id: postId, poll_option_id: optionId, user_id: user.id })
         .returning("id")
         .then((result) => {
-          return res(result);
+          return res(result)
         })
         .catch((err) => {
-          return rej(err);
-        });
-    });
+          return rej(err)
+        })
+    })
   }
 
   return {
@@ -891,8 +932,8 @@ function actions({ db, user }) {
     updatePost,
     getAllPosts,
     removePost,
-    vote,
-  };
+    vote
+  }
 }
 
 module.exports = {
@@ -902,5 +943,5 @@ module.exports = {
   POLL_TYPE,
   UNKNOWN_TYPE,
   BROWSABLE_ORDER,
-  DEFAULT_PAGINATION_DATA,
-};
+  DEFAULT_PAGINATION_DATA
+}
