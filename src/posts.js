@@ -551,6 +551,9 @@ function actions({ db, user }) {
         .where({ id: postId })
         .first()
         .then((result) => {
+          if (!result) {
+            return res(null);
+          }
           getPost(result.type, { postId, userId }, options)
             .then((post) => {
               res(post);

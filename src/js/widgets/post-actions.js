@@ -1,11 +1,15 @@
-import { $, turbo, req } from "../utils";
+import { $, turbo, req, onFrameLoaded } from "../utils";
 
 export default function postActions() {
-  function load($els) {
+  function load() {
+    $els = {
+      $delBtn: $("[data-post-action-delete]"),
+    };
     $els.$delBtn.on("click", confirmDelete.bind(undefined, $els));
   }
 
   function confirmDelete($els, e) {
+    console.log("delete", e);
     const ok = window.confirm(
       "Deleting a post is irreversible. Delete post anyway?"
     );
@@ -31,11 +35,16 @@ export default function postActions() {
             return;
           }
 
-          $post.remove();
           $(document).trigger("haptic:add-toast", {
             content: "Post deleted successfully",
             type: "success",
           });
+
+          if (window.location.pathname.startsWith("/p/")) {
+            turbo.actions.visit("/");
+          } else {
+            $post.remove();
+          }
         },
       }
     );
@@ -50,7 +59,9 @@ export default function postActions() {
     $els = {
       $delBtn: $("[data-post-action-delete]"),
     };
-    load($els);
+    load();
+    onFrameLoaded("browse-posts-list", load);
+    onFrameLoaded("product", load);
   });
 
   turbo.beforeCache(() => {
