@@ -75,6 +75,11 @@ function onFrameLoaded(id, fn) {
   $(document).on("haptic:frame-loaded:" + id, fn);
 }
 
+$(document).on("haptic:turbo-visit", (e) => {
+  console.log(e);
+  turbo.actions.visit(e.detail.path);
+});
+
 export {
   $,
   turbo,

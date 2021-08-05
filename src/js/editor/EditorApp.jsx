@@ -9,7 +9,8 @@ import { hasChosenProduct } from "./utils";
 import Select from "react-select";
 import { useImageUpload } from "./ImageUpload/ImageUploadProvider";
 import QuickUpdateTool from "./QuickUpdateTool";
-import Title from './Title';
+import Title from "./Title";
+import { toast, turbo } from "./utils";
 
 const TOOLS = {
   QUICK_UPDATE: "quick_update",
@@ -38,6 +39,11 @@ function reducer(state, action) {
         ...state,
         quickUpdateText: action.payload,
       };
+    case "publishing":
+      return {
+        ...state,
+        publishing: action.payload,
+      };
     default:
       throw new Error(`Invalid action type: ${action.type}`);
   }
@@ -51,6 +57,7 @@ const initialState = {
   chosenProduct: null,
   selectedTool: TOOLS.QUICK_UPDATE,
   quickUpdateText: "",
+  publishing: false,
 };
 
 export default function EditorApp() {
@@ -94,25 +101,52 @@ export default function EditorApp() {
   const onQuickUpdateChange = ({ target }) =>
     dispatch({ type: "quick_update_change", payload: target.value });
 
+  const onCloseFailMessage = () => {
+    imageUpload.clearFailed();
+  };
+
   const onQuickUpdateSubmit = () => {
+    dispatch({ type: "publishing", payload: true });
     const text = state.quickUpdateText;
-    const images = imageUpload.state.imageInfos.map(i => (i.url));
+    const images = imageUpload.state.imageInfos.map((i) => i.url);
     const productId = state.chosenProduct;
+    const product = outerState.find(
+      (product) => product.id === state.chosenProduct
+    );
     const csrf = document
       .querySelector('meta[name="csrf"]')
-      .getAttribute('content');
+      .getAttribute("content");
 
     const url = `/post/${productId}/text`;
 
-    axios.post(url, {
-      text,
-      images,
-      productId,
-      csrf
-    }).then(response => {
-      console.log({ response });
-    });
-  }
+    axios
+      .post(url, {
+        text,
+        images,
+        productId,
+        csrf,
+      })
+      .then((response) => {
+        toast({
+          type: "success",
+          content: "Update published successsfully",
+        });
+
+        dispatch({ type: "publishing", payload: false });
+        if (!product) return;
+        const postId = response.data.details.post.id;
+        if (postId) {
+          turbo.actions.visit(`/p/${product.slug}/${postId}`);
+        } else {
+          turbo.actions.visit(`/`);
+        }
+      })
+      .catch((err) => {
+        dispatch({ type: "publishing", payload: false });
+        const message = err.response.data.err;
+        toast({ type: "error", content: message });
+      });
+  };
 
   const onImageRemove = (image) => imageUpload.removeImage(image);
 
@@ -152,6 +186,8 @@ export default function EditorApp() {
           onChange={onQuickUpdateChange}
           onSubmit={onQuickUpdateSubmit}
           text={state.quickUpdateText}
+          disabled={state.publishing}
+          onCloseFailMessage={onCloseFailMessage}
         />
       ) : null}
     </div>

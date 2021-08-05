@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import UploadService from "./UploadService";
+import { toast } from "../utils";
 
 const ImageUploadContext = createContext(null);
 
@@ -28,10 +29,7 @@ export default function ImageUploadProvider({ children }) {
     let images = [];
     const targetFiles = [...event.target.files];
     const tooManyImages = () => {
-      const event = new CustomEvent(
-      'haptic:add-toast');
-      event.___td = { type: 'error', content: 'You can upload up to 5 files' };
-      document.dispatchEvent(event);
+      toast({ type: "error", content: "You can upload up to 5 files" });
     };
 
     const currImgCount = state.imageInfos.length;
@@ -41,12 +39,12 @@ export default function ImageUploadProvider({ children }) {
 
     if (freeSlots === 0) return tooManyImages(); // don't upload
     if (freeSlots < toBeUplCount) tooManyImages(); // upload the pickCount, but show that the limit is 5
-    
+
     const files = targetFiles.slice(0, pickCount).map((fileData, idx) => ({
       id: generateId(),
       fileData,
     }));
-    
+
     for (let i = 0; i < files.length; i++) {
       const currFile = files[i];
       images.push({
@@ -194,6 +192,23 @@ export default function ImageUploadProvider({ children }) {
     });
   }
 
+  function clearFailed() {
+    setState((prev) => {
+      const failedIds = prev.statusses.filter((s) => s.err).map((f) => f.id);
+      return {
+        ...prev,
+        imageInfos: prev.imageInfos.filter((i) => !failedIds.includes(i.id)),
+        previewImages: prev.previewImages.filter(
+          (i) => !failedIds.includes(i.id)
+        ),
+        progressInfos: prev.progressInfos.filter(
+          (i) => !failedIds.includes(i.id)
+        ),
+        statusses: prev.statusses.filter((i) => !failedIds.includes(i.id)),
+      };
+    });
+  }
+
   useEffect(() => {
     console.log(state);
   }, [state]);
@@ -202,6 +217,7 @@ export default function ImageUploadProvider({ children }) {
     state,
     selectFiles,
     removeImage,
+    clearFailed,
   };
 
   return (
