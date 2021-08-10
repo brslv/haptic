@@ -13,6 +13,7 @@ export default function QuickUpdateTool({
   text,
   disabled,
   onCloseFailMessage,
+  isEditMode,
 }) {
   const ref = useRef(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -155,7 +156,7 @@ export default function QuickUpdateTool({
               <TextareaAutosize
                 minRows={2}
                 value={text}
-                onChange={disabled ? null : onChange}
+                onChange={disabled ? () => {} : onChange}
                 className="outline-none border-none w-full textarea focus:ring-0"
                 autoFocus
               />
@@ -174,7 +175,7 @@ export default function QuickUpdateTool({
           className="focus:ring-2 ring-yellow-300 btn mr-2 flex items-center justify-center flex-col transition bg-yellow-50 hover:bg-yellow-300 rounded-xl"
         >
           <Icon name="plus" width={18} height={18} className="mb-0.5" />
-          <span>Publish</span>
+          {isEditMode ? <span>Update</span> : <span>Publish</span>}
         </button>
         <div className="flex items-center">
           <button

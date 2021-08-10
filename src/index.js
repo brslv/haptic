@@ -1612,6 +1612,43 @@ app.get("/logout", (req, res) => {
 });
 
 // ajax routes
+app.get(
+  "/edit-post-data/:id",
+  authOnly,
+  ajaxOnly,
+  express.json(),
+  (req, res, next) => {
+    const postActions = posts.actions({ db, user: req.user });
+    const id = req.params.id;
+    const isNum = (n) => !isNaN(Number(n));
+    if (!isNum(id)) {
+      res.status(400).json({
+        ok: 0,
+        err: "Invalid post id.",
+        details: null,
+      });
+    }
+
+    postActions
+      .getPost(posts.UNKNOWN_TYPE, { postId: id, userId: req.user.id })
+      .then((postResult) => {
+        if (!postResult || !postResult.id) {
+          return res.status(400).json({
+            ok: 0,
+            err: "Not authorized to edit this post.",
+            details: null,
+          });
+        }
+
+        res.json({ ok: 1, err: null, details: { post: postResult } });
+      })
+      .catch((err) => {
+        console.log(err);
+        throw err;
+      });
+  }
+);
+
 app.post(
   "/comment",
   authOnly,
@@ -2074,6 +2111,7 @@ app.post(
   }
 );
 
+// update post
 app.post(
   "/post/:pid",
   ajaxOnly,
@@ -2116,9 +2154,12 @@ app.post(
         postsActions
           .updatePost(type, pid, data)
           .then((result) => {
+            console.log("update result", result);
             if (result) {
               // result = 1
-              return res.status(200).json({ ok: 1, err: null, details: null });
+              return res
+                .status(200)
+                .json({ ok: 1, err: null, details: { post: { id: pid } } });
             }
           })
           .catch((err) => {

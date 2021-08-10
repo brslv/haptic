@@ -44,6 +44,15 @@ function reducer(state, action) {
         ...state,
         publishing: action.payload,
       };
+    case "loading": {
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          ...action.payload,
+        },
+      };
+    }
     default:
       throw new Error(`Invalid action type: ${action.type}`);
   }
@@ -58,12 +67,21 @@ const initialState = {
   selectedTool: TOOLS.QUICK_UPDATE,
   quickUpdateText: "",
   publishing: false,
+  loading: {
+    gettingEditPostData: false,
+  },
 };
+
+const isNum = (n) => !isNaN(Number(n));
 
 export default function EditorApp() {
   const [outerState, setOuterState] = useState(window.state);
   const [state, dispatch] = useReducer(reducer, initialState);
   const imageUpload = useImageUpload();
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const urlParams = Object.fromEntries(urlSearchParams.entries());
+  const editPostId = urlParams.edit;
+  const isEdit = isNum(editPostId) && editPostId > 0;
 
   const onProductChange = useCallback(
     (id) => {
@@ -86,6 +104,31 @@ export default function EditorApp() {
       onProductChange(outerState[0].id);
     }
   }, [outerState, onProductChange]);
+
+  useEffect(() => {
+    if (isEdit) {
+      dispatch({ type: "loading", payload: { gettingEditPostData: true } });
+      axios
+        .get(`/edit-post-data/${editPostId}`)
+        .then((response) => {
+          const post = response.data.details.post;
+          dispatch({ type: "quick_update_change", payload: post.text });
+          if (post.images && post.images.length)
+            imageUpload.populateImages(post.images);
+        })
+        .catch((err) => {
+          const message = err.response.data.err;
+          toast({ type: "error", content: message });
+          turbo.actions.visit("/");
+        })
+        .finally(() => {
+          dispatch({
+            type: "loading",
+            payload: { gettingEditPostData: false },
+          });
+        });
+    }
+  }, [editPostId, isEdit]);
 
   useEffect(() => console.log({ state }), [state]);
 
@@ -148,13 +191,59 @@ export default function EditorApp() {
       });
   };
 
+  const onQuickUpdateEditSubmit = () => {
+    dispatch({ type: "publishing", payload: true });
+
+    const productId = state.chosenProduct;
+    const product = outerState.find(
+      (product) => product.id === state.chosenProduct
+    );
+    const csrf = document
+      .querySelector('meta[name="csrf"]')
+      .getAttribute("content");
+
+    const url = `/post/${editPostId}`;
+    const data = {
+      text: state.quickUpdateText,
+      images: imageUpload.state.imageInfos.map((i) => i.url),
+      productId,
+      csrf,
+    };
+
+    axios
+      .post(url, data)
+      .then((response) => {
+        toast({
+          type: "success",
+          content: "Updated successfully.",
+        });
+
+        const postId = response.data.details.post.id;
+        if (postId) {
+          turbo.actions.visit(`/p/${product.slug}/${postId}`);
+        } else {
+          turbo.actions.visit(`/`);
+        }
+      })
+      .catch((err) => {
+        dispatch({ type: "publishing", payload: false });
+        const message = err.response.data.err;
+        toast({ type: "error", content: message });
+      });
+  };
+
   const onImageRemove = (image) => imageUpload.removeImage(image);
 
   return (
     <div>
-      <div className="mb-4 uppercase text-xs font-medium">
-        <Title className="inline-block">Publish in</Title>
-        {/*<span className="mr-2 md:mx-2">
+      {isEdit ? (
+        <div className="mb-4 uppercase text-xs font-medium">
+          <Title className="inline-block">Editing post</Title>
+        </div>
+      ) : (
+        <div className="mb-4 uppercase text-xs font-medium">
+          <Title className="inline-block">Publish in</Title>
+          {/*<span className="mr-2 md:mx-2">
           <Select
             className="inline-block w-32"
             classNamePrefix="hpt-select"
@@ -164,30 +253,34 @@ export default function EditorApp() {
             styles={selectStyles}
           />
         </span>*/}
-        <span className="mx-2">
-          <Select
-            className="inline-block w-32"
-            classNamePrefix="hpt-select"
-            options={productOptions}
-            value={productOptions.find(
-              (productOption) => +productOption.value === +state.chosenProduct
-            )}
-            onChange={(option) => onProductChange(option.value)}
-            styles={selectStyles}
-          />
-        </span>
-      </div>
+          <span className="mx-2">
+            <Select
+              className="inline-block w-32"
+              classNamePrefix="hpt-select"
+              options={productOptions}
+              value={productOptions.find(
+                (productOption) => +productOption.value === +state.chosenProduct
+              )}
+              onChange={(option) => onProductChange(option.value)}
+              styles={selectStyles}
+            />
+          </span>
+        </div>
+      )}
 
-      {state.chosenProduct && state.selectedTool === TOOLS.QUICK_UPDATE ? (
+      {!state.loading.gettingEditPostData &&
+      state.chosenProduct &&
+      state.selectedTool === TOOLS.QUICK_UPDATE ? (
         <QuickUpdateTool
           imagesState={imageUpload.state}
           onImagesUpload={onImagesUpload}
           onImageRemove={onImageRemove}
           onChange={onQuickUpdateChange}
-          onSubmit={onQuickUpdateSubmit}
+          onSubmit={isEdit ? onQuickUpdateEditSubmit : onQuickUpdateSubmit}
           text={state.quickUpdateText}
           disabled={state.publishing}
           onCloseFailMessage={onCloseFailMessage}
+          isEditMode={editPostId}
         />
       ) : null}
     </div>

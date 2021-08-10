@@ -25,6 +25,23 @@ export default function ImageUploadProvider({ children }) {
     },
   });
 
+  function populateImages(images) {
+    const _images = images.map((i) => ({ id: i.image_id, url: i.image_url }));
+    setState((prev) => ({
+      ...prev,
+      previewImages: [...state.previewImages, ..._images],
+      progressInfos: [
+        ...state.progressInfos,
+        ..._images.map((i) => ({ id: i.id, percentage: 100, file: null })),
+      ],
+      statusses: [
+        ...state.statusses,
+        ..._images.map((i) => ({ id: i.id, ok: true, file: null, err: null })),
+      ],
+      imageInfos: [...state.imageInfos, ..._images],
+    }));
+  }
+
   function selectFiles(event) {
     let images = [];
     const targetFiles = [...event.target.files];
@@ -218,6 +235,7 @@ export default function ImageUploadProvider({ children }) {
     selectFiles,
     removeImage,
     clearFailed,
+    populateImages,
   };
 
   return (

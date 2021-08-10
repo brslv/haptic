@@ -823,50 +823,55 @@ function actions({ db, user }) {
               .table("images")
               .select("id", "url")
               .where({ post_id: postId })
-              .first()
               .then((imagesResult) => {
-                if (imagesResult) {
-                  return imagesResult.id;
-                } else {
-                  return null;
-                }
+                return imagesResult ? imagesResult : null;
               });
           })
-          .then((imageId) => {
-            if (!data.image && imageId) {
+          .then((images) => {
+            if (data.images && !data.images.length && images && images.length) {
               // no data is passed through the "data.image", but the post already has an image
               // so remove it from the db
-              db.transacting(trx)
+              return db
+                .transacting(trx)
                 .table("images")
-                .where({ post_id: postId, id: imageId })
+                .where({ post_id: postId })
                 .del()
-                .then((result) => {
+                .then(() => {
                   trx.commit().then(() => res(true));
                 });
             }
 
             // update/add the image if any images are being passed through "data.image"
-            if (imageId) {
-              // the post already has an image, so update it
-              db.transacting(trx)
+            if (images && images.length) {
+              // the post already has an image, so delete it all and add the new as new records
+              return db
+                .transacting(trx)
                 .table("images")
-                .update({ url: data.image })
-                .where({ id: imageId })
-                .then((updateImageResult) => {
-                  if (updateImageResult) {
-                    trx.commit().then(() => res(true));
-                  } else {
-                    throw new Error("Image update failed.");
-                  }
+                .where({ post_id: postId })
+                .del()
+                .then(() => {
+                  return db
+                    .transacting(trx)
+                    .table("images")
+                    .insert(
+                      data.images.map((i) => ({ url: i, post_id: postId }))
+                    )
+                    .then(() => {
+                      trx.commit().then(() => res(true));
+                    })
+                    .catch((err) => {
+                      throw err;
+                    });
                 })
                 .catch((err) => {
                   throw err;
                 });
             } else {
               // the post doesn't have any images, so add the image
-              db.transacting(trx)
+              return db
+                .transacting(trx)
                 .table("images")
-                .insert({ url: data.image, post_id: postId })
+                .insert(data.images.map((i) => ({ url: i, post_id: postId })))
                 .then((insertImageResult) => {
                   if (insertImageResult) {
                     trx.commit().then(() => res(true));
@@ -880,6 +885,7 @@ function actions({ db, user }) {
             }
           })
           .catch((err) => {
+            console.log(err);
             trx.rollback().then(() => rej(err));
           });
       });

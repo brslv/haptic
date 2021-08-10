@@ -41,7 +41,7 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
                       +icon("twitter", { stroke: "white", width: '18', height: '18' })
                     span(style="white-space: nowrap;") Twitter
           if user && user.id === author_id
-            button(data-edit-post data-modal-trigger="edit-post" data-text=post_text_md data-img=img_url data-post-id=post_id class="btn btn-icon btn-small icon-container rounded-full hover:bg-gray-100 p-2 click-scale-2 inline-block ml-2 hover:ring-1 hover:ring-gray-300 hover:ring-offset-2")
+            a(href="/publish?edit=" + post_id class="btn btn-icon btn-small icon-container rounded-full hover:bg-gray-100 p-2 click-scale-2 inline-block ml-2 hover:ring-1 hover:ring-gray-300 hover:ring-offset-2")
                 +icon("edit", { width: 18, height: 18 })
             button(data-post-action-delete data-post-id=post_id class="btn btn-icon btn-small icon-container rounded-full hover:bg-gray-100 p-2 click-scale-2 inline-block ml-2 hover:ring-1 hover:ring-gray-300 hover:ring-offset-2")
                 +icon("trash-2", { width: 18, height: 18 })
