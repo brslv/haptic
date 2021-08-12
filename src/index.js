@@ -746,8 +746,8 @@ app.get("/dashboard", authOnly, async (req, res, next) => {
     success: await req.consumeFlash("success"),
   };
   const productsActions = products.actions({ db, user: req.user });
-  const title = "Dashboard | " + req.user.twitter_name + " | Haptic";
-  const description = "Dashboard of " + req.user.twitter_name;
+  const title = "Products | " + req.user.twitter_name + " | Haptic";
+  const description = "Products of " + req.user.twitter_name;
 
   productsActions
     .getMyProducts()
@@ -803,90 +803,90 @@ app.get("/dashboard/product/:slug", authOnly, (req, res) => {
   return res.redirect(`/dashboard/product/${req.params.slug}/settings`);
 });
 
-app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
-  const slug = req.params.slug;
-  const page = getPageFromQuery(req.query);
-  const productsActions = products.actions({ db, user: req.user });
-  productsActions
-    .getProductBySlug({ slug, user_id: req.user.id })
-    .then((productResult) => {
-      if (!productResult) {
-        return res.status(404).render("404", {
-          meta: {
-            ...defaultMetas,
-            title: "Page not found | Haptic",
-            og: { ...defaultMetas.og, title: "Page not found | Haptic" },
-          },
-        });
-      }
-
-      return posts
-        .actions({ db, user: req.user })
-        .getAllPosts(productResult.id, {
-          withComments: true,
-          paginationData: {
-            ...posts.DEFAULT_PAGINATION_DATA,
-            perPage: 5,
-            currentPage: page,
-          },
-        })
-        .then((postsResult) => {
-          return db("product_tools")
-            .where({ product_id: productResult.id })
-            .then((toolsResult) => {
-              const title = `Product | ${productResult.name} | Haptic`;
-              const description = `Product dashboard - ${productResult.name}`;
-              res.render("dashboard/product/posts", {
-                meta: {
-                  ...defaultMetas,
-                  title,
-                  description,
-                  og: {
-                    ...defaultMetas.og,
-                    title,
-                    description,
-                  },
-                },
-                product: { ...productResult },
-                tools: [...toolsResult],
-                pagination: postsResult.pagination,
-                createPaginationLink: (n) =>
-                  `/dashboard/product/${slug}/posts?page=${n}`,
-                posts: [
-                  ...postsResult.data.map((post) => {
-                    const strippedMdText = removeMd(post.text);
-                    const twitterText =
-                      strippedMdText.length > 180
-                        ? strippedMdText.substring(0, 180) + "..."
-                        : strippedMdText;
-                    return {
-                      ...post,
-                      text_md: post.text,
-                      twitter_text: twitterText,
-                      text: mdConverter.makeHtml(post.text),
-                      details_md:
-                        post.type === "poll" ? post.details : undefined,
-                      details:
-                        post.type === "poll"
-                          ? mdConverter.makeHtml(post.details)
-                          : undefined,
-                      created_at_formatted: dateFmt(post.created_at),
-                    };
-                  }),
-                ],
-                links: {
-                  posts: `/dashboard/product/${slug}/posts`,
-                  settings: `/dashboard/product/${slug}/settings`,
-                  url: `/p/${slug}`,
-                },
-              });
-            });
-        });
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+// app.get("/dashboard/product/:slug/posts", authOnly, (req, res, next) => {
+//   const slug = req.params.slug;
+//   const page = getPageFromQuery(req.query);
+//   const productsActions = products.actions({ db, user: req.user });
+//   productsActions
+//     .getProductBySlug({ slug, user_id: req.user.id })
+//     .then((productResult) => {
+//       if (!productResult) {
+//         return res.status(404).render("404", {
+//           meta: {
+//             ...defaultMetas,
+//             title: "Page not found | Haptic",
+//             og: { ...defaultMetas.og, title: "Page not found | Haptic" },
+//           },
+//         });
+//       }
+//
+//       return posts
+//         .actions({ db, user: req.user })
+//         .getAllPosts(productResult.id, {
+//           withComments: true,
+//           paginationData: {
+//             ...posts.DEFAULT_PAGINATION_DATA,
+//             perPage: 5,
+//             currentPage: page,
+//           },
+//         })
+//         .then((postsResult) => {
+//           return db("product_tools")
+//             .where({ product_id: productResult.id })
+//             .then((toolsResult) => {
+//               const title = `Product | ${productResult.name} | Haptic`;
+//               const description = `Product dashboard - ${productResult.name}`;
+//               res.render("dashboard/product/posts", {
+//                 meta: {
+//                   ...defaultMetas,
+//                   title,
+//                   description,
+//                   og: {
+//                     ...defaultMetas.og,
+//                     title,
+//                     description,
+//                   },
+//                 },
+//                 product: { ...productResult },
+//                 tools: [...toolsResult],
+//                 pagination: postsResult.pagination,
+//                 createPaginationLink: (n) =>
+//                   `/dashboard/product/${slug}/posts?page=${n}`,
+//                 posts: [
+//                   ...postsResult.data.map((post) => {
+//                     const strippedMdText = removeMd(post.text);
+//                     const twitterText =
+//                       strippedMdText.length > 180
+//                         ? strippedMdText.substring(0, 180) + "..."
+//                         : strippedMdText;
+//                     return {
+//                       ...post,
+//                       text_md: post.text,
+//                       twitter_text: twitterText,
+//                       text: mdConverter.makeHtml(post.text),
+//                       details_md:
+//                         post.type === "poll" ? post.details : undefined,
+//                       details:
+//                         post.type === "poll"
+//                           ? mdConverter.makeHtml(post.details)
+//                           : undefined,
+//                       created_at_formatted: dateFmt(post.created_at),
+//                     };
+//                   }),
+//                 ],
+//                 links: {
+//                   posts: `/dashboard/product/${slug}/posts`,
+//                   settings: `/dashboard/product/${slug}/settings`,
+//                   url: `/p/${slug}`,
+//                 },
+//               });
+//             });
+//         });
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// });
 
 app.get(
   "/dashboard/product/:slug/settings",
@@ -1350,31 +1350,26 @@ app.get("/p/:slug", (req, res, next) => {
       }
 
       return boostsActions.getProductBoosts(result.id).then((boostsResult) => {
-        return db("product_tools")
-          .where({ product_id: result.id })
-          .then((productToolsResult) => {
-            res.render("product", {
-              meta: {
-                ...defaultMetas,
+          res.render("product", {
+            meta: {
+              ...defaultMetas,
+              title: `${result.name} | Haptic`,
+              description: result.description,
+              og: {
+                ...defaultMetas.og,
                 title: `${result.name} | Haptic`,
                 description: result.description,
-                og: {
-                  ...defaultMetas.og,
-                  title: `${result.name} | Haptic`,
-                  description: result.description,
-                },
               },
-              predefinedCovers,
-              product: { ...result },
-              page: page,
-              boosts: boostsResult,
-              tools: productToolsResult,
-              links: {
-                posts: `/dashboard/product/${slug}/posts`,
-                settings: `/dashboard/product/${slug}/settings`,
-                url: `/p/${slug}`,
-              },
-            });
+            },
+            predefinedCovers,
+            product: { ...result },
+            page: page,
+            boosts: boostsResult,
+            links: {
+              posts: `/dashboard/product/${slug}/posts`,
+              settings: `/dashboard/product/${slug}/settings`,
+              url: `/p/${slug}`,
+            },
           });
       });
     })

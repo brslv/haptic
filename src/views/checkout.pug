@@ -32,7 +32,7 @@ block main
     if user.type === USER_TYPES.CREATOR
       div(class="my-4 text-gray-500")
         p You're already a Creator.
-        a(href="/dashboard" class="underline hover:no-underline") Go to Dashboard
+        a(href="/dashboard" class="underline hover:no-underline") Go to your products page
 
     div(class="my-4 hidden text-center" data-checkout-success)
       div(class="p-4 bg-white shadow-md rounded-md")
@@ -41,7 +41,7 @@ block main
         p(class="mb-4") An email with details about your order is waiting in your inbox already. It's sent from FastSpring, our payments provider.
         p(class="mb-4") If you have any questions or comments, feel free to reach out - #[a(href="mailto:borislav@haptic.so" class="underline hover:no-underline") send me an email.] 
 
-        a(href="/dashboard" class="btn btn-primary text-center my-4 inline-block w-full") Go to Dashboard
+        a(href="/dashboard" class="btn btn-primary text-center my-4 inline-block w-full") Go to your products page
 
         hr(class="my-4")
 
