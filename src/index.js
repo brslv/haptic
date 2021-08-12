@@ -2149,7 +2149,6 @@ app.post(
         postsActions
           .updatePost(type, pid, data)
           .then((result) => {
-            console.log("update result", result);
             if (result) {
               // result = 1
               return res
