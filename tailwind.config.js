@@ -3,7 +3,7 @@ const colors = require("tailwindcss/colors");
 
 module.exports = {
   purge: {
-    content: ["./src/views/**/*.pug", "./src/js/**/*.js"],
+    content: ["./src/views/**/*.pug", "./src/js/**/*.js", "./src/js/**/*.jsx"],
     options: { safelist: ["turbo-progress-bar"] },
   },
   darkMode: "class",
