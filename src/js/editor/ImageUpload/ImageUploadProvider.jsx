@@ -57,7 +57,7 @@ export default function ImageUploadProvider({ children }) {
     if (freeSlots === 0) return tooManyImages(); // don't upload
     if (freeSlots < toBeUplCount) tooManyImages(); // upload the pickCount, but show that the limit is 5
 
-    const files = targetFiles.slice(0, pickCount).map((fileData, idx) => ({
+    const files = targetFiles.slice(0, pickCount).map((fileData) => ({
       id: generateId(),
       fileData,
     }));
@@ -203,8 +203,6 @@ export default function ImageUploadProvider({ children }) {
         statusses: newStatusses,
       };
 
-      console.log({ newState });
-
       return newState;
     });
   }
@@ -225,10 +223,6 @@ export default function ImageUploadProvider({ children }) {
       };
     });
   }
-
-  useEffect(() => {
-    console.log(state);
-  }, [state]);
 
   const value = {
     state,

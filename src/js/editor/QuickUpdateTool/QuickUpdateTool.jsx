@@ -23,7 +23,7 @@ export default function QuickUpdateTool({
     }
   }, [ref.current]);
 
-  const focusOnEditor = (e) => {
+  const focusOnEditor = () => {
     if (ref && ref.current) ref.current.focus();
   };
 
@@ -84,7 +84,7 @@ export default function QuickUpdateTool({
                 return (
                   // image preview
                   <div
-                    key={image.url}
+                    key={localImage.url}
                     style={{
                       height:
                         imagesLength > 1
@@ -102,7 +102,7 @@ export default function QuickUpdateTool({
                     <div className="flex items-center justify-center overflow-hidden relative rounded-md max-h-full">
                       <img
                         src={localImage.url}
-                        data-zoomable
+                        data-zoomable="data-zoomable"
                         alt={`Uploaded image by user`}
                         className={`flex-shrink-0 min-w-full min-h-full ${
                           progress.percentage < 100 && status.ok
@@ -154,6 +154,7 @@ export default function QuickUpdateTool({
           <div className="px-4 pt-8 pb-16 w-full">
             {!isPreviewing ? (
               <TextareaAutosize
+                ref={ref}
                 minRows={2}
                 value={text}
                 onChange={disabled ? () => {} : onChange}
@@ -204,7 +205,7 @@ export default function QuickUpdateTool({
 }
 
 function LoadingState() {
-  return <div className="text-center">Uploading...please, wait</div>;
+  return null;
 }
 
 function FailedUploadsMessage({ imagesState, onClose }) {
@@ -232,6 +233,7 @@ function FailedUploadsMessage({ imagesState, onClose }) {
                 src={image.url}
                 className="rounded-md m-1 border border-gray-200"
                 style={{ maxHeight: 80 }}
+                alt="Failed"
               />
             );
           })}

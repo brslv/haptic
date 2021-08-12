@@ -64,7 +64,7 @@ mixin post({ product_slug, product_name, post_id, post_text_md, post_twitter_tex
 
         div(class={"hidden":!img_url, "border rounded-md p-1.5 bg-white border-gray-200 w-full mb-4": true})
           img(data-image data-zoomable src=img_url alt="Main photo" class={"hidden": !img_url, "mx-auto cursor-pointer rounded-md": true} style="margin-top: 0; margin-bottom: 0;")
-        div(data-content="data-content")
+        div(data-content="data-content" class="mt-4")
           block
 
       div(class="flex items-center justify-between")

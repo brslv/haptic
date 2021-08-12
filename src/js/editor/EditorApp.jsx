@@ -1,11 +1,9 @@
 import React, {
-  useRef,
   useState,
   useReducer,
   useEffect,
   useCallback,
 } from "react";
-import { hasChosenProduct } from "./utils";
 import Select from "react-select";
 import { useImageUpload } from "./ImageUpload/ImageUploadProvider";
 import QuickUpdateTool from "./QuickUpdateTool";
@@ -17,10 +15,10 @@ const TOOLS = {
   POLL: "poll",
 };
 
-const toolsOptions = [
-  { value: TOOLS.QUICK_UPDATE, label: "Quick Update" },
-  { value: TOOLS.POLL, label: "Poll" },
-];
+// const toolsOptions = [
+//   { value: TOOLS.QUICK_UPDATE, label: "Quick Update" },
+//   { value: TOOLS.POLL, label: "Poll" },
+// ];
 
 function reducer(state, action) {
   switch (action.type) {
@@ -75,7 +73,7 @@ const initialState = {
 const isNum = (n) => !isNaN(Number(n));
 
 export default function EditorApp() {
-  const [outerState, setOuterState] = useState(window.state);
+  const [outerState] = useState(window.state);
   const [state, dispatch] = useReducer(reducer, initialState);
   const imageUpload = useImageUpload();
   const urlSearchParams = new URLSearchParams(window.location.search);
@@ -90,13 +88,13 @@ export default function EditorApp() {
     [dispatch]
   );
 
-  const onToolChange = (tool) => {
-    dispatch({ type: "select_tool", payload: tool });
-  };
+  // const onToolChange = (tool) => {
+  //   dispatch({ type: "select_tool", payload: tool });
+  // };
 
-  const onToolClose = () => {
-    dispatch({ type: "select_tool", payload: null });
-  };
+  // const onToolClose = () => {
+  //   dispatch({ type: "select_tool", payload: null });
+  // };
 
   // Set the chosen product to the first one
   useEffect(() => {
@@ -129,8 +127,6 @@ export default function EditorApp() {
         });
     }
   }, [editPostId, isEdit]);
-
-  useEffect(() => console.log({ state }), [state]);
 
   const productOptions = outerState.map((product) => ({
     value: product.id,

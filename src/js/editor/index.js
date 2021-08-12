@@ -14,7 +14,6 @@ function Boot() {
 }
 
 if (root) {
-  console.log("load react app");
   ReactDOM.render(<Boot />, root);
 }
 
@@ -22,7 +21,6 @@ document.addEventListener("turbo:load", () => {
   const root = document.querySelector("#react-editor");
 
   if (root) {
-    console.log("load react app");
     ReactDOM.render(<Boot />, root);
   }
 });
