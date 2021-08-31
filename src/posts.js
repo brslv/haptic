@@ -829,8 +829,8 @@ function actions({ db, user }) {
           })
           .then((images) => {
             if (data.images && !data.images.length && images && images.length) {
-              // no data is passed through the "data.image", but the post already has an image
-              // so remove it from the db
+              // no data is passed through the "data.image", but the post already has images
+              // so remove them from the db
               return db
                 .transacting(trx)
                 .table("images")
@@ -842,7 +842,7 @@ function actions({ db, user }) {
             }
 
             // update/add the image if any images are being passed through "data.image"
-            if (images && images.length) {
+            if (images && images.length && data.images && data.images.length) {
               // the post already has an image, so delete it all and add the new as new records
               return db
                 .transacting(trx)
@@ -866,7 +866,11 @@ function actions({ db, user }) {
                 .catch((err) => {
                   throw err;
                 });
-            } else {
+            } else if (
+              data.images &&
+              data.images.length &&
+              (!images || !images.length)
+            ) {
               // the post doesn't have any images, so add the image
               return db
                 .transacting(trx)
@@ -882,6 +886,14 @@ function actions({ db, user }) {
                 .catch((err) => {
                   throw err;
                 });
+            }
+
+            if (
+              !data.images ||
+              (!data.images.length && !images) ||
+              !images.length
+            ) {
+              trx.commit().then(() => res(true));
             }
           })
           .catch((err) => {

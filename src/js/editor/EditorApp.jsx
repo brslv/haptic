@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useReducer,
-  useEffect,
-  useCallback,
-} from "react";
+import React, { useState, useReducer, useEffect, useCallback } from "react";
 import Select from "react-select";
 import { useImageUpload } from "./ImageUpload/ImageUploadProvider";
 import QuickUpdateTool from "./QuickUpdateTool";
@@ -205,6 +200,8 @@ export default function EditorApp() {
       productId,
       csrf,
     };
+
+    console.log({ url, data });
 
     axios
       .post(url, data)
