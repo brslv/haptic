@@ -201,8 +201,6 @@ export default function EditorApp() {
       csrf,
     };
 
-    console.log({ url, data });
-
     axios
       .post(url, data)
       .then((response) => {
